@@ -7,7 +7,7 @@ body {
     height: 30px;
     display: flex;
     align-items: center;
-    background-color:rgb(26, 17, 10);
+    background-color: rgb(26, 17, 10);
     color: white;
     overflow: hidden;
 }
@@ -56,8 +56,7 @@ body {
 }
 
 #myTable {
-display: flex;
-height: 200px;
-background-color: brown;
+    height: 200px;
+    background-color: brown;
 
 }
