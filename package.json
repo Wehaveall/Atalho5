@@ -1,0 +1,16 @@
+{
+  "name": "atalho",
+  "version": "4.0.0",
+  "description": "",
+  "main": "__main__.py",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:python": "\"C:\\Python311\\python.exe\" E:\\Atalho\\__main__.py"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node": "^20.3.1"
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atalho</title>
+     <link rel="stylesheet" type="text/css" href="src/styles/style.css">
+     <script src="appfunctions.js"></script>
+</head>
+
+<body>
+
+
+  
+  <div id="titleBar" class = "pywebview-drag-region">
+
+    <span id = "icon"><img src="/src/images/atalho.png" alt=""></span>
+    <span id = "name">Atalho</span>
+
+
+    <div id="buttonContainer">
+      
+      <button id="minimize" onclick="pywebview.api.minimize_window()"><img src="/src/images/minimizeBtn_white.png" alt="Minimize"></button>
+
+      <button id="maxRestore" onclick="maximizeOrRestore()"><img src="/src/images/maxBtn_white.png" alt="Max/Restore"></button>
+
+      <button id="close" onclick="pywebview.api.close_window()"><img src="/src/images/closeBtn_White2.png" alt="Close"></button>
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+  <h2>Database Content</h2>
+
+<table id="myTable">
+  <tr>
+    <th>Shortcut</th>
+    <th>Expansion</th>
+    <th>Label</th>
+  </tr>
+  <!-- Rows will be injected here from the Python code -->
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+

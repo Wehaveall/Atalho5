@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humans not welcome</title>
+<script type="text/javascript">
+
+</script>
+</head>
+
+<body>
+    <p align="CENTER">
+ <font face="Arial" size="2">
+  TÍTULO I
+  <br>
+  DAS PESSOAS NATURAIS
+ </font>
+</p>
+<p align="CENTER">
+ <font face="Arial" size="2">
+  CAPÍTULO I
+  <br>
+  Da Personalidade e da Capacidade
+ </font>
+</p
+<div id="art2">
+ <p>
+  Art. 1
+  <sup> 
+    o
+  </sup>
+  Toda pessoa é capaz de direitos e deveres na ordem civil. Alterado pelo art. 34.
+ </p>
+ <p>
+  Art. 2
+  <sup>
+   <u>
+    o
+   </u>
+  </sup>
+  A personalidade civil da pessoa começa do nascimento com
+vida; mas a lei põe a salvo, desde a concepção, os direitos do nascituro.
+<p>
+    Terceiro
+</p>
+
+<script>
+
+    
+// Pegar o texto dos parágrafos - Primeiro Passo
+var elementos = document.getElementsByTagName('p');
+    const newArray = Array.from(elementos)
+    
+    newArray.forEach(function(element){
+
+        if (element.innerText.startsWith('Art. ')) {
+            element.innerText = element.innerText.replace('Art. ' ,'* Art. ');
+        }
+  
+        
+// Substituir os "o" por "º"    - Segundo passo     
+var artnum = 1
+
+while (artnum <= 9)
+{
+    if (element.innerText.startsWith('* Art. '+ artnum +  ' o')) {
+            element.innerText = element.innerText.replace('* Art. '+ artnum + ' o','* Art. ' + artnum + 'º');
+        }
+
+       // console.log (artnum)
+artnum++
+}
+
+
+    })
+
+
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
