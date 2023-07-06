@@ -56,17 +56,14 @@ body {
 }
 
 #myTable {
-    height: 200px;
-    background-color: brown;
+
+    background-color: rgb(158, 138, 138);
 }
 
-#myTable tr {
-    line-height: 1;
-
-    /* Adjust as needed */
-}
-
+#myTable th,
 #myTable td {
-    padding: 0px;
+    padding: 2px;
+    /* Adjust as needed */
+    line-height: 1.2;
     /* Adjust as needed */
 }
