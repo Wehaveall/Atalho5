@@ -58,5 +58,15 @@ body {
 #myTable {
     height: 200px;
     background-color: brown;
+}
 
+#myTable tr {
+    line-height: 1;
+
+    /* Adjust as needed */
+}
+
+#myTable td {
+    padding: 0px;
+    /* Adjust as needed */
 }

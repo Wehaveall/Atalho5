@@ -88,7 +88,7 @@ def start_app():
 
     # Create a new thread that waits for the window to be created and then calls inject_data
     def inject_data_after_delay():
-        time.sleep(2)  # wait for the window to be created
+        time.sleep(0.5)  # wait for the window to be created
         get_data_from_database()
         inject_data(webview_window)
 
