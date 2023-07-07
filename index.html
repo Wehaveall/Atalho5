@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -12,12 +13,14 @@
   <link rel="stylesheet" type="text/css" href="src/styles/leftPanel.css">
 
   <script src="appfunctions.js"></script>
+
+
+
 </head>
 
 <body>
 
-
-
+  <!-- ----------------------Title Bar-------------------- -->
   <div id="titleBar" class="pywebview-drag-region">
     <span id="icon"><img src="/src/images/atalho.png" alt=""></span>
     <span id="name">Atalho</span>
@@ -33,31 +36,55 @@
 
   </div>
 
+  <!-- --------------------------------Borders-------------------------------- -->
+
+  <div class="border border-left"></div>
+  <div class="border border-right"></div>
+  <div class="border border-top"></div>
+  <div class="border border-bottom"></div>
+  <div class="border border-bottom-left"></div>
+  <div class="border border-bottom-right"></div>
+  <div class="border border-middle-right"></div>
+  <!-- ------------------------------------------------------------------------- -->
 
 
 
+  <div id="content">
+    <div id="leftPanel">
 
-  <div id="leftPanel">
-    <table id="myTable">
-      <tr>
-        <th>Shortcut</th>
-        <th>Expansion</th>
-        <th>Label</th>
-      </tr>
-      <!-- Rows will be injected here from the Python code -->
-    </table>
+      <h2 id="upperTable">
+
+      </h2>
+
+
+      <table id="myTable">
+        <tr>
+          <th>Shortcut</th>
+          <th>Expansion</th>
+          <th>Label</th>
+        </tr>
+        <!-- Rows will be injected here from the Python code -->
+      </table>
+
+    </div>
 
   </div>
 
 
 
 
+  <script>
 
+
+
+  </script>
 
 
 
 
 
 </body>
+
+
 
 </html>

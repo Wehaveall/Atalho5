@@ -1,10 +1,17 @@
+document.addEventListener('DOMContentLoaded', function () {
+  let isMouseDown = false;
+  let isResizing = false;
 
-document.addEventListener('DOMContentLoaded', (event) => {
+  // Function to check if the target element is a table row
+  function isTableRow(element) {
+    return element && element.nodeName === 'TR';
+  }
+
+  // Add click event listener to the table to handle row selection
   var table = document.getElementById('myTable');
-
   table.onclick = function (event) {
     var target = event.target;
-    while (target && target.nodeName !== "TR") {
+    while (target && !isTableRow(target)) {
       target = target.parentNode;
     }
     if (!target) { return; }
@@ -15,22 +22,50 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     target.classList.add('selected');
-  }
+  };
+
+  document.addEventListener('mousedown', function () {
+    isMouseDown = true;
+  });
+
+  document.addEventListener('mouseup', function () {
+    isMouseDown = false;
+    if (isResizing) {
+      pywebview.api.stop_resizing();
+      isResizing = false;
+    }
+    document.body.style.cursor = 'default';
+  });
+
+  const borders = document.querySelectorAll('.border');
+  borders.forEach(border => {
+    border.addEventListener('mousemove', function (e) {
+      if (isMouseDown) {
+        const rect = border.getBoundingClientRect();
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        const margin = 5; // Adjust the margin as needed
+
+        if (
+          mouseX <= rect.left + margin ||
+          mouseX >= rect.right - margin ||
+          mouseY <= rect.top + margin ||
+          mouseY >= rect.bottom - margin
+        ) {
+          document.body.style.cursor = 'nwse-resize';
+          if (!isResizing) {
+            pywebview.api.start_resizing();
+            isResizing = true;
+          }
+        } else {
+          document.body.style.cursor = 'default';
+          if (isResizing) {
+            pywebview.api.stop_resizing();
+            isResizing = false;
+          }
+        }
+      }
+    });
+  });
 });
 
-
-
-
-
-function maximizeOrRestore() {
-
-  var button = document.getElementById("maxRestore");  // get the button
-  var icon = button.getElementsByTagName('img')[0];  // get the img element in the button
-  // check the current icon and change it
-  if (icon.src.includes("maxBtn_white")) {
-    icon.src = "/src/images/restoreBtn_white.png";  // change to restore icon
-  } else {
-    icon.src = "/src/images/maxBtn_white.png";  // change back to maximize icon
-  }
-  pywebview.api.maximize_or_restore_window();  // Let Python handle the maximizing/restoring
-}
