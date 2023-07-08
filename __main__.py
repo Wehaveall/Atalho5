@@ -78,9 +78,15 @@ class Api:
         if window:
             if self.is_maximized:
                 window.restore()
+                self.window.evaluate_js(
+                    'document.getElementById("maxRestore").children[0].src="/src/images/maxBtn_white.png"'
+                )
             else:
                 window.maximize()
-            self.is_maximized = not self.is_maximized
+                self.window.evaluate_js(
+                    'document.getElementById("maxRestore").children[0].src="/src/images/restoreBtn_white.png"'
+                )
+                self.is_maximized = not self.is_maximized
 
     def create_and_position_window(self):
         monitor = get_monitors()[0]
@@ -156,6 +162,7 @@ class Api:
 
 def get_window():
     windows = gw.getWindowsWithTitle(WINDOW_TITLE)
+    print(f"Found window: {windows}")
     return windows[0] if windows else None
 
 
