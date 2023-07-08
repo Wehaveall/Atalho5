@@ -2,28 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
   let isResizing = false;
 
-  // Function to check if the target element is a table row
-  function isTableRow(element) {
-    return element && element.nodeName === 'TR';
-  }
-
-  // Add click event listener to the table to handle row selection
-  var table = document.getElementById('myTable');
-  table.onclick = function (event) {
-    var target = event.target;
-    while (target && !isTableRow(target)) {
-      target = target.parentNode;
-    }
-    if (!target) { return; }
-
-    var selected = table.querySelector('.selected');
-    if (selected) {
-      selected.classList.remove('selected');
-    }
-
-    target.classList.add('selected');
-  };
-
   document.addEventListener('mousedown', function () {
     isMouseDown = true;
   });
@@ -37,38 +15,36 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.style.cursor = 'default';
   });
 
-  const borders = document.querySelectorAll('.border');
-  borders.forEach(border => {
-    border.addEventListener('mousemove', function (e) {
-      if (isMouseDown) {
-        const rect = border.getBoundingClientRect();
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-        const margin = 5; // Adjust the margin as needed
+  const contentWrapper = document.querySelector('#content-wrapper');
+  const margin = 10; // Adjust the margin as needed
 
-        if (
-          mouseX <= rect.left + margin ||
-          mouseX >= rect.right - margin ||
-          mouseY <= rect.top + margin ||
-          mouseY >= rect.bottom - margin
-        ) {
-          document.body.style.cursor = 'nwse-resize';
-          if (!isResizing) {
-            pywebview.api.start_resizing();
-            isResizing = true;
-          }
-        } else {
-          document.body.style.cursor = 'default';
-          if (isResizing) {
-            pywebview.api.stop_resizing();
-            isResizing = false;
-          }
-        }
+  contentWrapper.addEventListener('mousemove', function (e) {
+    const rect = contentWrapper.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    if (
+      mouseX <= rect.left + margin ||
+      mouseX >= rect.right - margin ||
+      mouseY <= rect.top + margin ||
+      mouseY >= rect.bottom - margin
+    ) {
+      document.body.style.cursor = 'nwse-resize';
+      if (isMouseDown && !isResizing) {
+        pywebview.api.start_resizing();
+        isResizing = true;
       }
-    });
+    } else {
+      document.body.style.cursor = 'default';
+      if (isResizing) {
+        pywebview.api.stop_resizing();
+        isResizing = false;
+      }
+    }
   });
 });
 
+// Rest of your code...
 
 
 /////////////////////////////////////////////////////// LEFT PANEL
@@ -92,4 +68,3 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
   }
 });
-

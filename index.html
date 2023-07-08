@@ -23,78 +23,111 @@
 
 <body>
 
-  <!-- ----------------------Title Bar-------------------- -->
-  <div id="titleBar" class="pywebview-drag-region">
-    <span id="icon"><img src="/src/images/atalho.png" alt=""></span>
-    <span id="name">Atalho</span>
-
-    <div id="buttonContainer">
-      <button id="minimize" onclick="pywebview.api.minimize_window()"><img src="/src/images/minimizeBtn_white.png"
-          alt="Minimize"></button>
-      <button id="maxRestore" onclick="pywebview.api.maximize_or_restore_window()"><img
-          src="/src/images/maxBtn_white.png" alt="Max/Restore"></button>
-      <button id="close" onclick="pywebview.api.close_window()"><img src="/src/images/closeBtn_White2.png"
-          alt="Close"></button>
-    </div>
-
-  </div>
-
   <!-- --------------------------------Borders-------------------------------- -->
 
-  <div class="border border-left"></div>
-  <div class="border border-right"></div>
-  <div class="border border-top"></div>
-  <div class="border border-bottom"></div>
-  <div class="border border-bottom-left"></div>
-  <div class="border border-bottom-right"></div>
-  <div class="border border-middle-right"></div>
+
+
   <!-- ------------------------------------------------------------------------- -->
 
 
-  <!-- --------------------Content------------------------------ -->
-  <div id="content">
 
 
 
-    <div id="leftPanel">
+  <div id="edge-detection">
 
-      <button class="collapsible"><span class="arrow"> ► </span> Cars</button>
+    <div id="content-wrapper">
 
 
-      <div class="listing">
-        <p>Volvo</p>
-        <p>Saab</p>
-        <p>Mercedes</p>
-        <p>Audi</p>
+
+      <!-- ----------------------Title Bar-------------------- -->
+      <div id="titleBar" class="pywebview-drag-region">
+        <span id="icon"><img src="/src/images/atalho.png" alt=""></span>
+        <span id="name">Atalho</span>
+
+        <div id="buttonContainer">
+          <button id="minimize" onclick="pywebview.api.minimize_window()"><img src="/src/images/minimizeBtn_white.png"
+              alt="Minimize"></button>
+          <button id="maxRestore" onclick="pywebview.api.maximize_or_restore_window()"><img
+              src="/src/images/maxBtn_white.png" alt="Max/Restore"></button>
+          <button id="close" onclick="pywebview.api.close_window()"><img src="/src/images/closeBtn_White2.png"
+              alt="Close"></button>
+        </div>
+
       </div>
 
 
 
+
+
+
+
+
+
+
+
+
+      <!-- --------------------Content------------------------------ -->
+      <div id="content">
+
+
+
+        <div id="leftPanel">
+
+          <button class="collapsible"><span class="arrow"> ► </span> Cars</button>
+
+
+          <div class="listing">
+            <p>Volvo</p>
+            <p>Saab</p>
+            <p>Mercedes</p>
+            <p>Audi</p>
+          </div>
+
+
+
+        </div>
+
+
+
+
+        <div id="middlePanel">
+
+          <h2 id="upperTable">
+
+          </h2>
+
+
+          <table id="myTable">
+            <tr>
+              <th>Shortcut</th>
+              <th>Expansion</th>
+              <th>Label</th>
+            </tr>
+            <!-- Rows will be injected here from the Python code -->
+          </table>
+
+        </div>
+
+
+
+
+
+
+      </div>
+      <!-- End of Content -->
+
+      
+      <div id=bottomPanel>
+      </div>
+
+
+
+
     </div>
 
-
-
-
-    <div id="middlePanel">
-
-      <h2 id="upperTable">
-
-      </h2>
-
-
-      <table id="myTable">
-        <tr>
-          <th>Shortcut</th>
-          <th>Expansion</th>
-          <th>Label</th>
-        </tr>
-        <!-- Rows will be injected here from the Python code -->
-      </table>
-
-    </div>
-
+    <!-- Content wrapper -->
   </div>
-
+  <!-- Edge detection -->
 
 
 

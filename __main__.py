@@ -102,6 +102,7 @@ class Api:
             resizable=True,
             js_api=self,
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
+            
         )
 
         # Wait a short moment for the window to be created
