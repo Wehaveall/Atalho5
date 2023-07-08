@@ -3,3 +3,8 @@ body {
     height: 100%;
     overflow: hidden;
 }
+
+#content {
+    display: flex;
+    justify-content: flex-start;
+  }

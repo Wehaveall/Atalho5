@@ -1,0 +1,41 @@
+#middlePanel {
+    background-color: rgb(158, 138, 138);
+    height: 80vh;
+    width: 26vw;
+    margin: 0px;
+    padding: 0px;
+    flex: 2; /* adjust this as needed */
+
+}
+
+#myTable {
+    background-color: rgb(158, 138, 138);
+    /* height: 80vh; */
+    /* 50% of the viewport's height */
+    width: 25vw;
+    /* Não sei pq é um a menos do que o parent quando está minimizado */
+    overflow: auto;
+    /* this will add scrollbars if the content exceeds the height or width */
+}
+
+
+#myTable th,
+#myTable td {
+    padding: 2px;
+    /* Adjust as needed */
+    line-height: 1.2;
+    /* Adjust as needed */
+}
+
+#myTable tr {
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+    /* Adjust line height as needed */
+}
+
+
+
+#myTable tr.selected {
+    background-color: #317a7c;
+}
