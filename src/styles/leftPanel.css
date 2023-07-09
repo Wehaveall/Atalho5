@@ -49,5 +49,7 @@ input[type=text] {
 
 input[type="text"]:focus {
     border: 2px solid rgb(232, 159, 15);
+    /* outline:remover a borda padrão preta, senão não adianta setar cor */
     outline: none;
+
 }
