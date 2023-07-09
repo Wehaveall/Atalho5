@@ -1,8 +1,7 @@
 #leftPanel {
-    /* your styles here */
-    flex: 1;
-    /* adjust this as needed */
-    background-color: transparent;
+    width: 30%;
+    /* adjust as needed */
+
 }
 
 .collapsible {

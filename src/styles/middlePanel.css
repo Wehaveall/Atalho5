@@ -1,13 +1,12 @@
 #middlePanel {
-    background-color: rgb(158, 138, 138);
-    height: 80vh;
-    width: 26vw;
-    margin: 0px;
-    padding: 0px;
-    flex: 2;
-    /* adjust this as needed */
+    margin: 0;
+    padding: 0;
+    align-self: flex-start;
+    width: 70%;
+    /* adjust as needed */
 
 }
+
 
 #myTable {
     background-color: rgb(158, 138, 138);

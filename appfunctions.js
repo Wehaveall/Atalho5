@@ -23,26 +23,33 @@ document.addEventListener('DOMContentLoaded', function () {
     const mouseX = e.clientX;
     const mouseY = e.clientY;
 
-    if (
-      mouseX <= rect.left + margin ||
-      mouseX >= rect.right - margin ||
-      mouseY <= rect.top + margin ||
-      mouseY >= rect.bottom - margin
-    ) {
-      document.body.style.cursor = 'nwse-resize';
+    // Calculate distances to all four borders
+    const distTop = Math.abs(mouseY - rect.top);
+    const distBottom = Math.abs(mouseY - rect.bottom);
+    const distLeft = Math.abs(mouseX - rect.left);
+    const distRight = Math.abs(mouseX - rect.right);
+
+    // Determine the smallest distance
+    const minDist = Math.min(distTop, distBottom, distLeft, distRight);
+
+    if (minDist <= margin) {
+      if (minDist === distLeft || minDist === distRight) {
+        // Closer to left or right border
+        document.body.style.cursor = 'w-resize';
+      } else {
+        // Closer to top or bottom border
+        document.body.style.cursor = 'n-resize';
+      }
       if (isMouseDown && !isResizing) {
         pywebview.api.start_resizing();
         isResizing = true;
       }
     } else {
       document.body.style.cursor = 'default';
-      if (isResizing) {
-        pywebview.api.stop_resizing();
-        isResizing = false;
-      }
     }
   });
 });
+
 
 // Rest of your code...
 

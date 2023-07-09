@@ -102,7 +102,6 @@ class Api:
             resizable=True,
             js_api=self,
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
-            
         )
 
         # Wait a short moment for the window to be created
@@ -163,7 +162,7 @@ class Api:
 
 def get_window():
     windows = gw.getWindowsWithTitle(WINDOW_TITLE)
-    print(f"Found window: {windows}")
+    # print(f"Found window: {windows}")
     return windows[0] if windows else None
 
 
