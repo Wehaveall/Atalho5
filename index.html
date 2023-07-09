@@ -6,13 +6,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap" rel="stylesheet">
+
+
+
+
   <title>Atalho</title>
 
   <link rel="stylesheet" type="text/css" href="src/styles/style.css">
   <link rel="stylesheet" type="text/css" href="src/styles/titleBar.css">
   <link rel="stylesheet" type="text/css" href="src/styles/leftPanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/middlePanel.css">
-  <link rel="stylesheet" type="text/css" href="src/styles/borders.css">
+  <link rel="stylesheet" type="text/css" href="src/styles/rightPanel.css">
+  <link rel="stylesheet" type="text/css" href="src/styles/tabs.css">
 
 
   <script src="appfunctions.js"></script>
@@ -23,20 +32,20 @@
 
 <body>
 
-  <!-- --------------------------------Borders-------------------------------- -->
-
-
-
-  <!-- ------------------------------------------------------------------------- -->
 
 
 
 
 
+
+
+
+
+  <!-- --------------------------------Edge Detection - Content Wrapper-------------------------------- -->
   <div id="edge-detection">
 
     <div id="content-wrapper">
-
+      <!-- ------------------------------------------------------------------------- -->
 
 
       <!-- ----------------------Title Bar-------------------- -->
@@ -56,74 +65,139 @@
       </div>
 
 
+      <!-- ////////////////////////TABS ////////////////////////// -->
 
 
 
+      <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Tab1')">Principal</button>
+        <button class="tablinks" onclick="openTab(event, 'Tab2')">Configurações</button>
+        <button class="tablinks" onclick="openTab(event, 'Tab3')">Rascunho</button>
+        <button class="tablinks" onclick="openTab(event, 'Tab4')">Ajuda</button>
+      </div>
+
+      <div id="Tab1" class="tabcontent">
+        <!-- Your existing div "content" goes here -->
 
 
 
+        <!-- --------------------Content------------------------------ -->
+        <div class="content">
 
 
 
+          <div id="leftPanel">
 
-      <!-- --------------------Content------------------------------ -->
-      <div class="content">
-
-
-
-        <div id="leftPanel">
-
-          <button class="collapsible"><span class="arrow"> ► </span> Cars</button>
+            <button class="collapsible"><span class="arrow"> ► </span> Cars</button>
 
 
-          <div class="listing">
-            <p>Volvo</p>
-            <p>Saab</p>
-            <p>Mercedes</p>
-            <p>Audi</p>
+            <div class="listing">
+              <p>Volvo</p>
+              <p>Saab</p>
+              <p>Mercedes</p>
+              <p>Audi</p>
+            </div>
+
+          </div>
+
+
+          <div id="middlePanel">
+
+
+            <table id="myTable">
+              <tr>
+                <th>Shortcut</th>
+                <th>Expansion</th>
+                <th>Label</th>
+              </tr>
+              <!-- Rows will be injected here from the Python code -->
+            </table>
+
           </div>
 
 
 
+
+
+          <div id="rightPanel">
+
+            teste
+
+
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
-
-
-
-
-        <div id="middlePanel">
-
-
-
-
-          <table id="myTable">
-            <tr>
-              <th>Shortcut</th>
-              <th>Expansion</th>
-              <th>Label</th>
-            </tr>
-            <!-- Rows will be injected here from the Python code -->
-          </table>
-
-        </div>
+        <!-- End of Content -->
 
 
 
 
 
+        <!-- Existing content -->
+      </div>
+
+      <div id="Tab2" class="tabcontent">
+        <!-- Tab2 content goes here -->
+      </div>
+
+      <div id="Tab3" class="tabcontent">
+        <!-- Tab3 content goes here -->
+      </div>
+
+      <div id="Tab4" class="tabcontent">
 
       </div>
-      <!-- End of Content -->
-
-
-
-      <div id=bottomPanel>
-      </div>
-
-
-
     </div>
 
-    <!-- Content wrapper -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id=bottomPanel>
+    </div>
+
+
+
+  </div>
+
+  <!-- Content wrapper -->
   </div>
   <!-- Edge detection -->
 

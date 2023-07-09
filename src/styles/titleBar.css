@@ -1,9 +1,10 @@
 #titleBar {
-    
+
     height: 30px;
     display: flex;
     align-items: center;
     background-color: rgb(26, 17, 10);
+    font-family: 'Work Sans', sans-serif;
     color: white;
     overflow: hidden;
 }

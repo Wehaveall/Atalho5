@@ -75,3 +75,35 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
   }
 });
+
+
+
+
+
+function openTab(evt, tabName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+
+
+//Stop event propagation
+document.getElementById("content").addEventListener("click", function (event) {
+  event.stopPropagation();
+}, false);
+
+var collapsibles = document.getElementsByClassName("content");
+for (var i = 0; i < collapsibles.length; i++) {
+  collapsibles[i].addEventListener("click", function (event) {
+    event.stopPropagation();
+  }, false);
+}

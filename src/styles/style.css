@@ -1,34 +1,37 @@
-body, 
+body,
 
 html {
-    height: 100%;
-    margin: 0;
-  }
+  height: 100%;
+  margin: 0;
+}
 
 
 #edge-detection {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 #content-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 
 .content {
-    flex-grow: 1;  /* expand to take up remaining space */
-    display: flex; /* align child elements in a row */
-    width: 100%;   /* take up full width */
-  }
+  /* flex-grow: 1; */
+  /* expand to take up remaining space */
+  display: flex;
+  /* align child elements in a row */
+  width: 100%;
+  /* take up full width */
+}
 
 
 #bottomPanel {
-    background-color: blue;
-    height: 50px;
-    /* fixed height of 50px */
-    width: 100%;
-    /* take up full width */
+  background-color: blue;
+  height: 50px;
+  /* fixed height of 50px */
+  width: 100%;
+  /* take up full width */
 }
