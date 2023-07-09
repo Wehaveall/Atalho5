@@ -42,9 +42,11 @@ input[type=text] {
     background-color: white;
     padding: 6px;
     margin-top: 10px;
-    border: 2px salmon;
     border-radius: 10px;
     font-size: 12px;
+    border: 2px solid #ccc;
+    /* border color when not in focus */
+    box-sizing: border-box;
 }
 
 input[type="text"]:focus {
