@@ -1,11 +1,13 @@
 #leftPanel {
+    background-color: #ccc;
     width: 20%;
+    margin-top: 5px #ccc;
     /* adjust as needed */
 
 }
 
 .collapsible {
-    background-color: #777;
+    background-color: #ccc;
     color: white;
     cursor: pointer;
     padding: 18px;
@@ -33,4 +35,19 @@
 .arrow-right,
 .arrow-down {
     margin-right: 5px;
+}
+
+
+input[type=text] {
+    background-color: white;
+    padding: 6px;
+    margin-top: 10px;
+    border: 2px salmon;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+input[type="text"]:focus {
+    border: 2px solid rgb(232, 159, 15);
+    outline: none;
 }
