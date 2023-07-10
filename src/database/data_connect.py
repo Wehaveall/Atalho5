@@ -5,7 +5,7 @@ import json
 
 def create_db():
     # Connect to SQLite database (or create it if it doesn't exist)
-    conn = sqlite3.connect("my_database.db")
+    conn = sqlite3.connect("./src/database/groups/geral.db")
 
     # Create a cursor object
     c = conn.cursor()
@@ -31,7 +31,7 @@ def insert_into_db(shortcut, expansion, label):
     if len(label) > 40:
         raise ValueError("Label exceeds 40 characters limit.")
 
-    conn = sqlite3.connect("my_database.db")
+    conn = sqlite3.connect("./src/database/groups/geral.db")
     c = conn.cursor()
 
     # Insert a row of data
@@ -46,7 +46,7 @@ def insert_into_db(shortcut, expansion, label):
 
 def get_data_from_database():
     # Connect to SQLite database
-    conn = sqlite3.connect("my_database.db")
+    conn = sqlite3.connect("./src/database/groups/geral.db")
 
     # Create a cursor object
     c = conn.cursor()
