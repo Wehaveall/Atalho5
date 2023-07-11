@@ -2,10 +2,29 @@ import sqlite3
 import webview
 import json
 
+# for the colapsible
+import os
+import glob
+
+
+def process_all_databases():
+    db_files = get_db_files_in_directory(get_database_path())
+    for db_file in db_files:
+        conn = sqlite3.connect(db_file)
+        # Now you can use the 'conn' object to execute queries on the specific database.
+        # ...
+        conn.close()
+
+
+def get_database_path(db_name):
+    base_dir = os.path.dirname(__file__)
+    db_path = os.path.join(base_dir, "./src/database/groups/", db_name)
+    return db_path
+
 
 def create_db():
     # Connect to SQLite database (or create it if it doesn't exist)
-    conn = sqlite3.connect("./src/database/groups/geral.db")
+    conn = sqlite3.connect(get_database_path())
 
     # Create a cursor object
     c = conn.cursor()
@@ -31,7 +50,7 @@ def insert_into_db(shortcut, expansion, label):
     if len(label) > 40:
         raise ValueError("Label exceeds 40 characters limit.")
 
-    conn = sqlite3.connect("./src/database/groups/geral.db")
+    conn = sqlite3.connect(get_database_path())
     c = conn.cursor()
 
     # Insert a row of data
@@ -46,7 +65,7 @@ def insert_into_db(shortcut, expansion, label):
 
 def get_data_from_database():
     # Connect to SQLite database
-    conn = sqlite3.connect("./src/database/groups/geral.db")
+    conn = sqlite3.connect(get_database_path())
 
     # Create a cursor object
     c = conn.cursor()
@@ -64,13 +83,33 @@ def get_data_from_database():
 
 
 def inject_data(window):
-    data = get_data_from_database()
+    # Get all subdirectories in ./src/database/groups/
+    subdirectories = [
+        f.path for f in os.scandir("./src/database/groups/") if f.is_dir()
+    ]
 
-    for row in data:
-        row_html = "<tr><td>{}</td><td>{}</td><td>{}</td></tr>".format(*row)
-        encoded_html = json.dumps(row_html)  # This will escape any special characters
-        window.evaluate_js(
-            'document.getElementById("myTable").insertAdjacentHTML("beforeend", {});'.format(
-                encoded_html
+    for subdirectory in subdirectories:
+        db_files = get_db_files_in_directory(subdirectory)
+        encoded_directory = json.dumps(os.path.basename(subdirectory))
+
+        for db_file in db_files:
+            # Create a new listing item for each .db file
+            encoded_db_file = json.dumps(db_file)
+            window.evaluate_js(
+                f"createCollapsible({encoded_directory}, {encoded_db_file});"
             )
-        )
+
+
+# Get the db files
+def get_db_files_in_directory(directory):
+    # Check if directory exists
+    if not os.path.exists(directory):
+        raise ValueError(f"Directory '{directory}' does not exist.")
+
+    # Get all .db files in the directory
+    db_files = glob.glob(os.path.join(directory, "*.db"))
+
+    # Extract the base name (file name) for each .db file
+    db_file_names = [os.path.basename(db_file) for db_file in db_files]
+
+    return db_file_names

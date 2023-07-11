@@ -73,22 +73,6 @@ class Api:
         if window:
             window.minimize()
 
-    # ////Problems resolution with maximize restore when an internal element was clicked - Event propagation
-
-    # It seems like you're trying to manage the state of your window (whether it's maximized or not) manually.
-    # The problem might be that the internal state of the window and your is_maximized variable get out of sync.
-    # The method maximize_or_restore_window in your Api class changes the is_maximized variable and calls
-    # window.maximize() or window.restore() based on its current state. However, there might be cases when the
-    # window state changes without your method being called. For example,
-    # the user might restore the window by double-clicking on the title bar or using a system shortcut.
-    # In such cases, your is_maximized variable would still indicate that the window
-    # is maximized, while it's actually not, hence you can't maximize it again.
-
-    # To solve this issue, instead of keeping your own is_maximized state,
-    # you can check the window's actual state. Unfortunately,
-    # pywebview does not provide an explicit API to check if a window is maximized or not.
-    # But as a workaround, you can compare the window's current size with the size of the screen. Here is an example:
-
     def maximize_or_restore_window(self):
         window = get_window()
         if window:
@@ -133,6 +117,12 @@ class Api:
         window = get_window()
         if window:
             window.moveTo(pos_x, pos_y)
+
+        threading.Thread(target=self.call_load_handler_after_delay).start()
+
+    def call_load_handler_after_delay(self):
+        time.sleep(0.5)  # wait for the window to be ready
+        load_handler(self.window)
 
     # Handle Window Resize
     def start_resizing(self):
@@ -184,22 +174,16 @@ class Api:
 
 def get_window():
     windows = gw.getWindowsWithTitle(WINDOW_TITLE)
-    # print(f"Found window: {windows}")
     return windows[0] if windows else None
+
+
+def load_handler(window):
+    inject_data(window)
 
 
 def start_app():
     api = Api()
     api.create_and_position_window()
-
-    # Create a new thread that waits for the window to be created and then calls inject_data
-    def inject_data_after_delay():
-        time.sleep(0.5)  # wait for the window to be created
-        get_data_from_database()
-        inject_data(api.window)
-
-    threading.Thread(target=inject_data_after_delay).start()
-
     webview.start()
 
 

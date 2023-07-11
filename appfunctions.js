@@ -107,3 +107,56 @@ for (var i = 0; i < collapsibles.length; i++) {
     event.stopPropagation();
   }, false);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createCollapsible(directory, file) {
+  console.log("Creating collapsible for directory: " + directory + " and file: " + file);
+  var leftPanel = document.getElementById('leftPanel');
+
+  // Create the button for the collapsible
+  var collapsibleButton = document.createElement('button');
+  collapsibleButton.className = 'collapsible';
+  collapsibleButton.innerHTML = directory;
+  leftPanel.appendChild(collapsibleButton);
+
+  // Create the content for the collapsible
+  var collapsibleContent = document.createElement('div');
+  collapsibleContent.className = 'content';
+  collapsibleContent.innerHTML = '<p>' + file + '</p>';
+  leftPanel.appendChild(collapsibleContent);
+
+  // Add the click event to the collapsible button
+  collapsibleButton.addEventListener('click', function () {
+    this.classList.toggle('active');
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
