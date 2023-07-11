@@ -67,6 +67,9 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
+
+
+    #-----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
     def loadState(self, directory):
         # In the loadState method, if state.json does not exist,
         # the method will return "none". This is done using:
@@ -77,6 +80,9 @@ class Api:
         with open("state.json", "r") as file:
             data = json.load(file)
             return data.get(directory, "none")
+
+
+    #-----------------------Por enquanto, salvando o state do collapsible	Left Panel - state.json
 
     def saveState(self, directory, state):
         # In the saveState method, if state.json does not exist, a new dictionary
@@ -92,17 +98,25 @@ class Api:
         with open("state.json", "w") as file:
             json.dump(data, file)
 
+    
+    
+    
+    #------------------------------------------Fechar Janela
     def close_window(self):
         self.is_window_open = False
         if webview.windows:
             self.window.destroy()
             listener.stop_keyboard_listener(listener_instance, pynput_listener)
 
+    #----------------------------------------Minimizar Janela
     def minimize_window(self):
         window = get_window()
         if window:
             window.minimize()
 
+    
+    
+    #-----------------------------------------Maximizar, Restaura Janela
     def maximize_or_restore_window(self):
         window = get_window()
         if window:
@@ -123,6 +137,9 @@ class Api:
                 self.window.evaluate_js(
                     'document.getElementById("maxRestore").children[0].src="/src/images/maxBtn_white.png"'
                 )
+
+
+    #----------------------------Criar e posicionar janela
 
     def create_and_position_window(self):
         monitor = get_monitors()[0]
