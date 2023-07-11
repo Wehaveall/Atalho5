@@ -68,6 +68,9 @@ class Api:
         self.is_resizing = False  # Add a state variable for resizing
 
     def loadState(self, directory):
+        # In the loadState method, if state.json does not exist,
+        # the method will return "none". This is done using:
+
         if not os.path.exists("state.json"):
             return "none"
 
@@ -76,6 +79,9 @@ class Api:
             return data.get(directory, "none")
 
     def saveState(self, directory, state):
+        # In the saveState method, if state.json does not exist, a new dictionary
+        #  is created to store the data. This is done using:
+
         if not os.path.exists("state.json"):
             data = {}
         else:
