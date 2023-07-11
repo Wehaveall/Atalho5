@@ -1,3 +1,6 @@
+// RESIZING FUNCTION
+
+
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
   let isResizing = false;
@@ -54,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Rest of your code...
 
 
-/////////////////////////////////////////////////////// LEFT PANEL
+///////////////////////////////////////////////////////////// LEFT PANEL
 
 document.addEventListener('DOMContentLoaded', (event) => {
   var coll = document.getElementsByClassName("collapsible");
@@ -117,7 +120,7 @@ for (var i = 0; i < collapsibles.length; i++) {
 
 
 
-
+//////////////////////////////////////////////////////////////////Create Collapsible
 
 
 function createCollapsible(directory, file) {
