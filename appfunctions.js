@@ -1,3 +1,5 @@
+
+
 // RESIZING FUNCTION
 
 
@@ -123,7 +125,9 @@ for (var i = 0; i < collapsibles.length; i++) {
 //////////////////////////////////////////////////////////////////Create Collapsible
 
 
-function createCollapsible(directory, file) {
+
+
+async function createCollapsible(directory, file) {
   console.log("Creating collapsible for directory: " + directory + " and file: " + file);
   var leftPanel = document.getElementById('leftPanel');
 
@@ -139,20 +143,28 @@ function createCollapsible(directory, file) {
   collapsibleContent.innerHTML = '<p>' + file + '</p>';
   leftPanel.appendChild(collapsibleContent);
 
+  // Load state from Python API
+  var storedState = await window.pywebview.api.loadState(directory);
+  if (storedState === "block") {
+    collapsibleContent.style.display = "block";
+    collapsibleButton.classList.add('active');
+  } else {
+    collapsibleContent.style.display = "none";
+  }
+
   // Add the click event to the collapsible button
-  collapsibleButton.addEventListener('click', function () {
+  collapsibleButton.addEventListener('click', async function () {
     this.classList.toggle('active');
     var content = this.nextElementSibling;
     if (content.style.display === "block") {
       content.style.display = "none";
+      await window.pywebview.api.saveState(directory, "none");
     } else {
       content.style.display = "block";
+      await window.pywebview.api.saveState(directory, "block");
     }
   });
 }
-
-
-
 
 
 

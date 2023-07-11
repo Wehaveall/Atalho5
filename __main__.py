@@ -8,6 +8,7 @@ from screeninfo import get_monitors
 import listener  # import listener.py
 from listener import KeyListener
 
+
 # Import database
 from src.database.data_connect import (
     create_db,
@@ -17,6 +18,10 @@ from src.database.data_connect import (
 )
 
 from ctypes import windll, Structure, c_long, byref
+
+# Save/Restore States
+import json
+import os
 
 
 listener_instance, pynput_listener = listener.start_listener()
@@ -61,6 +66,25 @@ class Api:
         self.is_window_open = True
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
+
+    def loadState(self, directory):
+        if not os.path.exists("state.json"):
+            return "none"
+
+        with open("state.json", "r") as file:
+            data = json.load(file)
+            return data.get(directory, "none")
+
+    def saveState(self, directory, state):
+        if not os.path.exists("state.json"):
+            data = {}
+        else:
+            with open("state.json", "r") as file:
+                data = json.load(file)
+
+        data[directory] = state
+        with open("state.json", "w") as file:
+            json.dump(data, file)
 
     def close_window(self):
         self.is_window_open = False
@@ -184,7 +208,7 @@ def load_handler(window):
 def start_app():
     api = Api()
     api.create_and_position_window()
-    webview.start()
+    webview.start(http_server=True)
 
 
 listener_thread = threading.Thread(target=KeyListener, daemon=True)
