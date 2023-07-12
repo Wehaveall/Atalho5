@@ -1,3 +1,6 @@
+api = None  # Declare api as a global variable
+
+
 import webview
 import threading
 import time
@@ -67,9 +70,35 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
+    # Loading Translations
 
+    def load_translations(self, window):
+        with open("languages.json") as f:
+            translations = json.load(f)
 
-    #-----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
+        # You can use window.evaluate_js to create a new JavaScript variable
+        # that will hold the translations
+        window.evaluate_js(f"var translations = {json.dumps(translations)};")
+
+    def set_language(self, window, language_code):
+        # Modify the currentLanguage JavaScript variable
+        window.evaluate_js(f'var currentLanguage = "{language_code}";')
+
+    def update_language(self, window):
+        update_language_js = """
+        function updateLanguage() {
+          document.querySelectorAll('.tablinks').forEach(button => {
+            const tabName = button.getAttribute('onclick').split("'")[1];
+            button.textContent = translations[currentLanguage][tabName];
+          });
+        }
+        """
+        window.evaluate_js(update_language_js)
+        window.evaluate_js("updateLanguage()")
+
+    ...
+
+    # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
     def loadState(self, directory):
         # In the loadState method, if state.json does not exist,
         # the method will return "none". This is done using:
@@ -81,8 +110,7 @@ class Api:
             data = json.load(file)
             return data.get(directory, "none")
 
-
-    #-----------------------Por enquanto, salvando o state do collapsible	Left Panel - state.json
+    # -----------------------Por enquanto, salvando o state do collapsible	Left Panel - state.json
 
     def saveState(self, directory, state):
         # In the saveState method, if state.json does not exist, a new dictionary
@@ -98,25 +126,20 @@ class Api:
         with open("state.json", "w") as file:
             json.dump(data, file)
 
-    
-    
-    
-    #------------------------------------------Fechar Janela
+    # ------------------------------------------Fechar Janela
     def close_window(self):
         self.is_window_open = False
         if webview.windows:
             self.window.destroy()
             listener.stop_keyboard_listener(listener_instance, pynput_listener)
 
-    #----------------------------------------Minimizar Janela
+    # ----------------------------------------Minimizar Janela
     def minimize_window(self):
         window = get_window()
         if window:
             window.minimize()
 
-    
-    
-    #-----------------------------------------Maximizar, Restaura Janela
+    # -----------------------------------------Maximizar, Restaura Janela
     def maximize_or_restore_window(self):
         window = get_window()
         if window:
@@ -138,8 +161,7 @@ class Api:
                     'document.getElementById("maxRestore").children[0].src="/src/images/maxBtn_white.png"'
                 )
 
-
-    #----------------------------Criar e posicionar janela
+    # ----------------------------Criar e posicionar janela
 
     def create_and_position_window(self):
         monitor = get_monitors()[0]
@@ -154,6 +176,12 @@ class Api:
             frameless=True,
             resizable=True,
             js_api=self,
+            # The Python webview package provides an option to bind Python methods to JavaScript functions through
+            # the js_api parameter of the webview.create_window() function.
+            # In the main.py file you provided, an instance of the Api class is passed as the js_api parameter.
+            #  This means that all methods of the Api class are available to be called from JavaScript.
+            # You can add a new method to the Api class to load the translations from a JSON file and return them.
+            #  This method can then be called from JavaScript to get the translations.
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
         )
 
@@ -225,10 +253,15 @@ def get_window():
 
 
 def load_handler(window):
+    global api
+    api.load_translations(window)
+    api.set_language(window, "en")
+    api.update_language(window)
     inject_data(window)
 
 
 def start_app():
+    global api
     api = Api()
     api.create_and_position_window()
     webview.start(http_server=True)
