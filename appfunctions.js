@@ -1,4 +1,22 @@
 
+window.onload = function() {
+  // Load the translations when the page loads
+  pywebview.api.get_translations().then(function(translations) {
+    window.translations = translations;
+    window.currentLanguage = 'en'; // adjust this line to set the language dynamically
+    updateLanguage();
+  });
+
+  // Add click event handlers to the flag images
+  var flags = document.getElementsByClassName('flag');
+  for (var i = 0; i < flags.length; i++) {
+    flags[i].addEventListener('click', function(event) {
+      // When a flag is clicked, update the current language and refresh the translations
+      window.currentLanguage = event.target.id;
+      updateLanguage();
+    });
+  }
+};
 
 
 

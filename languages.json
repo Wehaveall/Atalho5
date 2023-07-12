@@ -5,10 +5,34 @@
     "Tab3": "Draft",
     "Tab4": "Help"
   },
-  "pt": {
-    "Tab1": "Principal",
+  "pt-BR": {
+    "Tab1": "Início",
     "Tab2": "Configurações",
     "Tab3": "Rascunho",
     "Tab4": "Ajuda"
+  },
+  "de": {
+    "Tab1": "Startseite",
+    "Tab2": "Einstellungen",
+    "Tab3": "Entwurf",
+    "Tab4": "Hilfe"
+  },
+  "it": {
+    "Tab1": "Home",
+    "Tab2": "Impostazioni",
+    "Tab3": "Bozza",
+    "Tab4": "Aiuto"
+  },
+  "fr": {
+    "Tab1": "Accueil",
+    "Tab2": "Paramètres",
+    "Tab3": "Brouillon",
+    "Tab4": "Aide"
+  },
+  "es": {
+    "Tab1": "Inicio",
+    "Tab2": "Configuraciones",
+    "Tab3": "Borrador",
+    "Tab4": "Ayuda"
   }
 }

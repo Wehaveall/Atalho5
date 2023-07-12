@@ -35,3 +35,31 @@ html {
   width: 100%;
   /* take up full width */
 }
+
+
+
+.flex-container {
+
+  display: flex;
+  align-items: center;
+  background-color: cornflowerblue;
+  font-family: 'Work Sans', sans-serif;
+
+}
+
+.flex-container>div:first-child {
+  margin-right: 20px;
+  /* adjust as needed */
+}
+
+
+.flag {
+  width: 40px;
+  /* adjust as needed */
+  height: auto;
+  /* keeps aspect ratio */
+  margin-right: 10px;
+  /* space between flags */
+  cursor: pointer;
+  /* shows a hand cursor when the mouse is over the flag */
+}
