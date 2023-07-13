@@ -72,56 +72,30 @@ class Api:
 
     # Loading Translations
 
-    def load_translations(self, window):
-        with open("languages.json") as f:
-            translations = json.load(f)
-        return translations
+    def load_translations(self):
+        try:
+            with open("languages.json") as f:
+                translations = json.load(f)
+            return translations
+        except Exception as e:
+            print(f"Error in load_translations: {e}")
 
-    def load_language_setting(self, window):
-        with open("settings.json", "r") as f:
-            settings = json.load(f)
-        return settings["language"]
+    def load_language_setting(self):
+        try:
+            with open("settings.json", "r") as f:
+                settings = json.load(f)
+            return settings.get("language", "en")  # Default to 'en' if not found
+        except Exception as e:
+            print(f"Error in load_language_setting: {e}")
 
     def change_language(self, language_code):
-        self.window.currentLanguage = language_code
-        self.set_language(self.window)  # passing self.window as the argument
-        self.update_language(self.window)  # using self.window here as well
-        self.save_language_setting(language_code)  # Save the selected language
-
-    def set_language(self, window):
-        set_language_js = """
-        function setLanguage(languageCode) {
-        window.currentLanguage = languageCode;
-        updateLanguage();
-        }
-        """
-        self.window.evaluate_js(set_language_js)
-        self.window.evaluate_js(f"setLanguage('{self.window.currentLanguage}')")
-
-    def update_language(self, window):
-        update_language_js = """
-        function updateLanguage() {
-        document.querySelectorAll('.tablinks').forEach(button => {
-            const tabName = button.getAttribute('onclick').split("'")[1];
-            button.textContent = translations[currentLanguage][tabName];
-        });
-        }
-        """
-        self.window.evaluate_js(update_language_js)
-        self.window.evaluate_js("updateLanguage()")
-
-    ...
-
-    def save_language_setting(self, language_code):
-        print("Saving language setting")  # Debugging print statement
-        print(f"Language Code: {language_code}")  # Debugging print statement
-        settings = {"language": language_code}
         try:
+            settings = {"language": language_code}
             with open("settings.json", "w") as f:
                 json.dump(settings, f)
+            return {"language": language_code}
         except Exception as e:
-            print(f"Error writing to settings.json: {e}")
-        return {}
+            print(f"Error in change_language: {e}")
 
     # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
     def loadState(self, directory):
@@ -279,15 +253,7 @@ def get_window():
 
 def load_handler(window):
     global api
-    api.load_translations(window)
 
-    # Load preferred language from a JSON file
-    with open("settings.json", "r") as f:
-        settings = json.load(f)
-    preferred_language = settings.get("language")  # default to 'en' if not found
-
-    api.change_language(preferred_language)
-    api.update_language(window)  # Use the passed `window` argument
     inject_data(window)
 
 

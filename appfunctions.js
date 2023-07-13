@@ -3,6 +3,7 @@
 // RESIZING FUNCTION
 
 
+
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
   let isResizing = false;
@@ -102,16 +103,19 @@ function openTab(evt, tabName) {
 
 
 //Stop event propagation
-document.getElementById("content").addEventListener("click", function (event) {
-  event.stopPropagation();
-}, false);
-
-var collapsibles = document.getElementsByClassName("content");
-for (var i = 0; i < collapsibles.length; i++) {
-  collapsibles[i].addEventListener("click", function (event) {
+document.addEventListener('DOMContentLoaded', (event) => {
+  document.getElementById("content").addEventListener("click", function (event) {
     event.stopPropagation();
   }, false);
-}
+
+  var collapsibles = document.getElementsByClassName("content");
+  for (var i = 0; i < collapsibles.length; i++) {
+    collapsibles[i].addEventListener("click", function (event) {
+      event.stopPropagation();
+    }, false);
+  }
+});
+
 
 
 
