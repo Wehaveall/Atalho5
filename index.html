@@ -25,6 +25,8 @@
 
 
   <script src="appfunctions.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pywebview@latest/dist/webview.js"></script>
+
 
 
 
@@ -191,6 +193,19 @@
 
 
   <script src="lang.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      window.pywebview.api.load_language_setting()
+        .then(languageCode => {
+          // Assuming setFlags is a function to set flags according to language
+          setFlags(languageCode);
+          // Change the language according to the loaded setting
+          changeLanguage(languageCode);
+        })
+        .catch((error) => console.error('Error in load_language_setting:', error));
+    });
+  </script>
+
 
 
 </body>

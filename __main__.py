@@ -74,9 +74,10 @@ class Api:
 
     def load_translations(self):
         try:
-            with open("languages.json") as f:
+            with open("languages.json", encoding="utf-8") as f:
                 translations = json.load(f)
-            return translations
+                language = self.load_language_setting()
+                return translations.get(language, {})
         except Exception as e:
             print(f"Error in load_translations: {e}")
 
@@ -84,7 +85,9 @@ class Api:
         try:
             with open("settings.json", "r") as f:
                 settings = json.load(f)
-            return settings.get("language", "en")  # Default to 'en' if not found
+            language = settings.get("language", "en")  # Default to 'en' if not found
+            print(f"Loaded language setting: {language}")
+            return language
         except Exception as e:
             print(f"Error in load_language_setting: {e}")
 
@@ -93,6 +96,7 @@ class Api:
             settings = {"language": language_code}
             with open("settings.json", "w") as f:
                 json.dump(settings, f)
+            print(f"Changed language setting to: {language_code}")
             return {"language": language_code}
         except Exception as e:
             print(f"Error in change_language: {e}")
