@@ -75,12 +75,20 @@ class Api:
     def load_translations(self, window):
         with open("languages.json") as f:
             translations = json.load(f)
+        return translations
 
-        # You can use window.evaluate_js to create a new JavaScript variable
-        # that will hold the translations
-        window.evaluate_js(f"var translations = {json.dumps(translations)};")
+    def load_language_setting(self, window):
+        with open("settings.json", "r") as f:
+            settings = json.load(f)
+        return settings["language"]
 
-    def set_language(self):
+    def change_language(self, language_code):
+        self.window.currentLanguage = language_code
+        self.set_language(self.window)  # passing self.window as the argument
+        self.update_language(self.window)  # using self.window here as well
+        self.save_language_setting(language_code)  # Save the selected language
+
+    def set_language(self, window):
         set_language_js = """
         function setLanguage(languageCode) {
         window.currentLanguage = languageCode;
@@ -90,7 +98,7 @@ class Api:
         self.window.evaluate_js(set_language_js)
         self.window.evaluate_js(f"setLanguage('{self.window.currentLanguage}')")
 
-    def update_language(self):
+    def update_language(self, window):
         update_language_js = """
         function updateLanguage() {
         document.querySelectorAll('.tablinks').forEach(button => {
@@ -104,27 +112,15 @@ class Api:
 
     ...
 
-    def change_language(self, language_code):
-        self.window.currentLanguage = language_code
-        self.set_language()
-        self.update_language()
-
-    ...
-
     def save_language_setting(self, language_code):
-        settings = {}
-        if os.path.exists("settings.json"):
-            with open("settings.json", "r") as f:
-                settings = json.load(f)
-
-        settings["language"] = language_code
-
-        with open("settings.json", "w") as f:
-            json.dump(settings, f)
-
-        # Apply the new language setting to the current application run
-        self.change_language(language_code)
-
+        print("Saving language setting")  # Debugging print statement
+        print(f"Language Code: {language_code}")  # Debugging print statement
+        settings = {"language": language_code}
+        try:
+            with open("settings.json", "w") as f:
+                json.dump(settings, f)
+        except Exception as e:
+            print(f"Error writing to settings.json: {e}")
         return {}
 
     # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
@@ -288,12 +284,10 @@ def load_handler(window):
     # Load preferred language from a JSON file
     with open("settings.json", "r") as f:
         settings = json.load(f)
-        preferred_language = settings.get(
-            "language", "en"
-        )  # default to 'en' if not found
+    preferred_language = settings.get("language")  # default to 'en' if not found
 
     api.change_language(preferred_language)
-    api.update_language()
+    api.update_language(window)  # Use the passed `window` argument
     inject_data(window)
 
 

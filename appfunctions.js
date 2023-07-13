@@ -1,61 +1,44 @@
 
-window.onload = function () {
+
+// Rest of your JavaScript code
+window.addEventListener('DOMContentLoaded', function () {
   // Load the translations when the page loads
-  pywebview.api.load_translations().then(function (translations) {
+  pywebview.api.bridge().load_translations().then(function (translations) {
     // Store the translations in a global variable
     window.translations = translations;
 
     // Load the current language from the settings
-    pywebview.api.load_language_setting().then(function (language) {
+    pywebview.api.bridge().load_language_setting().then(function (language) {
       // Store the current language in a global variable
       window.currentLanguage = language;
       updateLanguage();
     });
   });
 
-  //Add click event handlers to the flag images
-
-
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
     flags[i].addEventListener('click', function (event) {
       // When a flag is clicked, update the current language and refresh the translations
+      console.log(event.target.id);
       window.currentLanguage = event.target.id;
-      pywebview.api.change_language(window.currentLanguage).then(function (translations) {
-        // Update the translations with the new ones returned from Python
-        window.translations = translations;
+      pywebview.api.bridge().save_language_setting(window.currentLanguage).then(function () {
         updateLanguage();
       });
     });
   }
-};
-
-
-
-flags[i].addEventListener('click', function (event) {
-  // When a flag is clicked, update the current language and refresh the translations
-  window.currentLanguage = event.target.id;
-  pywebview.api.change_language(window.currentLanguage).then(function () {
-    // After changing the language, save the new language setting
-    pywebview.api.save_language_setting(window.currentLanguage).then(function () {
-      updateLanguage();
-    });
-  });
 });
 
-
-
-
-
+// Define the updateLanguage function
 function updateLanguage() {
   // Update the text of all elements with the 'tablinks' class
-  document.querySelectorAll('.tablinks').forEach(button => {
-    const tabName = button.getAttribute('onclick').split("'")[1];
+  document.querySelectorAll('.tablinks').forEach(function (button) {
+    var tabName = button.getAttribute('onclick').split("'")[1];
     button.textContent = window.translations[window.currentLanguage][tabName];
   });
 }
 
-
+// Define other functions and event listeners as needed
+// ...
 
 
 
