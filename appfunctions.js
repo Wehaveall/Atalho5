@@ -1,22 +1,59 @@
 
-window.onload = function() {
+window.onload = function () {
   // Load the translations when the page loads
-  pywebview.api.get_translations().then(function(translations) {
+  pywebview.api.load_translations().then(function (translations) {
+    // Store the translations in a global variable
     window.translations = translations;
-    window.currentLanguage = 'en'; // adjust this line to set the language dynamically
-    updateLanguage();
+
+    // Load the current language from the settings
+    pywebview.api.load_language_setting().then(function (language) {
+      // Store the current language in a global variable
+      window.currentLanguage = language;
+      updateLanguage();
+    });
   });
 
-  // Add click event handlers to the flag images
+  //Add click event handlers to the flag images
+
+
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
-    flags[i].addEventListener('click', function(event) {
+    flags[i].addEventListener('click', function (event) {
       // When a flag is clicked, update the current language and refresh the translations
       window.currentLanguage = event.target.id;
-      updateLanguage();
+      pywebview.api.change_language(window.currentLanguage).then(function (translations) {
+        // Update the translations with the new ones returned from Python
+        window.translations = translations;
+        updateLanguage();
+      });
     });
   }
 };
+
+
+
+flags[i].addEventListener('click', function (event) {
+  // When a flag is clicked, update the current language and refresh the translations
+  window.currentLanguage = event.target.id;
+  pywebview.api.change_language(window.currentLanguage).then(function () {
+    // After changing the language, save the new language setting
+    pywebview.api.save_language_setting(window.currentLanguage).then(function () {
+      updateLanguage();
+    });
+  });
+});
+
+
+
+
+
+function updateLanguage() {
+  // Update the text of all elements with the 'tablinks' class
+  document.querySelectorAll('.tablinks').forEach(button => {
+    const tabName = button.getAttribute('onclick').split("'")[1];
+    button.textContent = window.translations[window.currentLanguage][tabName];
+  });
+}
 
 
 

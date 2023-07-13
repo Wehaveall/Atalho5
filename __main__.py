@@ -80,23 +80,52 @@ class Api:
         # that will hold the translations
         window.evaluate_js(f"var translations = {json.dumps(translations)};")
 
-    def set_language(self, window, language_code):
-        # Modify the currentLanguage JavaScript variable
-        window.evaluate_js(f'var currentLanguage = "{language_code}";')
-
-    def update_language(self, window):
-        update_language_js = """
-        function updateLanguage() {
-          document.querySelectorAll('.tablinks').forEach(button => {
-            const tabName = button.getAttribute('onclick').split("'")[1];
-            button.textContent = translations[currentLanguage][tabName];
-          });
+    def set_language(self):
+        set_language_js = """
+        function setLanguage(languageCode) {
+        window.currentLanguage = languageCode;
+        updateLanguage();
         }
         """
-        window.evaluate_js(update_language_js)
-        window.evaluate_js("updateLanguage()")
+        self.window.evaluate_js(set_language_js)
+        self.window.evaluate_js(f"setLanguage('{self.window.currentLanguage}')")
+
+    def update_language(self):
+        update_language_js = """
+        function updateLanguage() {
+        document.querySelectorAll('.tablinks').forEach(button => {
+            const tabName = button.getAttribute('onclick').split("'")[1];
+            button.textContent = translations[currentLanguage][tabName];
+        });
+        }
+        """
+        self.window.evaluate_js(update_language_js)
+        self.window.evaluate_js("updateLanguage()")
 
     ...
+
+    def change_language(self, language_code):
+        self.window.currentLanguage = language_code
+        self.set_language()
+        self.update_language()
+
+    ...
+
+    def save_language_setting(self, language_code):
+        settings = {}
+        if os.path.exists("settings.json"):
+            with open("settings.json", "r") as f:
+                settings = json.load(f)
+
+        settings["language"] = language_code
+
+        with open("settings.json", "w") as f:
+            json.dump(settings, f)
+
+        # Apply the new language setting to the current application run
+        self.change_language(language_code)
+
+        return {}
 
     # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
     def loadState(self, directory):
@@ -175,7 +204,7 @@ class Api:
             url="index.html",
             frameless=True,
             resizable=True,
-            js_api=self,
+            js_api=api,
             # The Python webview package provides an option to bind Python methods to JavaScript functions through
             # the js_api parameter of the webview.create_window() function.
             # In the main.py file you provided, an instance of the Api class is passed as the js_api parameter.
@@ -255,8 +284,16 @@ def get_window():
 def load_handler(window):
     global api
     api.load_translations(window)
-    api.set_language(window, "en")
-    api.update_language(window)
+
+    # Load preferred language from a JSON file
+    with open("settings.json", "r") as f:
+        settings = json.load(f)
+        preferred_language = settings.get(
+            "language", "en"
+        )  # default to 'en' if not found
+
+    api.change_language(preferred_language)
+    api.update_language()
     inject_data(window)
 
 
