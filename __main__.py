@@ -1,7 +1,5 @@
 api = None  # Declare api as a global variable
 
-import pywebview
-
 
 import webview
 import threading
