@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
 
@@ -24,8 +24,23 @@
   <link rel="stylesheet" type="text/css" href="src/styles/tabs.css">
 
 
+  <script src="lang.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      window.pywebview.api.load_language_setting()
+        .then(languageCode => {
+          // Assuming setFlags is a function to set flags according to language
+          setFlags(languageCode);
+          // Change the language according to the loaded setting
+          changeLanguage(languageCode);
+        })
+        .catch((error) => console.error('Error in load_language_setting:', error));
+    });
+  </script>
+
   <script src="appfunctions.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pywebview@latest/dist/webview.js"></script>
+
 
 
 
@@ -74,11 +89,12 @@
 
 
       <div class="tab">
-        <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">Principal</button>
-        <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">Configurações</button>
-        <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">Rascunho</button>
-        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')">Ajuda</button>
+        <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')"></button>
+        <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')"></button>
+        <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')"></button>
+        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')"></button>
       </div>
+
 
       <div id="Tab1" class="tabcontent">
         <!-- Your existing div "content" goes here -->
@@ -192,19 +208,7 @@
   <!-- Edge detection -->
 
 
-  <script src="lang.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      window.pywebview.api.load_language_setting()
-        .then(languageCode => {
-          // Assuming setFlags is a function to set flags according to language
-          setFlags(languageCode);
-          // Change the language according to the loaded setting
-          changeLanguage(languageCode);
-        })
-        .catch((error) => console.error('Error in load_language_setting:', error));
-    });
-  </script>
+
 
 
 

@@ -25,7 +25,12 @@ from ctypes import windll, Structure, c_long, byref
 # Save/Restore States
 import json
 import os
+import logging
 
+
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 listener_instance, pynput_listener = listener.start_listener()
 
@@ -74,32 +79,36 @@ class Api:
 
     def load_translations(self):
         try:
+            logging.debug("load_translations called")
             with open("languages.json", encoding="utf-8") as f:
                 translations = json.load(f)
                 language = self.load_language_setting()
+                logging.debug(f"load_translations loaded language: {language}")
                 return translations.get(language, {})
         except Exception as e:
-            print(f"Error in load_translations: {e}")
+            logging.error(f"Error in load_translations: {e}")
 
     def load_language_setting(self):
         try:
+            logging.debug("load_language_setting called")
             with open("settings.json", "r") as f:
                 settings = json.load(f)
             language = settings.get("language", "en")  # Default to 'en' if not found
-            print(f"Loaded language setting: {language}")
+            logging.debug(f"load_language_setting loaded language: {language}")
             return language
         except Exception as e:
-            print(f"Error in load_language_setting: {e}")
+            logging.error(f"Error in load_language_setting: {e}")
 
     def change_language(self, language_code):
         try:
+            logging.debug(f"change_language called with language code: {language_code}")
             settings = {"language": language_code}
             with open("settings.json", "w") as f:
                 json.dump(settings, f)
-            print(f"Changed language setting to: {language_code}")
+            logging.debug(f"change_language changed language to: {language_code}")
             return {"language": language_code}
         except Exception as e:
-            print(f"Error in change_language: {e}")
+            logging.error(f"Error in change_language: {e}")
 
     # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
     def loadState(self, directory):
