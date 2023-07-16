@@ -1,5 +1,4 @@
 import sqlite3
-import webview
 import json
 
 # for the colapsible
@@ -18,8 +17,10 @@ def process_all_databases():
 
 def get_database_path(db_name):
     base_dir = os.path.dirname(__file__)
-    db_path = os.path.join(base_dir, "./src/database/groups/", db_name)
-    return db_path
+    db_path = os.path.join(base_dir, "groups", db_name, f"{db_name}.db")
+    forward_slash_db_path = db_path.replace("\\", "/")
+    print(f"Connecting to database at {forward_slash_db_path}")
+    return forward_slash_db_path
 
 
 def create_db():
@@ -63,15 +64,15 @@ def insert_into_db(shortcut, expansion, label):
     conn.close()
 
 
-def get_data_from_database():
+def get_data(self, databaseName, tableName):
     # Connect to SQLite database
-    conn = sqlite3.connect(get_database_path())
+    conn = sqlite3.connect(get_database_path(databaseName))
 
     # Create a cursor object
     c = conn.cursor()
 
     # Execute an SQL command
-    c.execute("SELECT * FROM my_table")
+    c.execute(f"SELECT * FROM {tableName}")
 
     # Fetch all rows from the last executed SQL command
     rows = c.fetchall()

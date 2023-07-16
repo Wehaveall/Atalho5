@@ -62,25 +62,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
 ///////////////////////////////////////////////////////////// LEFT PANEL
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  var coll = document.getElementsByClassName("collapsible");
-  var i;
+// document.addEventListener('DOMContentLoaded', (event) => {
+//   var coll = document.getElementsByClassName("collapsible");
+//   var i;
 
-  for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function () {
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      var arrow = this.getElementsByClassName('arrow')[0];
-      if (content.style.maxHeight) {
-        content.style.maxHeight = null;
-        arrow.innerHTML = " ► ";
-      } else {
-        content.style.maxHeight = content.scrollHeight + "px";
-        arrow.innerHTML = " ▼ ";
-      }
-    });
-  }
-});
+//   for (i = 0; i < coll.length; i++) {
+//     coll[i].addEventListener("click", function () {
+//       this.classList.toggle("active");
+//       var content = this.nextElementSibling;
+//       var arrow = this.getElementsByClassName('arrow')[0];
+//       if (content.style.maxHeight) {
+//         content.style.maxHeight = null;
+//         arrow.innerHTML = " ► ";
+//       } else {
+//         content.style.maxHeight = content.scrollHeight + "px";
+//         arrow.innerHTML = " ▼ ";
+//       }
+
+//       // Get the database name from the data-database attribute
+//       var databaseName = this.getAttribute('data-database');
+
+//       // Call populateTable with the database name
+//       populateTable(databaseName);
+//     });
+//   }
+// });
 
 
 
@@ -139,6 +145,24 @@ async function createCollapsible(directory, file) {
   var collapsibleButton = document.createElement('button');
   collapsibleButton.className = 'collapsible';
   collapsibleButton.innerHTML = directory;
+
+  // Set the data-database attribute to the directory name
+  collapsibleButton.setAttribute('data-database', directory);
+
+  // Add a click event listener to the button
+  collapsibleButton.addEventListener('click', function () {
+    // Get the database name from the data-database attribute
+    var databaseName = this.getAttribute('data-database');
+
+    // Call the function to get data from the database and populate the table
+    window.pywebview.api.get_data(databaseName, 'myTable')
+      .then(data => {
+        console.log(data); // Log the data
+        populateTable(data);
+      })
+      .catch(error => console.error('Error:', error));
+  });
+
   leftPanel.appendChild(collapsibleButton);
 
   // Create the content for the collapsible
@@ -155,20 +179,8 @@ async function createCollapsible(directory, file) {
   } else {
     collapsibleContent.style.display = "none";
   }
-
-  // Add the click event to the collapsible button
-  collapsibleButton.addEventListener('click', async function () {
-    this.classList.toggle('active');
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-      await window.pywebview.api.saveState(directory, "none");
-    } else {
-      content.style.display = "block";
-      await window.pywebview.api.saveState(directory, "block");
-    }
-  });
 }
+
 
 
 

@@ -15,8 +15,9 @@ from listener import KeyListener
 # Import database
 from src.database.data_connect import (
     create_db,
+    get_database_path,
     insert_into_db,
-    get_data_from_database,
+    get_data,
     inject_data,
 )
 
@@ -26,6 +27,7 @@ from ctypes import windll, Structure, c_long, byref
 import json
 import os
 import logging
+import sqlite3
 
 
 logging.basicConfig(
@@ -74,6 +76,27 @@ class Api:
         self.is_window_open = True
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
+
+    def get_data(self, databaseName, tableName):
+    # Connect to SQLite database
+        conn = sqlite3.connect(get_database_path(databaseName))
+
+        # Create a cursor object
+        c = conn.cursor()
+
+        # Execute an SQL command
+        c.execute(f"SELECT * FROM {tableName}")
+
+        # Fetch all rows from the last executed SQL command
+        rows = c.fetchall()
+
+        # Don't forget to close the connection
+        conn.close()
+
+        # Convert rows to list of dictionaries
+        data = [dict(zip(['shortcut', 'expansion', 'label'], row)) for row in rows]
+
+        return data
 
     # Loading Translations
 
@@ -266,7 +289,6 @@ def get_window():
 
 def load_handler(window):
     global api
-
     inject_data(window)
 
 
