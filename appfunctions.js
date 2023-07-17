@@ -151,16 +151,15 @@ async function createCollapsible(directory, file) {
 
   // Add a click event listener to the button
   collapsibleButton.addEventListener('click', function () {
-    // Get the database name from the data-database attribute
-    var databaseName = this.getAttribute('data-database');
-
-    // Call the function to get data from the database and populate the table
-    window.pywebview.api.get_data(databaseName, 'myTable')
-      .then(data => {
-        console.log(data); // Log the data
-        populateTable(data);
-      })
-      .catch(error => console.error('Error:', error));
+    // Toggle active class
+    this.classList.toggle('active');
+    // Expand/collapse content
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
   });
 
   leftPanel.appendChild(collapsibleButton);
@@ -169,6 +168,19 @@ async function createCollapsible(directory, file) {
   var collapsibleContent = document.createElement('div');
   collapsibleContent.className = 'content';
   collapsibleContent.innerHTML = '<p>' + file + '</p>';
+
+  // Add a click event listener to the content
+  collapsibleContent.addEventListener('click', function () {
+    // Call the function to get data from the database and populate the table
+    var databaseName = collapsibleButton.getAttribute('data-database');
+    window.pywebview.api.get_data(databaseName)
+      .then(data => {
+        console.log(data); // Log the data
+        populateTable(data);
+      })
+      .catch(error => console.error('Error:', error));
+  });
+
   leftPanel.appendChild(collapsibleContent);
 
   // Load state from Python API
@@ -180,6 +192,8 @@ async function createCollapsible(directory, file) {
     collapsibleContent.style.display = "none";
   }
 }
+
+
 
 
 

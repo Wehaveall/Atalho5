@@ -77,26 +77,26 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
-    def get_data(self, databaseName, tableName):
-    # Connect to SQLite database
+    def get_data(self, databaseName):
+        # Connect to SQLite database
         conn = sqlite3.connect(get_database_path(databaseName))
 
         # Create a cursor object
         c = conn.cursor()
 
         # Execute an SQL command
-        c.execute(f"SELECT * FROM {tableName}")
+        c.execute("SELECT * FROM myTable")
 
         # Fetch all rows from the last executed SQL command
         rows = c.fetchall()
 
+        # Convert each tuple to a list
+        rows_as_list = [list(row) for row in rows]
+
         # Don't forget to close the connection
         conn.close()
 
-        # Convert rows to list of dictionaries
-        data = [dict(zip(['shortcut', 'expansion', 'label'], row)) for row in rows]
-
-        return data
+        return rows_as_list
 
     # Loading Translations
 
