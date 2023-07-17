@@ -134,7 +134,7 @@ class Api:
             logging.error(f"Error in change_language: {e}")
 
     # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
-    def loadState(self, directory):
+    def load_state(self, directory):
         # In the loadState method, if state.json does not exist,
         # the method will return "none". This is done using:
 
@@ -147,7 +147,7 @@ class Api:
 
     # -----------------------Por enquanto, salvando o state do collapsible	Left Panel - state.json
 
-    def saveState(self, directory, state):
+    def save_state(self, directory, state):
         # In the saveState method, if state.json does not exist, a new dictionary
         #  is created to store the data. This is done using:
 

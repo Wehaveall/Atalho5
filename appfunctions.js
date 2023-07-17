@@ -157,8 +157,12 @@ async function createCollapsible(directory, file) {
     var content = this.nextElementSibling;
     if (content.style.display === "block") {
       content.style.display = "none";
+      // Save state to Python API
+      window.pywebview.api.save_state(directory, 'none');
     } else {
       content.style.display = "block";
+      // Save state to Python API
+      window.pywebview.api.save_state(directory, 'block');
     }
   });
 
@@ -184,14 +188,17 @@ async function createCollapsible(directory, file) {
   leftPanel.appendChild(collapsibleContent);
 
   // Load state from Python API
-  var storedState = await window.pywebview.api.loadState(directory);
-  if (storedState === "block") {
-    collapsibleContent.style.display = "block";
-    collapsibleButton.classList.add('active');
-  } else {
-    collapsibleContent.style.display = "none";
-  }
+  window.pywebview.api.load_state(directory)
+    .then(state => {
+      if (state === 'block') {
+        collapsibleContent.style.display = 'block';
+        collapsibleButton.classList.add('active');
+      } else {
+        collapsibleContent.style.display = 'none';
+      }
+    });
 }
+
 
 
 
