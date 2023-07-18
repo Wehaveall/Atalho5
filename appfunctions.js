@@ -146,9 +146,6 @@ async function createCollapsible(directory, file) {
   collapsibleButton.className = 'collapsible';
   collapsibleButton.innerHTML = directory;
 
-  // Set the data-database attribute to the directory name
-  collapsibleButton.setAttribute('data-database', directory);
-
   // Add a click event listener to the button
   collapsibleButton.addEventListener('click', function () {
     // Toggle active class
@@ -172,12 +169,13 @@ async function createCollapsible(directory, file) {
   var collapsibleContent = document.createElement('div');
   collapsibleContent.className = 'content';
 
-  var dbPara = document.createElement('p');
-  dbPara.innerHTML = file;
+  // For each file in the directory, create a new paragraph element
+  var fileElement = document.createElement('p');
+  fileElement.innerHTML = file;
 
-  // Add a click event listener to the p element (database name)
-  dbPara.addEventListener('click', function () {
-    // Get data and populate the table when the database name is clicked
+  // Add a click event listener to the fileElement
+  fileElement.addEventListener('click', function () {
+    // When the fileElement is clicked, get data from the corresponding database and populate the table
     window.pywebview.api.get_data(directory, file)
       .then(data => {
         console.log(data); // Log the data
@@ -186,7 +184,9 @@ async function createCollapsible(directory, file) {
       .catch(error => console.error('Error:', error));
   });
 
-  collapsibleContent.appendChild(dbPara);
+  // Add the fileElement to the collapsibleContent
+  collapsibleContent.appendChild(fileElement);
+
   leftPanel.appendChild(collapsibleContent);
 
   // Load state from Python API

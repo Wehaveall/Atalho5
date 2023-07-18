@@ -66,25 +66,6 @@ def insert_into_db(shortcut, expansion, label):
     conn.close()
 
 
-def get_data(self, databaseName, tableName):
-    # Connect to SQLite database
-    conn = sqlite3.connect(get_database_path(databaseName))
-
-    # Create a cursor object
-    c = conn.cursor()
-
-    # Execute an SQL command
-    c.execute(f"SELECT * FROM {tableName}")
-
-    # Fetch all rows from the last executed SQL command
-    rows = c.fetchall()
-
-    # Don't forget to close the connection
-    conn.close()
-
-    return rows
-
-
 def inject_data(window):
     # Get all subdirectories in ./src/database/groups/
     subdirectories = [

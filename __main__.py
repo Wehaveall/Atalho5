@@ -105,8 +105,8 @@ class Api:
 
         return rows
 
-    def get_tables(self, groupName, databaseName):
-        conn = sqlite3.connect(get_database_path(groupName, databaseName))
+    def get_tables(self, databaseName):
+        conn = sqlite3.connect(get_database_path(databaseName))
         c = conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = c.fetchall()
