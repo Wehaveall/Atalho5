@@ -233,6 +233,7 @@ class Api:
             # You can add a new method to the Api class to load the translations from a JSON file and return them.
             #  This method can then be called from JavaScript to get the translations.
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
+            # Wait for DOMContentLoaded before creating the window
         )
 
         # Wait a short moment for the window to be created
