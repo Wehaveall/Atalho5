@@ -15,9 +15,11 @@ def process_all_databases():
         conn.close()
 
 
-def get_database_path(db_name):
+def get_database_path(group_name, db_name):
     base_dir = os.path.dirname(__file__)
-    db_path = os.path.join(base_dir, "groups", db_name, f"{db_name}.db")
+    if not db_name.endswith(".db"):
+        db_name += ".db"
+    db_path = os.path.join(base_dir, "groups", group_name, db_name)
     forward_slash_db_path = db_path.replace("\\", "/")
     print(f"Connecting to database at {forward_slash_db_path}")
     return forward_slash_db_path

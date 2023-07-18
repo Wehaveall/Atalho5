@@ -14,10 +14,7 @@ from listener import KeyListener
 
 # Import database
 from src.database.data_connect import (
-    create_db,
     get_database_path,
-    insert_into_db,
-    get_data,
     inject_data,
 )
 
@@ -77,26 +74,44 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
-    def get_data(self, databaseName):
+    def get_data(self, groupName, databaseName):
         # Connect to SQLite database
-        conn = sqlite3.connect(get_database_path(databaseName))
+        conn = sqlite3.connect(get_database_path(groupName, databaseName))
 
         # Create a cursor object
         c = conn.cursor()
 
-        # Execute an SQL command
-        c.execute("SELECT * FROM myTable")
+        # First, get the name of the table in the database
+        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        result = c.fetchone()
+        if result is None:
+            print(
+                f"No tables found in the database at {get_database_path(groupName, databaseName)}"
+            )
+            return []
+
+        tableName = result[
+            0
+        ]  # This will get the name of the first table in the database
+
+        # Then, execute an SQL command to get all rows from the table
+        c.execute(f"SELECT * FROM {tableName}")
 
         # Fetch all rows from the last executed SQL command
         rows = c.fetchall()
 
-        # Convert each tuple to a list
-        rows_as_list = [list(row) for row in rows]
-
         # Don't forget to close the connection
         conn.close()
 
-        return rows_as_list
+        return rows
+
+    def get_tables(self, groupName, databaseName):
+        conn = sqlite3.connect(get_database_path(groupName, databaseName))
+        c = conn.cursor()
+        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = c.fetchall()
+        conn.close()
+        return tables
 
     # Loading Translations
 

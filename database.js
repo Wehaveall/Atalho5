@@ -17,15 +17,20 @@ window.pywebview.api.get_database_names()
             window.pywebview.api.get_table_names(databaseName)
                 .then(function (tableNames) {
                     for (var j = 0; j < tableNames.length; j++) {
-                        var tableName = tableNames[j];
+                        (function () {  // New scope
+                            var tableName = tableNames[j];
 
-                        var p = document.createElement('p');
-                        p.innerHTML = tableName;
-                        p.addEventListener('click', function () {
-                            populateTable(databaseName, tableName);
-                        });
+                            var p = document.createElement('p');
+                            p.innerHTML = tableName;
+                            p.addEventListener('click', function () {
+                                // Call the get_data function
+                                window.pywebview.api.get_data(databaseName)
+                                    .then(data => populateTable(data))
+                                    .catch(error => console.error('Error:', error));
+                            });
 
-                        content.appendChild(p);
+                            content.appendChild(p);
+                        })();  // End new scope
                     }
                 })
                 .catch(function (error) {
@@ -60,7 +65,6 @@ window.pywebview.api.get_database_names()
 
 
 
-
 function populateTable(data) {
     var table = document.getElementById('myTable');
 
@@ -82,7 +86,6 @@ function populateTable(data) {
         cell3.innerHTML = data[i][2]; // Label
     }
 }
-3
 
 
 
@@ -93,15 +96,15 @@ function populateTable(data) {
 
 
 
-document.addEventListener('click', function (event) {
-    // If the clicked element doesn't have the right selector, bail
-    if (!event.target.matches('.collapsible')) return;
-    // Don't follow the link
-    event.preventDefault();
+// document.addEventListener('click', function (event) {
+//     // If the clicked element doesn't have the right selector, bail
+//     if (!event.target.matches('.collapsible')) return;
+//     // Don't follow the link
+//     event.preventDefault();
 
-    // Call the get_data function
-    var databaseName = event.target.getAttribute('data-database');
-    window.pywebview.api.get_data(databaseName)
-        .then(data => populateTable(data))
-        .catch(error => console.error('Error:', error));
-}, false);
+//     // Call the get_data function
+//     var databaseName = event.target.getAttribute('data-database');
+//     window.pywebview.api.get_data(databaseName, tableName)
+//         .then(data => populateTable(data))
+//         .catch(error => console.error('Error:', error));
+// }, false);
