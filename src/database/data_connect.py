@@ -75,13 +75,11 @@ def inject_data(window):
     for subdirectory in subdirectories:
         db_files = get_db_files_in_directory(subdirectory)
         encoded_directory = json.dumps(os.path.basename(subdirectory))
+        encoded_db_files = json.dumps(db_files)  # encode the whole list of db files
 
-        for db_file in db_files:
-            # Create a new listing item for each .db file
-            encoded_db_file = json.dumps(db_file)
-            window.evaluate_js(
-                f"createCollapsible({encoded_directory}, {encoded_db_file});"
-            )
+        window.evaluate_js(
+            f"createCollapsible({encoded_directory}, {encoded_db_files});"
+        )
 
 
 # Get the db files

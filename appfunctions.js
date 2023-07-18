@@ -1,9 +1,3 @@
-
-
-// RESIZING FUNCTION
-
-
-
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
   let isResizing = false;
@@ -56,42 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-
-// Rest of your code...
-
-
-///////////////////////////////////////////////////////////// LEFT PANEL
-
-// document.addEventListener('DOMContentLoaded', (event) => {
-//   var coll = document.getElementsByClassName("collapsible");
-//   var i;
-
-//   for (i = 0; i < coll.length; i++) {
-//     coll[i].addEventListener("click", function () {
-//       this.classList.toggle("active");
-//       var content = this.nextElementSibling;
-//       var arrow = this.getElementsByClassName('arrow')[0];
-//       if (content.style.maxHeight) {
-//         content.style.maxHeight = null;
-//         arrow.innerHTML = " ► ";
-//       } else {
-//         content.style.maxHeight = content.scrollHeight + "px";
-//         arrow.innerHTML = " ▼ ";
-//       }
-
-//       // Get the database name from the data-database attribute
-//       var databaseName = this.getAttribute('data-database');
-
-//       // Call populateTable with the database name
-//       populateTable(databaseName);
-//     });
-//   }
-// });
-
-
-
-
-
 function openTab(evt, tabName) {
   var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
@@ -106,9 +64,6 @@ function openTab(evt, tabName) {
   evt.currentTarget.className += " active";
 }
 
-
-
-//Stop event propagation
 document.addEventListener('DOMContentLoaded', (event) => {
   document.getElementById("content").addEventListener("click", function (event) {
     event.stopPropagation();
@@ -122,94 +77,78 @@ document.addEventListener('DOMContentLoaded', (event) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////Create Collapsible
-
-
-
-
-async function createCollapsible(directory, file) {
-  console.log("Creating collapsible for directory: " + directory + " and file: " + file);
+function createCollapsible(directory, db_files) {
   var leftPanel = document.getElementById('leftPanel');
 
-  // Create the button for the collapsible
   var collapsibleButton = document.createElement('button');
   collapsibleButton.className = 'collapsible';
   collapsibleButton.innerHTML = directory;
 
-  // Add a click event listener to the button
+  var contentDiv = document.createElement('div');
+  contentDiv.className = 'content';
+
+  db_files.forEach(function (databaseFile) {
+    var db_file_elem = document.createElement('p');
+    db_file_elem.textContent = databaseFile;
+    db_file_elem.addEventListener('click', function () {
+      window.pywebview.api.get_tables(directory, databaseFile)
+        .then(function (tableNames) {
+          tableNames.forEach(function (tableName) {
+            window.pywebview.api.get_data(directory, databaseFile, tableName)
+              .then(data => populateTable(data))
+              .catch(error => console.error('Error:', error));
+          });
+        })
+        .catch(function (error) {
+          console.log('Error in get_tables:', error);
+        });
+    });
+    contentDiv.appendChild(db_file_elem);
+  });
+
   collapsibleButton.addEventListener('click', function () {
-    // Toggle active class
     this.classList.toggle('active');
-    // Expand/collapse content
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-      // Save state to Python API
+    if (contentDiv.style.display === "block") {
+      contentDiv.style.display = "none";
       window.pywebview.api.save_state(directory, 'none');
     } else {
-      content.style.display = "block";
-      // Save state to Python API
+      contentDiv.style.display = "block";
       window.pywebview.api.save_state(directory, 'block');
     }
   });
 
   leftPanel.appendChild(collapsibleButton);
+  leftPanel.appendChild(contentDiv);
 
-  // Create the content for the collapsible
-  var collapsibleContent = document.createElement('div');
-  collapsibleContent.className = 'content';
-
-  // For each file in the directory, create a new paragraph element
-  var fileElement = document.createElement('p');
-  fileElement.innerHTML = file;
-
-  // Add a click event listener to the fileElement
-  fileElement.addEventListener('click', function () {
-    // When the fileElement is clicked, get data from the corresponding database and populate the table
-    window.pywebview.api.get_data(directory, file)
-      .then(data => {
-        console.log(data); // Log the data
-        populateTable(data);
-      })
-      .catch(error => console.error('Error:', error));
-  });
-
-  // Add the fileElement to the collapsibleContent
-  collapsibleContent.appendChild(fileElement);
-
-  leftPanel.appendChild(collapsibleContent);
-
-  // Load state from Python API
   window.pywebview.api.load_state(directory)
     .then(state => {
       if (state === 'block') {
-        collapsibleContent.style.display = 'block';
+        contentDiv.style.display = 'block';
         collapsibleButton.classList.add('active');
       } else {
-        collapsibleContent.style.display = 'none';
+        contentDiv.style.display = 'none';
       }
     });
 }
 
+function populateTable(data) {
+  var table = document.getElementById('myTable');
 
+  // Remove any existing rows (except for the header)
+  while (table.rows.length > 1) {
+    table.deleteRow(1);
+  }
 
+  // Add new rows
+  for (var i = 0; i < data.length; i++) {
+    var row = table.insertRow(-1); // Insert a new row at the end
 
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
 
-
-
-
-
-
-
-
-
+    cell1.innerHTML = data[i][0]; // Shortcut
+    cell2.innerHTML = data[i][1]; // Expansion
+    cell3.innerHTML = data[i][2]; // Label
+  }
+}

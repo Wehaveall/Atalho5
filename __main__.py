@@ -74,28 +74,20 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
-    def get_data(self, groupName, databaseName):
+    def get_data(self, groupName, databaseName, tableName):
+        print(
+            f"get_data called with: groupName={groupName}, databaseName={databaseName}, tableName={tableName}"
+        )  # debug print
         # Connect to SQLite database
         conn = sqlite3.connect(get_database_path(groupName, databaseName))
 
         # Create a cursor object
         c = conn.cursor()
 
-        # First, get the name of the table in the database
-        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        result = c.fetchone()
-        if result is None:
-            print(
-                f"No tables found in the database at {get_database_path(groupName, databaseName)}"
-            )
-            return []
-
-        tableName = result[
-            0
-        ]  # This will get the name of the first table in the database
-
-        # Then, execute an SQL command to get all rows from the table
-        c.execute(f"SELECT * FROM {tableName}")
+        # Execute an SQL command to get all rows from the table
+        c.execute(
+            f"SELECT * FROM {tableName[0]}"
+        )  # Use the first element of the tableName list
 
         # Fetch all rows from the last executed SQL command
         rows = c.fetchall()
@@ -105,8 +97,11 @@ class Api:
 
         return rows
 
-    def get_tables(self, databaseName):
-        conn = sqlite3.connect(get_database_path(databaseName))
+    def get_tables(self, groupName, databaseName):
+        print(
+            f"get_tables called with: groupName={groupName}, databaseName={databaseName}"
+        )  # debug print
+        conn = sqlite3.connect(get_database_path(groupName, databaseName))
         c = conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = c.fetchall()
