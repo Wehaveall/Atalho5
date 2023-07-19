@@ -132,6 +132,7 @@ function createCollapsible(directory, db_files) {
 }
 
 function populateTable(data) {
+  console.log("populateTable called with data:", data);
   var table = document.getElementById('myTable');
 
   // Remove any existing rows (except for the header)
@@ -147,8 +148,9 @@ function populateTable(data) {
     var cell2 = row.insertCell(1);
     var cell3 = row.insertCell(2);
 
-    cell1.innerHTML = data[i][0]; // Shortcut
-    cell2.innerHTML = data[i][1]; // Expansion
-    cell3.innerHTML = data[i][2]; // Label
+    cell1.innerHTML = data[i]['shortcut']; // Shortcut
+    cell2.innerHTML = data[i]['expansion']; // Expansion
+    cell3.innerHTML = data[i]['label']; // Label
   }
 }
+

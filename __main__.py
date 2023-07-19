@@ -1,6 +1,5 @@
 api = None  # Declare api as a global variable
 
-
 import webview
 import threading
 import time
@@ -11,11 +10,12 @@ from screeninfo import get_monitors
 import listener  # import listener.py
 from listener import KeyListener
 
-
 # Import database
 from src.database.data_connect import (
     get_database_path,
     inject_data,
+    load_db_into_memory,
+    save_db_from_memory,
 )
 
 from ctypes import windll, Structure, c_long, byref
@@ -27,12 +27,15 @@ import logging
 import sqlite3
 
 
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, MetaData, Table, select
+from sqlalchemy import inspect
+
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
 listener_instance, pynput_listener = listener.start_listener()
-
 
 WINDOW_TITLE = "Atalho"
 WINDOW_WIDTH = 1000
@@ -56,15 +59,60 @@ def setsizer(window, perW, perH):
     user32 = windll.user32
     user32.SetProcessDPIAware()
     [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
-
     window.move(10, 10)
-
     w = w * (perW / 100)  # resize to 80% of user screen W
     y = h * (perH / 100)  # resize to 80% of user screen H
     window.resize(round(w), round(y))
 
 
-####################################
+# Add a function to handle database operations
+from sqlalchemy import inspect
+
+
+def handle_database_operations(groupName, databaseName, tableName):
+    database_path = get_database_path(groupName, databaseName)
+    engine = create_engine(
+        f"sqlite:///./src/database/groups/{groupName}/{databaseName}"
+    )
+    metadata = MetaData()
+
+    try:
+        # Ensure tableName is a string, not a list
+        if isinstance(tableName, list) and len(tableName) == 1:
+            tableName = tableName[0]
+
+        with Session(engine) as session:
+            table = Table(tableName, metadata, autoload_with=engine)
+            result = session.execute(select(table)).fetchall()
+            session.commit()
+
+            # Convert the results into a list of dictionaries
+            # Modified this line to use row2dict
+            rows = [row2dict(row) for row in result]
+
+            # Print the rows for debugging
+            print(f"Fetched {len(rows)} row(s) from {tableName}:")
+            for row in rows:
+                print(row)
+
+            return rows
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+        # If the table doesn't exist, print the available tables for debugging
+        inspector = inspect(engine)
+        print(f"Available tables in {databaseName}: {inspector.get_table_names()}")
+
+        return None
+
+
+def row2dict(row):
+    """Convert a SQLAlchemy RowProxy into a dictionary."""
+    return dict(row._mapping)
+
+
+##--------------------------------------------------------------------------
 
 
 class Api:
@@ -74,33 +122,18 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
+    # /////////////////////////////////////////////////////////Funções para o banco de dados
+    # //////////////////////////////////////////////////////////
+
     def get_data(self, groupName, databaseName, tableName):
-        print(
-            f"get_data called with: groupName={groupName}, databaseName={databaseName}, tableName={tableName}"
-        )  # debug print
-        # Connect to SQLite database
-        conn = sqlite3.connect(get_database_path(groupName, databaseName))
-
-        # Create a cursor object
-        c = conn.cursor()
-
-        # Execute an SQL command to get all rows from the table
-        c.execute(
-            f"SELECT * FROM {tableName[0]}"
-        )  # Use the first element of the tableName list
-
-        # Fetch all rows from the last executed SQL command
-        rows = c.fetchall()
-
-        # Don't forget to close the connection
-        conn.close()
-
+        rows = handle_database_operations(groupName, databaseName, tableName)
         return rows
 
+    # Pega o nome da tabela do banco de dados - Nome qualquer
     def get_tables(self, groupName, databaseName):
-        print(
-            f"get_tables called with: groupName={groupName}, databaseName={databaseName}"
-        )  # debug print
+        # print(
+        #     f"get_tables called with: groupName={groupName}, databaseName={databaseName}"
+        # )  # debug print
         conn = sqlite3.connect(get_database_path(groupName, databaseName))
         c = conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -108,7 +141,8 @@ class Api:
         conn.close()
         return tables
 
-    # Loading Translations
+    # //////////////////////////////////////////////////////////// Loading Translations
+    # //////////////////////////////////////////////////////////////
 
     def load_translations(self):
         try:
@@ -143,6 +177,7 @@ class Api:
         except Exception as e:
             logging.error(f"Error in change_language: {e}")
 
+    # ----------------------------------------------States do Collapsible - Left Panel --------------------------------
     # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
     def load_state(self, directory):
         # In the loadState method, if state.json does not exist,
@@ -171,7 +206,8 @@ class Api:
         with open("state.json", "w") as file:
             json.dump(data, file)
 
-    # ------------------------------------------Fechar Janela
+    # ---------------------------------------------------------------------Janelas
+    #  ------------------------------------------Fechar Janela
     def close_window(self):
         self.is_window_open = False
         if webview.windows:
