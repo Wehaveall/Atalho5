@@ -1,19 +1,25 @@
-var buttonStates = {};
 
+
+var buttonStates = {};
+var allDbFiles = {};
+
+// Wait until the document is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // Ensure pywebview API is ready
   window.addEventListener('pywebviewready', function () {
-    // ensure that pywebview API is ready
     if (!window.pywebview || !window.pywebview.api) {
-      console.error('pywebview API is not available tiotiotiotito');
+      console.error('pywebview API is not available');
       return;
     }
 
     // Load all states once at the start of the program
     window.pywebview.api.load_all_states().then(function (states) {
+      console.log('load_all_states called');
       buttonStates = states;
 
-      // get all directories and database files
+      // Get all directories and database files
       window.pywebview.api.get_all_db_files().then(function (allDbFiles) {
+        console.log('get_all_db_files called');
         // Now that the states have been loaded, create the collapsibles
         for (let directory in allDbFiles) {
           var db_files = allDbFiles[directory];
@@ -21,11 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     });
-
-    // Rest of your code...
   });
-});
 
+  // ... Rest of your code ...
+});
 
 
 
@@ -86,8 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-var buttonStates = {};
-var allDbFiles = {};
 
 window.onload = function () {
   // Load all states once at the start of the program
@@ -132,6 +135,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
 function createCollapsible(directory, db_files) {
+  console.log('createCollapsible called for directory:', directory);
   var leftPanel = document.getElementById('leftPanel');
 
   // Check if the button and the content div already exist
@@ -191,6 +195,9 @@ function createCollapsible(directory, db_files) {
   } else {
     collapsibleButton.innerHTML = "▶ " + directory;
   }
+
+  // Clear the content div before appending new database file names
+  contentDiv.innerHTML = '';
 
   db_files.forEach(function (databaseFile) {
     var db_file_elem = document.createElement('p');
@@ -263,7 +270,8 @@ function populateTable(data) {
 
 window.onbeforeunload = function () {
   // Save all states before the window closes
-  window.pywebview.api.save_all_states(buttonStates);
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.save_all_states(buttonStates);
+  }
   // Signal to Python that the window is closing
-
 };

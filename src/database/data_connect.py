@@ -49,23 +49,6 @@ def insert_into_db(shortcut, expansion, label):
         c.execute("INSERT INTO my_table VALUES (?, ?, ?)", (shortcut, expansion, label))
 
 
-def inject_data(window):
-    base_dir = os.path.dirname(
-        os.path.abspath(__file__)
-    )  # directory of the current script
-    groups_dir = os.path.join(base_dir, "groups")
-    subdirectories = [f.path for f in os.scandir(groups_dir) if f.is_dir()]
-
-    for subdirectory in subdirectories:
-        db_files = get_db_files_in_directory(subdirectory)
-        encoded_directory = json.dumps(os.path.basename(subdirectory))
-        encoded_db_files = json.dumps(db_files)  # encode the whole list of db files
-
-        window.evaluate_js(
-            f"createCollapsible({encoded_directory}, {encoded_db_files});"
-        )
-
-
 def get_db_files_in_directory(directory):
     if not os.path.exists(directory):
         raise ValueError(f"Directory '{directory}' does not exist.")

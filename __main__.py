@@ -13,7 +13,6 @@ from listener import KeyListener
 from src.database.data_connect import (
     get_database_path,
     get_db_files_in_directory,
-    inject_data,
     load_db_into_memory,
     save_db_from_memory,
 )
@@ -42,6 +41,13 @@ listener_instance, pynput_listener = listener.start_listener()
 WINDOW_TITLE = "Atalho"
 WINDOW_WIDTH = 1000
 WINDOW_HEIGHT = 600
+
+
+# Get the absolute path of the directory the script is in.
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Change the current working directory to the script directory.
+os.chdir(script_dir)
 
 
 # Window Resize classes and Functions
@@ -134,7 +140,7 @@ class Api:
 
     def get_all_db_files(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        groups_dir = os.path.join(base_dir, "groups")
+        groups_dir = os.path.join(base_dir, "src", "database", "groups")
         subdirectories = [f.path for f in os.scandir(groups_dir) if f.is_dir()]
 
         all_db_files = {}
@@ -142,6 +148,15 @@ class Api:
             db_files = get_db_files_in_directory(subdirectory)
             directory_name = os.path.basename(subdirectory)
             all_db_files[directory_name] = db_files
+
+            # Encode the directory name and .db files as JSON
+            encoded_directory = json.dumps(directory_name)
+            encoded_db_files = json.dumps(db_files)
+
+            # Call createCollapsible in JavaScript for this directory and its .db files
+            self.window.evaluate_js(
+                f"createCollapsible({encoded_directory}, {encoded_db_files});"
+            )
 
         return all_db_files
 
@@ -308,7 +323,6 @@ def get_window():
 
 def load_handler(window):
     global api
-    inject_data(window)
 
 
 def start_app():
