@@ -1,26 +1,38 @@
 var buttonStates = {};
 
 document.addEventListener('DOMContentLoaded', function () {
-  // ensure that pywebview API is ready
-  if (!window.pywebview || !window.pywebview.api) {
-    console.error('pywebview API is not available');
-    return;
-  }
+  window.addEventListener('pywebviewready', function () {
+    // ensure that pywebview API is ready
+    if (!window.pywebview || !window.pywebview.api) {
+      console.error('pywebview API is not available tiotiotiotito');
+      return;
+    }
 
-  // Load all states once at the start of the program
-  window.pywebview.api.load_all_states().then(function(states) {
-    buttonStates = states;
+    // Load all states once at the start of the program
+    window.pywebview.api.load_all_states().then(function (states) {
+      buttonStates = states;
 
-    // get all directories and database files
-    window.pywebview.api.get_all_db_files().then(function(allDbFiles) {
-      // Now that the states have been loaded, create the collapsibles
-      for (let directory in allDbFiles) {
-        var db_files = allDbFiles[directory];
-        createCollapsible(directory, db_files);
-      }
+      // get all directories and database files
+      window.pywebview.api.get_all_db_files().then(function (allDbFiles) {
+        // Now that the states have been loaded, create the collapsibles
+        for (let directory in allDbFiles) {
+          var db_files = allDbFiles[directory];
+          createCollapsible(directory, db_files);
+        }
+      });
     });
+
+    // Rest of your code...
   });
 });
+
+
+
+
+
+
+
+
 
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
