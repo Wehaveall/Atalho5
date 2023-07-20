@@ -1,18 +1,26 @@
-window.onload = function () {
+var buttonStates = {};
+
+document.addEventListener('DOMContentLoaded', function () {
+  // ensure that pywebview API is ready
+  if (!window.pywebview || !window.pywebview.api) {
+    console.error('pywebview API is not available');
+    return;
+  }
+
   // Load all states once at the start of the program
-  window.pywebview.api.load_all_states()
-    .then(states => {
-      buttonStates = states;
-      // Now that the states have been loaded, get the db_files_dict
-      window.pywebview.api.get_db_files_dict()
-        .then(db_files_dict => {
-          // Now that the db_files_dict has been loaded, create the collapsibles
-          for (let directory in buttonStates) {
-            createCollapsible(directory, db_files_dict[directory]);
-          }
-        });
+  window.pywebview.api.load_all_states().then(function(states) {
+    buttonStates = states;
+
+    // get all directories and database files
+    window.pywebview.api.get_all_db_files().then(function(allDbFiles) {
+      // Now that the states have been loaded, create the collapsibles
+      for (let directory in allDbFiles) {
+        var db_files = allDbFiles[directory];
+        createCollapsible(directory, db_files);
+      }
     });
-};
+  });
+});
 
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;

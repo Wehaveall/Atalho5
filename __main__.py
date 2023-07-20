@@ -12,6 +12,7 @@ from listener import KeyListener
 # Import database
 from src.database.data_connect import (
     get_database_path,
+    get_db_files_in_directory,
     inject_data,
     load_db_into_memory,
     save_db_from_memory,
@@ -123,20 +124,26 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
-    def get_db_files_dict(self):
-        base_dir = os.path.dirname(
-            os.path.abspath(__file__)
-        )  # directory of the current script
+    def get_database_names(self):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        groups_dir = os.path.join(base_dir, "groups")
+        database_files = glob.glob(os.path.join(groups_dir, "*.db"))
+        database_names = [os.path.basename(db_file) for db_file in database_files]
+
+        return database_names
+
+    def get_all_db_files(self):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
         subdirectories = [f.path for f in os.scandir(groups_dir) if f.is_dir()]
 
-        db_files_dict = {}
+        all_db_files = {}
         for subdirectory in subdirectories:
             db_files = get_db_files_in_directory(subdirectory)
-            encoded_directory = json.dumps(os.path.basename(subdirectory))
-            db_files_dict[encoded_directory] = db_files
+            directory_name = os.path.basename(subdirectory)
+            all_db_files[directory_name] = db_files
 
-        return db_files_dict
+        return all_db_files
 
     def get_data(self, groupName, databaseName, tableName):
         rows = handle_database_operations(groupName, databaseName, tableName)

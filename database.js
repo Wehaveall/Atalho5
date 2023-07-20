@@ -1,21 +1,21 @@
 
 // The DOMContentLoaded event listener and the populateTable function remain unchanged
 
-document.addEventListener('DOMContentLoaded', function () {
-    window.pywebview.api.get_database_names()
-        .then(function (databaseNames) {
-            var container = document.getElementById('collapsible');
-            for (var i = 0; i < databaseNames.length; i++) {
-                var databaseName = databaseNames[i];
-                // This code has been removed, since it's now in the createCollapsible function in appfunctions.js
-            }
-        })
-        .catch(function (error) {
-            console.log('Error in get_database_names:', error);
-        });
-});
-
-
+window.onload = function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        window.pywebview.api.get_database_names()
+            .then(function (databaseNames) {
+                var container = document.getElementById('collapsible');
+                for (var i = 0; i < databaseNames.length; i++) {
+                    var databaseName = databaseNames[i];
+                    // This code has been removed, since it's now in the createCollapsible function in appfunctions.js
+                }
+            })
+            .catch(function (error) {
+                console.log('Error in get_database_names:', error);
+            });
+    });
+}
 
 //------------------------------- Popular dados dos bancos de dados no elemento myTable
 // function populateTable(data) {
