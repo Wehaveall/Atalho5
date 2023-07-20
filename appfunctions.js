@@ -1,3 +1,19 @@
+window.onload = function () {
+  // Load all states once at the start of the program
+  window.pywebview.api.load_all_states()
+    .then(states => {
+      buttonStates = states;
+      // Now that the states have been loaded, get the db_files_dict
+      window.pywebview.api.get_db_files_dict()
+        .then(db_files_dict => {
+          // Now that the db_files_dict has been loaded, create the collapsibles
+          for (let directory in buttonStates) {
+            createCollapsible(directory, db_files_dict[directory]);
+          }
+        });
+    });
+};
+
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
   let isResizing = false;
@@ -50,6 +66,21 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+var buttonStates = {};
+var allDbFiles = {};
+
+window.onload = function () {
+  // Load all states once at the start of the program
+  window.pywebview.api.load_all_states()
+    .then(states => {
+      buttonStates = states;
+      // Now that the states have been loaded, create the collapsibles
+      for (let directory in allDbFiles) {
+        createCollapsible(directory, allDbFiles[directory]);
+      }
+    });
+};
+
 function openTab(evt, tabName) {
   var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
@@ -77,19 +108,78 @@ document.addEventListener('DOMContentLoaded', (event) => {
   }
 });
 
+
+
+
 function createCollapsible(directory, db_files) {
   var leftPanel = document.getElementById('leftPanel');
 
-  var collapsibleButton = document.createElement('button');
-  collapsibleButton.className = 'collapsible';
-  collapsibleButton.innerHTML = directory;
+  // Check if the button and the content div already exist
+  var collapsibleButton = document.getElementById(directory);
+  var contentDiv = document.getElementById(directory + '-content');
 
-  var contentDiv = document.createElement('div');
-  contentDiv.className = 'content';
+  // If the button doesn't exist, create it
+  if (!collapsibleButton) {
+    collapsibleButton = document.createElement('button');
+    collapsibleButton.id = directory;
+    collapsibleButton.className = 'collapsible';
+
+    // Set the color of the collapsible button text to dark gray
+    collapsibleButton.style.color = "#333";
+
+    // Set the background color of the button to light gray
+    collapsibleButton.style.backgroundColor = "#ccc";
+
+    // Add an event listener to the button
+    collapsibleButton.addEventListener('click', function () {
+      this.classList.toggle('active');
+      if (contentDiv.style.display === "block") {
+        contentDiv.style.display = "none";
+        buttonStates[directory] = 'none';
+        this.innerHTML = "▶ " + directory;
+      } else {
+        contentDiv.style.display = "block";
+        buttonStates[directory] = 'block';
+        this.innerHTML = "▼ " + directory;
+      }
+      window.pywebview.api.save_all_states(buttonStates);  // Save the states whenever a button is clicked
+    });
+
+    // Append the button to the left panel
+    leftPanel.appendChild(collapsibleButton);
+  }
+
+  // If the content div doesn't exist, create it
+  if (!contentDiv) {
+    contentDiv = document.createElement('div');
+    contentDiv.id = directory + '-content';
+    contentDiv.className = 'content';
+
+    // Add CSS rules to ensure the div behaves as a block-level element
+    contentDiv.style.display = "none";
+    contentDiv.style.width = "100%";
+
+    // Append the content div to the left panel
+    leftPanel.appendChild(contentDiv);
+  }
+
+  // Get the state of the button from the buttonStates global variable and set the initial arrow direction
+  var state = buttonStates[directory] || 'none';
+  if (state === 'block') {
+    collapsibleButton.innerHTML = "▼ " + directory;
+    contentDiv.style.display = "block";
+  } else {
+    collapsibleButton.innerHTML = "▶ " + directory;
+  }
 
   db_files.forEach(function (databaseFile) {
     var db_file_elem = document.createElement('p');
-    db_file_elem.textContent = databaseFile;
+    var filenameWithoutExtension = databaseFile.replace('.db', '');
+    db_file_elem.textContent = filenameWithoutExtension;
+
+    // Add left padding to align with the title
+    db_file_elem.style.paddingLeft = "30px";
+
     db_file_elem.addEventListener('click', function () {
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
@@ -103,33 +193,22 @@ function createCollapsible(directory, db_files) {
           console.log('Error in get_tables:', error);
         });
     });
+
+    // Append the p element to the content div
     contentDiv.appendChild(db_file_elem);
   });
-
-  collapsibleButton.addEventListener('click', function () {
-    this.classList.toggle('active');
-    if (contentDiv.style.display === "block") {
-      contentDiv.style.display = "none";
-      window.pywebview.api.save_state(directory, 'none');
-    } else {
-      contentDiv.style.display = "block";
-      window.pywebview.api.save_state(directory, 'block');
-    }
-  });
-
-  leftPanel.appendChild(collapsibleButton);
-  leftPanel.appendChild(contentDiv);
-
-  window.pywebview.api.load_state(directory)
-    .then(state => {
-      if (state === 'block') {
-        contentDiv.style.display = 'block';
-        collapsibleButton.classList.add('active');
-      } else {
-        contentDiv.style.display = 'none';
-      }
-    });
 }
+
+
+
+
+
+
+
+
+//----------------------------------------------------------------POPULATE DATA----------------------------------------------------------------
+
+
 
 function populateTable(data) {
   console.log("populateTable called with data:", data);
@@ -154,3 +233,17 @@ function populateTable(data) {
   }
 }
 
+
+
+
+
+
+
+
+
+window.onbeforeunload = function () {
+  // Save all states before the window closes
+  window.pywebview.api.save_all_states(buttonStates);
+  // Signal to Python that the window is closing
+
+};

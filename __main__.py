@@ -3,7 +3,6 @@ api = None  # Declare api as a global variable
 import webview
 import threading
 import time
-
 import pygetwindow as gw
 from screeninfo import get_monitors
 
@@ -26,10 +25,12 @@ import os
 import logging
 import sqlite3
 
-
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy import inspect
+from threading import Lock
+
+state_lock = Lock()
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -122,27 +123,32 @@ class Api:
         self.window = None
         self.is_resizing = False  # Add a state variable for resizing
 
-    # /////////////////////////////////////////////////////////Funções para o banco de dados
-    # //////////////////////////////////////////////////////////
+    def get_db_files_dict(self):
+        base_dir = os.path.dirname(
+            os.path.abspath(__file__)
+        )  # directory of the current script
+        groups_dir = os.path.join(base_dir, "groups")
+        subdirectories = [f.path for f in os.scandir(groups_dir) if f.is_dir()]
+
+        db_files_dict = {}
+        for subdirectory in subdirectories:
+            db_files = get_db_files_in_directory(subdirectory)
+            encoded_directory = json.dumps(os.path.basename(subdirectory))
+            db_files_dict[encoded_directory] = db_files
+
+        return db_files_dict
 
     def get_data(self, groupName, databaseName, tableName):
         rows = handle_database_operations(groupName, databaseName, tableName)
         return rows
 
-    # Pega o nome da tabela do banco de dados - Nome qualquer
     def get_tables(self, groupName, databaseName):
-        # print(
-        #     f"get_tables called with: groupName={groupName}, databaseName={databaseName}"
-        # )  # debug print
         conn = sqlite3.connect(get_database_path(groupName, databaseName))
         c = conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = c.fetchall()
         conn.close()
         return tables
-
-    # //////////////////////////////////////////////////////////// Loading Translations
-    # //////////////////////////////////////////////////////////////
 
     def load_translations(self):
         try:
@@ -177,50 +183,30 @@ class Api:
         except Exception as e:
             logging.error(f"Error in change_language: {e}")
 
-    # ----------------------------------------------States do Collapsible - Left Panel --------------------------------
-    # -----------------------Por enquanto, caregando o state do collapsible	Left Panel - state.json
-    def load_state(self, directory):
-        # In the loadState method, if state.json does not exist,
-        # the method will return "none". This is done using:
-
+    def load_all_states(self):
         if not os.path.exists("state.json"):
-            return "none"
-
-        with open("state.json", "r") as file:
-            data = json.load(file)
-            return data.get(directory, "none")
-
-    # -----------------------Por enquanto, salvando o state do collapsible	Left Panel - state.json
-
-    def save_state(self, directory, state):
-        # In the saveState method, if state.json does not exist, a new dictionary
-        #  is created to store the data. This is done using:
-
-        if not os.path.exists("state.json"):
-            data = {}
-        else:
+            return {}
+        with state_lock:
             with open("state.json", "r") as file:
                 data = json.load(file)
+                return data
 
-        data[directory] = state
-        with open("state.json", "w") as file:
-            json.dump(data, file)
+    def save_all_states(self, states):
+        with state_lock:
+            with open("state.json", "w") as file:
+                json.dump(states, file)
 
-    # ---------------------------------------------------------------------Janelas
-    #  ------------------------------------------Fechar Janela
     def close_window(self):
         self.is_window_open = False
         if webview.windows:
             self.window.destroy()
             listener.stop_keyboard_listener(listener_instance, pynput_listener)
 
-    # ----------------------------------------Minimizar Janela
     def minimize_window(self):
         window = get_window()
         if window:
             window.minimize()
 
-    # -----------------------------------------Maximizar, Restaura Janela
     def maximize_or_restore_window(self):
         window = get_window()
         if window:
@@ -230,19 +216,15 @@ class Api:
             window_size = window.size
 
             if window_size.width < screen_width or window_size.height < screen_height:
-                # The window is not maximized, so maximize it
                 window.maximize()
                 self.window.evaluate_js(
                     'document.getElementById("maxRestore").children[0].src="/src/images/restoreBtn_white.png"'
                 )
             else:
-                # The window is maximized, so restore it
                 window.restore()
                 self.window.evaluate_js(
                     'document.getElementById("maxRestore").children[0].src="/src/images/maxBtn_white.png"'
                 )
-
-    # ----------------------------Criar e posicionar janela
 
     def create_and_position_window(self):
         monitor = get_monitors()[0]
@@ -257,20 +239,11 @@ class Api:
             frameless=True,
             resizable=True,
             js_api=api,
-            # The Python webview package provides an option to bind Python methods to JavaScript functions through
-            # the js_api parameter of the webview.create_window() function.
-            # In the main.py file you provided, an instance of the Api class is passed as the js_api parameter.
-            #  This means that all methods of the Api class are available to be called from JavaScript.
-            # You can add a new method to the Api class to load the translations from a JSON file and return them.
-            #  This method can then be called from JavaScript to get the translations.
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
-            # Wait for DOMContentLoaded before creating the window
         )
 
-        # Wait a short moment for the window to be created
         time.sleep(1)
 
-        # Find the window and move it
         window = get_window()
         if window:
             window.moveTo(pos_x, pos_y)
@@ -278,25 +251,18 @@ class Api:
         threading.Thread(target=self.call_load_handler_after_delay).start()
 
     def call_load_handler_after_delay(self):
-        time.sleep(0.5)  # wait for the window to be ready
+        time.sleep(0.5)
         load_handler(self.window)
 
-    # Handle Window Resize
     def start_resizing(self):
         self.is_resizing = True
-        threading.Thread(
-            target=self.doresize
-        ).start()  # Start the resizing on a new thread
+        threading.Thread(target=self.doresize).start()
 
     def stop_resizing(self):
         self.is_resizing = False
 
     def doresize(self):
-        # The doresize function now checks the is_resizing state variable
-        # And runs in a loop until is_resizing is set to False
-        state_left = windll.user32.GetKeyState(
-            0x01
-        )  # Left button down = 0 or 1. Button up = -127 or -128
+        state_left = windll.user32.GetKeyState(0x01)
         winWbefore = self.window.width
         winHbefore = self.window.height
 
@@ -311,7 +277,6 @@ class Api:
             try:
                 totalx = int(beforex) - int(afterx)
                 totaly = int(beforey) - int(aftery)
-
             except:
                 print("fail")
             if totalx > 0:
