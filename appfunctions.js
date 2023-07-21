@@ -1,4 +1,5 @@
 
+var activeCollapsibleButton = null;  /// For the rounded border
 
 var buttonStates = {};
 var allDbFiles = {};
@@ -132,7 +133,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+///CREATE COLLAPSIBLE
 
 function createCollapsible(directory, db_files) {
   console.log('createCollapsible called for directory:', directory);
@@ -148,24 +152,63 @@ function createCollapsible(directory, db_files) {
     collapsibleButton.id = directory;
     collapsibleButton.className = 'collapsible';
 
+    // Create span for the arrow
+    var arrowSpan = document.createElement('span');
+    arrowSpan.className = 'arrow-right';
+    arrowSpan.innerHTML = "▶ ";
+
+    // Create span for the directory name
+    var directorySpan = document.createElement('span');
+    directorySpan.textContent = directory;
+
+    // Append the spans to the button
+    collapsibleButton.appendChild(arrowSpan);
+    collapsibleButton.appendChild(directorySpan);
+
+    collapsibleButton.style.fontFamily = "'Work Sans', sans-serif";
+
     // Set the color of the collapsible button text to dark gray
     collapsibleButton.style.color = "#333";
 
     // Set the background color of the button to light gray
     collapsibleButton.style.backgroundColor = "#ccc";
 
+    // Use Flexbox to vertically center the arrow and the directory name
+    collapsibleButton.style.display = 'flex';
+    collapsibleButton.style.alignItems = 'center';
+
+    // Add a transparent border to the button
+    collapsibleButton.style.border = '2px solid transparent';
+    collapsibleButton.style.borderRadius = '5px';
+
     // Add an event listener to the button
     collapsibleButton.addEventListener('click', function () {
+      // If there's an active button and it's not the current button, make its border transparent
+      if (activeCollapsibleButton && activeCollapsibleButton !== this) {
+        activeCollapsibleButton.style.borderColor = 'transparent';
+      }
+
+      // Toggle this button's active state
       this.classList.toggle('active');
+
+      var arrowSpan = this.children[0];  // get the arrow span
+
       if (contentDiv.style.display === "block") {
         contentDiv.style.display = "none";
         buttonStates[directory] = 'none';
-        this.innerHTML = "▶ " + directory;
+        arrowSpan.innerHTML = "▶ ";
       } else {
         contentDiv.style.display = "block";
         buttonStates[directory] = 'block';
-        this.innerHTML = "▼ " + directory;
+        arrowSpan.innerHTML = "▼ ";
       }
+
+      // Change the border color to orange
+      this.style.borderColor = 'orange';
+
+      // Set this button as the active button
+      activeCollapsibleButton = this;
+
       window.pywebview.api.save_all_states(buttonStates);  // Save the states whenever a button is clicked
     });
 
@@ -187,15 +230,6 @@ function createCollapsible(directory, db_files) {
     leftPanel.appendChild(contentDiv);
   }
 
-  // Get the state of the button from the buttonStates global variable and set the initial arrow direction
-  var state = buttonStates[directory] || 'none';
-  if (state === 'block') {
-    collapsibleButton.innerHTML = "▼ " + directory;
-    contentDiv.style.display = "block";
-  } else {
-    collapsibleButton.innerHTML = "▶ " + directory;
-  }
-
   // Clear the content div before appending new database file names
   contentDiv.innerHTML = '';
 
@@ -206,6 +240,9 @@ function createCollapsible(directory, db_files) {
 
     // Add left padding to align with the title
     db_file_elem.style.paddingLeft = "30px";
+    db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
+    db_file_elem.style.fontSize = "14px";
+    db_file_elem.style.marginTop = "10px";
 
     db_file_elem.addEventListener('click', function () {
       window.pywebview.api.get_tables(directory, databaseFile)
@@ -225,7 +262,6 @@ function createCollapsible(directory, db_files) {
     contentDiv.appendChild(db_file_elem);
   });
 }
-
 
 
 
