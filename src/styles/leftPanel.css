@@ -18,6 +18,12 @@
     font-size: 15px;
 }
 
+
+.focused {
+    background-color: orange;
+  }
+
+
 .active,
 .collapsible:hover {
     background-color: #555;

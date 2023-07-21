@@ -223,8 +223,16 @@ function createCollapsible(directory, db_files) {
     contentDiv.className = 'content';
 
     // Add CSS rules to ensure the div behaves as a block-level element
-    contentDiv.style.display = "none";
     contentDiv.style.width = "100%";
+
+    // Set the display state of the content div based on the saved state
+    if (buttonStates[directory] === 'block') {
+      contentDiv.style.display = "block";
+      arrowSpan.innerHTML = "▼ ";
+    } else {
+      contentDiv.style.display = "none";
+      arrowSpan.innerHTML = "▶ ";
+    }
 
     // Append the content div to the left panel
     leftPanel.appendChild(contentDiv);
@@ -238,6 +246,9 @@ function createCollapsible(directory, db_files) {
     var filenameWithoutExtension = databaseFile.replace('.db', '');
     db_file_elem.textContent = filenameWithoutExtension;
 
+    // Add a class to child elements
+    db_file_elem.className = 'child-elem';
+
     // Add left padding to align with the title
     db_file_elem.style.paddingLeft = "30px";
     db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
@@ -245,6 +256,15 @@ function createCollapsible(directory, db_files) {
     db_file_elem.style.marginTop = "10px";
 
     db_file_elem.addEventListener('click', function () {
+      // Remove 'focused' class from all children across all sections
+      let allChildElements = document.getElementsByClassName('child-elem');
+      for (let i = 0; i < allChildElements.length; i++) {
+        allChildElements[i].classList.remove('focused');
+      }
+
+      // Add 'focused' class to the clicked child
+      this.classList.add('focused');
+
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
           tableNames.forEach(function (tableName) {
@@ -262,6 +282,8 @@ function createCollapsible(directory, db_files) {
     contentDiv.appendChild(db_file_elem);
   });
 }
+
+
 
 
 
