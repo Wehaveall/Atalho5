@@ -6,7 +6,6 @@ body {
 
 table {
     border-collapse: collapse
-  
 }
 
 table:not([cellpadding]) td,
@@ -64,4 +63,15 @@ code {
     border-right: 2px solid #ccc;
     margin-right: 1.5rem;
     padding-right: 1rem
+}
+
+.tox .tox-tbtn {
+    transform: scale(0.4) !important;
+    /* you can set the scale that you want */
+    height: unset !important;
+    width: unset !important;
+}
+
+.tox .tox-tbtn--bespoke .tox-tbtn__select-label {
+    width: unset !important;
 }
