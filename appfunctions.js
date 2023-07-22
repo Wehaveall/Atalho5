@@ -211,7 +211,7 @@ function createCollapsible(directory, db_files) {
 
         // Hide the table and table headers when a group is collapsed
         document.getElementById('myTable').style.display = 'none';
-
+        document.getElementById("header").style.display = "none";
 
       } else {
         contentDiv.style.display = "block";
@@ -284,6 +284,13 @@ function createCollapsible(directory, db_files) {
         allChildElements[i].classList.remove('focused');
       }
 
+      // Deselect the active collapsible button
+      if (activeCollapsibleButton) {
+        activeCollapsibleButton.classList.remove('active');
+        activeCollapsibleButton.style.borderColor = 'transparent';
+        activeCollapsibleButton = null;
+      }
+
       // Add 'focused' class to the clicked child
       this.classList.add('focused');
 
@@ -295,14 +302,15 @@ function createCollapsible(directory, db_files) {
             window.pywebview.api.get_data(directory, databaseFile, tableName)
               .then(data => {
                 if (databaseChildSelected) {
-                  console.log('Showing table and headers');  // Add this
-                  document.getElementById('myTable').style.display = 'table';  // Make it visible
 
+                  document.getElementById('myTable').style.display = 'table';  // Make it visible
+                  document.getElementById('header').style.display = 'block';
                   populateTable(data);
                 } else {
-                  console.log('Hiding table and headers');  // Add this
+
                   document.getElementById('myTable').innerHTML = "";
                   document.getElementById('myTable').style.display = 'none';  // Hide it
+                  document.getElementById('header').style.display = 'none';
 
                 }
               })
