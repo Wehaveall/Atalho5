@@ -1,6 +1,11 @@
+@import '~quill/dist/quill.snow.css';
+
+
+
+
 #rightPanel {
     width: 45%;
-    background-color: chartreuse;
+    background-color: rgb(228, 230, 225);
     /* adjust as needed */
 
 }

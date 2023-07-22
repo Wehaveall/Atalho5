@@ -1,5 +1,6 @@
 api = None  # Declare api as a global variable
 
+import glob
 import webview
 import threading
 import time
