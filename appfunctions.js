@@ -138,6 +138,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 /////////////////////////////////////////////////////////////////////////////////////////
 ///CREATE COLLAPSIBLE
 
+let databaseChildSelected = false;
+
 function createCollapsible(directory, db_files) {
   console.log('createCollapsible called for directory:', directory);
   var leftPanel = document.getElementById('leftPanel');
@@ -171,7 +173,7 @@ function createCollapsible(directory, db_files) {
     collapsibleButton.style.color = "#333";
 
     // Set the background color of the button to light gray
-    collapsibleButton.style.backgroundColor = "#ccc";
+    collapsibleButton.style.backgroundColor = "#f1f1f1";
 
     // Use Flexbox to vertically center the arrow and the directory name
     collapsibleButton.style.display = 'flex';
@@ -197,6 +199,15 @@ function createCollapsible(directory, db_files) {
         contentDiv.style.display = "none";
         buttonStates[directory] = 'none';
         arrowSpan.innerHTML = "▶ ";
+
+        // When collapsing the group, deselect any selected database
+        let allChildElements = contentDiv.getElementsByClassName('child-elem');
+        for (let i = 0; i < allChildElements.length; i++) {
+          allChildElements[i].classList.remove('focused');
+        }
+        databaseChildSelected = false;
+        document.getElementById('nomeDatabase').textContent = '';
+        document.getElementById('myTable').style.display = 'none';  // Hide the table
       } else {
         contentDiv.style.display = "block";
         buttonStates[directory] = 'block';
@@ -204,7 +215,7 @@ function createCollapsible(directory, db_files) {
       }
 
       // Change the border color to orange
-      this.style.borderColor = 'orange';
+      this.style.borderColor = '#f5b57f';
 
       // Set this button as the active button
       activeCollapsibleButton = this;
@@ -265,11 +276,21 @@ function createCollapsible(directory, db_files) {
       // Add 'focused' class to the clicked child
       this.classList.add('focused');
 
+      databaseChildSelected = true;
+
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
           tableNames.forEach(function (tableName) {
             window.pywebview.api.get_data(directory, databaseFile, tableName)
-              .then(data => populateTable(data))
+              .then(data => {
+                if (databaseChildSelected) {
+                  document.getElementById('myTable').style.display = 'table';  // Make it visible
+                  populateTable(data);
+                } else {
+                  document.getElementById('myTable').innerHTML = "";
+                  document.getElementById('myTable').style.display = 'none';  // Hide it
+                }
+              })
               .catch(error => console.error('Error:', error));
           });
         })
@@ -282,7 +303,6 @@ function createCollapsible(directory, db_files) {
     contentDiv.appendChild(db_file_elem);
   });
 }
-
 
 
 
