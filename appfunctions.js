@@ -201,17 +201,28 @@ function createCollapsible(directory, db_files) {
         arrowSpan.innerHTML = "▶ ";
 
         // When collapsing the group, deselect any selected database
-        let allChildElements = contentDiv.getElementsByClassName('child-elem');
+        // When collapsing the group or expanding, deselect any selected database in any group
+        let allChildElements = document.getElementsByClassName('child-elem');
         for (let i = 0; i < allChildElements.length; i++) {
           allChildElements[i].classList.remove('focused');
         }
         databaseChildSelected = false;
-        document.getElementById('nomeDatabase').textContent = '';
-        document.getElementById('myTable').style.display = 'none';  // Hide the table
+
+
+        // Hide the table and table headers when a group is collapsed
+        document.getElementById('myTable').style.display = 'none';
+
+
       } else {
         contentDiv.style.display = "block";
         buttonStates[directory] = 'block';
         arrowSpan.innerHTML = "▼ ";
+
+        // When expanding the group, deselect any selected child
+        let allChildElements = contentDiv.getElementsByClassName('child-elem');
+        for (let i = 0; i < allChildElements.length; i++) {
+          allChildElements[i].classList.remove('focused');
+        }
       }
 
       // Change the border color to orange
@@ -284,11 +295,15 @@ function createCollapsible(directory, db_files) {
             window.pywebview.api.get_data(directory, databaseFile, tableName)
               .then(data => {
                 if (databaseChildSelected) {
+                  console.log('Showing table and headers');  // Add this
                   document.getElementById('myTable').style.display = 'table';  // Make it visible
+
                   populateTable(data);
                 } else {
+                  console.log('Hiding table and headers');  // Add this
                   document.getElementById('myTable').innerHTML = "";
                   document.getElementById('myTable').style.display = 'none';  // Hide it
+
                 }
               })
               .catch(error => console.error('Error:', error));
