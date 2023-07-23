@@ -4371,3 +4371,14 @@ body.tox-dialog__disable-scroll {
     display: flex;
     flex: 1
 }
+
+.tox .tox-tbtn {
+    transform: scale(0.9) !important;
+    /* you can set the scale that you want */
+    height: unset !important;
+    width: unset !important;
+}
+
+.tox .tox-tbtn--bespoke .tox-tbtn__select-label {
+    width: unset !important;
+}

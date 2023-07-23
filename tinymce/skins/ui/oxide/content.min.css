@@ -926,3 +926,13 @@ table {
     border-collapse: collapse
 }
 
+.tox .tox-tbtn {
+    transform: scale(0.7) !important;
+    /* you can set the scale that you want */
+    height: unset !important;
+    width: unset !important;
+}
+
+.tox .tox-tbtn--bespoke .tox-tbtn__select-label {
+    width: unset !important;
+}
