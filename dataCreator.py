@@ -174,11 +174,11 @@ def create_db(fields, db_name="E:/legal.db"):
 
 
 # Load the HTML file
-with open("E:/ce_v2.html", "r", encoding="utf-8") as file:
+with open("E:/cf_v2.html", "r", encoding="utf-8") as file:
     html = file.read()
 
 # Extract the fields from the HTML
-prefix = "ce"
+prefix = "cf"
 fields = extract_fields(html, prefix)
 
 # Create the database and insert the data

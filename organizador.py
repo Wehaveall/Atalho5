@@ -58,7 +58,7 @@ def modify_legal_document(input_file_path, output_file_path):
 
 
 # Test the function with the original file and a new output file
-modify_legal_document("E:/ce.html", "E:/ce_v2.html")
+modify_legal_document("E:/cf.html", "E:/cf_v2.html")
 
 # "/mnt/data/modified_DEL2848compilado_function_v2.html"  # Return the path of the new file for the user to download
 
