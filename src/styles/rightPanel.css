@@ -2,7 +2,24 @@
     margin-right: 5px;
     height: 10%;
     width: 45%;
-    background-color: rgb(228, 230, 225);
+    background-color: rgb(245, 245, 245);
     /* adjust as needed */
 
+
+}
+
+#atalhoRight,
+#caseRight {
+    display: inline-block;
+}
+
+#atalhoRight input,
+#caseRight select {
+    border: none;
+    height: 30px;
+    /* adjust this value to fit your needs */
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 15px;
+    /* adjust this value to fit your needs */
 }

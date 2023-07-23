@@ -3,20 +3,30 @@ body,
 html {
   height: 100%;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* add this line to hide scrollbar */
 }
 
 
 #edge-detection {
+  background-color: coral;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
 #content-wrapper {
+
+  background-color: chartreuse;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  /* add this line to make content wrapper fill all available space */
+  overflow: auto;
+  /* add this line to allow scrolling inside content wrapper if content exceeds its height */
 }
+
 
 .content {
   /* flex-grow: 1; */

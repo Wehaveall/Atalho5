@@ -41,7 +41,7 @@ listener_instance, pynput_listener = listener.start_listener()
 
 WINDOW_TITLE = "Atalho"
 WINDOW_WIDTH = 1270
-WINDOW_HEIGHT = 600
+WINDOW_HEIGHT = 720
 
 
 # Get the absolute path of the directory the script is in.
