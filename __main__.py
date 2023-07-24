@@ -40,8 +40,8 @@ logging.basicConfig(
 listener_instance, pynput_listener = listener.start_listener()
 
 WINDOW_TITLE = "Atalho"
-WINDOW_WIDTH = 1
-WINDOW_HEIGHT = 1
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 700
 
 
 # Get the absolute path of the directory the script is in.
@@ -262,7 +262,7 @@ class Api:
             frameless=False,
             resizable=True,
             js_api=api,
-            min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
+            min_size=(screen_width // 2, WINDOW_HEIGHT),
         )
 
         time.sleep(1)
@@ -279,44 +279,44 @@ class Api:
 
     # ----------------------------------------------Resizing
 
-    def start_resizing(self):
-        self.is_resizing = True
-        threading.Thread(target=self.doresize).start()
+    # def start_resizing(self):
+    #     self.is_resizing = True
+    #     threading.Thread(target=self.doresize).start()
 
-    def stop_resizing(self):
-        self.is_resizing = False
+    # def stop_resizing(self):
+    #     self.is_resizing = False
 
-    def doresize(self):
-        state_left = windll.user32.GetKeyState(0x01)
-        winWbefore = self.window.width
-        winHbefore = self.window.height
+    # def doresize(self):
+    #     state_left = windll.user32.GetKeyState(0x01)
+    #     winWbefore = self.window.width
+    #     winHbefore = self.window.height
 
-        mouseactive = queryMousePosition()
-        beforex = mouseactive["x"]
-        beforey = mouseactive["y"]
+    #     mouseactive = queryMousePosition()
+    #     beforex = mouseactive["x"]
+    #     beforey = mouseactive["y"]
 
-        while self.is_resizing:
-            mouseactive = queryMousePosition()
-            afterx = mouseactive["x"]
-            aftery = mouseactive["y"]
-            try:
-                totalx = int(beforex) - int(afterx)
-                totaly = int(beforey) - int(aftery)
-            except:
-                print("fail")
-            if totalx > 0:
-                changerx = winWbefore + (totalx * -1)
-            else:
-                changerx = winWbefore + (totalx * -1)
+    #     while self.is_resizing:
+    #         mouseactive = queryMousePosition()
+    #         afterx = mouseactive["x"]
+    #         aftery = mouseactive["y"]
+    #         try:
+    #             totalx = int(beforex) - int(afterx)
+    #             totaly = int(beforey) - int(aftery)
+    #         except:
+    #             print("fail")
+    #         if totalx > 0:
+    #             changerx = winWbefore + (totalx * -1)
+    #         else:
+    #             changerx = winWbefore + (totalx * -1)
 
-            if totaly > 0:
-                changerY = winHbefore + (totaly * -1)
-            else:
-                changerY = winHbefore + (totaly * -1)
+    #         if totaly > 0:
+    #             changerY = winHbefore + (totaly * -1)
+    #         else:
+    #             changerY = winHbefore + (totaly * -1)
 
-            self.window.resize(changerx, changerY)
+    #         self.window.resize(changerx, changerY)
 
-            time.sleep(0.01)
+    #         time.sleep(0.01)
 
 
 def get_window():
