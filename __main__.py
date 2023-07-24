@@ -40,8 +40,8 @@ logging.basicConfig(
 listener_instance, pynput_listener = listener.start_listener()
 
 WINDOW_TITLE = "Atalho"
-WINDOW_WIDTH = 1270
-WINDOW_HEIGHT = 720
+WINDOW_WIDTH = 1
+WINDOW_HEIGHT = 1
 
 
 # Get the absolute path of the directory the script is in.
@@ -260,7 +260,7 @@ class Api:
             title=WINDOW_TITLE,
             url="index.html",
             frameless=True,
-            resizable=True,
+            resizable=False,
             js_api=api,
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
         )
@@ -276,6 +276,8 @@ class Api:
     def call_load_handler_after_delay(self):
         time.sleep(0.5)
         load_handler(self.window)
+
+    # ----------------------------------------------Resizing
 
     def start_resizing(self):
         self.is_resizing = True
