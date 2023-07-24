@@ -17,7 +17,7 @@
   <title>Atalho</title>
 
   <link rel="stylesheet" type="text/css" href="src/styles/style.css">
-  <link rel="stylesheet" type="text/css" href="src/styles/titleBar.css">
+  <!-- <link rel="stylesheet" type="text/css" href="src/styles/titleBar.css"> -->
   <link rel="stylesheet" type="text/css" href="src/styles/leftPanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/middlePanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/rightPanel.css">
@@ -54,14 +54,14 @@
 
 
   <!-- --------------------------------Edge Detection - Content Wrapper-------------------------------- -->
-  <div id="edge-detection">
+  <!-- <div id="edge-detection">
 
-    <div id="content-wrapper">
-      <!-- ------------------------------------------------------------------------- -->
+    <div id="content-wrapper"> -->
+  <!-- ------------------------------------------------------------------------- -->
 
 
-      <!-- ----------------------Title Bar-------------------- -->
-      <div id="titleBar" class="pywebview-drag-region">
+  <!-- ----------------------Title Bar-------------------- -->
+  <!-- <div id="titleBar" class="pywebview-drag-region">
         <span id="icon"><img src="/src/images/atalho.png" alt=""></span>
         <span id="name">Atalho</span>
 
@@ -74,156 +74,156 @@
               alt="Close"></button>
         </div>
 
+      </div> -->
+
+
+  <!-- ////////////////////////TABS ////////////////////////// -->
+
+
+
+  <div class="tab">
+    <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
+    <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
+    <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
+    <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
+  </div>
+
+
+  <div id="Tab1" class="tabcontent">
+    <!-- Your existing div "content" goes here -->
+
+
+
+    <!-- --------------------Content------------------------------ -->
+    <div id="content" class="content">
+
+
+
+      <div id="leftPanel">
+
+
+        <input type="text" placeholder="Pesquisar...">
+
+
+
+
       </div>
 
 
-      <!-- ////////////////////////TABS ////////////////////////// -->
+      <div id="middlePanel">
 
-
-
-      <div class="tab">
-        <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
-        <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
-        <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
-        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
-      </div>
-
-
-      <div id="Tab1" class="tabcontent">
-        <!-- Your existing div "content" goes here -->
-
-
-
-        <!-- --------------------Content------------------------------ -->
-        <div id="content" class="content">
-
-
-
-          <div id="leftPanel">
-
-
-            <input type="text" placeholder="Pesquisar...">
-
-
-
-
-          </div>
-
-
-          <div id="middlePanel">
-
-            <!-- <tr id="tableHeaders">
+        <!-- <tr id="tableHeaders">
               <th id="Desc">Descrição/Conteúdo</th>
               <th id="short">Atalho</th>
             </tr> -->
 
 
-            <div id="header">Descrição/Expansão Atalho</div>
+        <div id="header">Descrição/Expansão Atalho</div>
 
 
-            <table id="myTable">
-              <tr id="nomeDatabase"></tr>
+        <table id="myTable">
+          <tr id="nomeDatabase"></tr>
 
-              <!-- Rows will be injected here from the Python code -->
-            </table>
+          <!-- Rows will be injected here from the Python code -->
+        </table>
 
-          </div>
-
-
+      </div>
 
 
 
-          <div id="rightPanel">
 
-            <div id="editor">
-            </div>
 
-            <div id="labelRight">
+      <div id="rightPanel">
 
-              <input type="text" placeholder="Descrição:">
+        <div id="editor">
+        </div>
 
-            </div>
+        <div id="labelRight">
 
-            <div id="atalhoRight">
-
-              <input type="text" placeholder="Atalho:">
-
-            </div>
-
-            <div id="caseRight">
-
-              <select name="dog-names" id="dog-names">
-                <option value="rigatoni">Diferenciar maiúsculas/minúsculas</option>
-                <option value="dave">Não diferenciar entre maiúsculas e minúsculas</option>
-                <option value="pumpernickel">Adaptar ao atalho</option>
-
-              </select>
-
-            </div>
-          </div>
-
+          <input type="text" placeholder="Descrição:">
 
         </div>
 
+        <div id="atalhoRight">
 
+          <input type="text" placeholder="Atalho:">
 
+        </div>
 
+        <div id="caseRight">
 
+          <select name="dog-names" id="dog-names">
+            <option value="rigatoni">Diferenciar maiúsculas/minúsculas</option>
+            <option value="dave">Não diferenciar entre maiúsculas e minúsculas</option>
+            <option value="pumpernickel">Adaptar ao atalho</option>
 
-      </div>
-      <!-- End of Content -->
-
-
-
-
-
-      <!-- Existing content -->
-
-
-      <div id="Tab2" class="tabcontent">
-        <div class="flex-container">
-          <div id="language_choice">Escolha seu idioma:</div>
-
-          <div>
-            <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
-              title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
-            <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
-              onclick="changeLanguage('en')">
-            <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
-              onclick="changeLanguage('es')">
-            <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
-              onclick="changeLanguage('it')">
-            <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
-              onclick="changeLanguage('de')">
-            <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
-              onclick="changeLanguage('fr')">
-          </div>
-
-
+          </select>
 
         </div>
       </div>
 
-      <div id="Tab3" class="tabcontent">
-        <!-- Tab3 content goes here -->
+
+    </div>
+
+
+
+
+
+
+  </div>
+  <!-- End of Content -->
+
+
+
+
+
+  <!-- Existing content -->
+
+
+  <div id="Tab2" class="tabcontent">
+    <div class="flex-container">
+      <div id="language_choice">Escolha seu idioma:</div>
+
+      <div>
+        <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
+          title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
+        <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
+          onclick="changeLanguage('en')">
+        <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
+          onclick="changeLanguage('es')">
+        <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
+          onclick="changeLanguage('it')">
+        <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
+          onclick="changeLanguage('de')">
+        <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
+          onclick="changeLanguage('fr')">
       </div>
-
-      <div id="Tab4" class="tabcontent">
-
-      </div>
-
 
 
 
     </div>
-    <!-- Content Wrapper -->
+  </div>
 
+  <div id="Tab3" class="tabcontent">
+    <!-- Tab3 content goes here -->
+  </div>
 
-    <div id=bottomPanel></div>
-
+  <div id="Tab4" class="tabcontent">
 
   </div>
-  <!-- Edge detection -->
+
+
+
+
+  <!-- </div>
+    Content Wrapper -->
+
+
+  <div id=bottomPanel></div>
+
+
+  <!-- </div>
+  Edge detection -->
 
 
 

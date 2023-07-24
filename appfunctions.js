@@ -38,57 +38,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-document.addEventListener('DOMContentLoaded', function () {
-  let isMouseDown = false;
-  let isResizing = false;
+// document.addEventListener('DOMContentLoaded', function () {
+//   let isMouseDown = false;
+//   let isResizing = false;
 
-  document.addEventListener('mousedown', function () {
-    isMouseDown = true;
-  });
+//   document.addEventListener('mousedown', function () {
+//     isMouseDown = true;
+//   });
 
-  document.addEventListener('mouseup', function () {
-    isMouseDown = false;
-    if (isResizing) {
-      pywebview.api.stop_resizing();
-      isResizing = false;
-    }
-    document.body.style.cursor = 'default';
-  });
+//   document.addEventListener('mouseup', function () {
+//     isMouseDown = false;
+//     if (isResizing) {
+//       pywebview.api.stop_resizing();
+//       isResizing = false;
+//     }
+//     document.body.style.cursor = 'default';
+//   });
 
-  const edgeDetection = document.querySelector('#edge-detection');
-  const margin = 10; // Adjust the margin as needed
+//   const edgeDetection = document.querySelector('#edge-detection');
+//   const margin = 10; // Adjust the margin as needed
 
-  edgeDetection.addEventListener('mousemove', function (e) {
-    const rect = edgeDetection.getBoundingClientRect();
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
+//   edgeDetection.addEventListener('mousemove', function (e) {
+//     const rect = edgeDetection.getBoundingClientRect();
+//     const mouseX = e.clientX;
+//     const mouseY = e.clientY;
 
-    // Calculate distances to all four borders
-    const distTop = Math.abs(mouseY - rect.top);
-    const distBottom = Math.abs(mouseY - rect.bottom);
-    const distLeft = Math.abs(mouseX - rect.left);
-    const distRight = Math.abs(mouseX - rect.right);
+//     // Calculate distances to all four borders
+//     const distTop = Math.abs(mouseY - rect.top);
+//     const distBottom = Math.abs(mouseY - rect.bottom);
+//     const distLeft = Math.abs(mouseX - rect.left);
+//     const distRight = Math.abs(mouseX - rect.right);
 
-    // Determine the smallest distance
-    const minDist = Math.min(distTop, distBottom, distLeft, distRight);
+//     // Determine the smallest distance
+//     const minDist = Math.min(distTop, distBottom, distLeft, distRight);
 
-    if (minDist <= margin) {
-      if (minDist === distLeft || minDist === distRight) {
-        // Closer to left or right border
-        document.body.style.cursor = 'w-resize';
-      } else {
-        // Closer to top or bottom border
-        document.body.style.cursor = 'n-resize';
-      }
-      if (isMouseDown && !isResizing) {
-        pywebview.api.start_resizing();
-        isResizing = true;
-      }
-    } else {
-      document.body.style.cursor = 'default';
-    }
-  });
-});
+//     if (minDist <= margin) {
+//       if (minDist === distLeft || minDist === distRight) {
+//         // Closer to left or right border
+//         document.body.style.cursor = 'w-resize';
+//       } else {
+//         // Closer to top or bottom border
+//         document.body.style.cursor = 'n-resize';
+//       }
+//       if (isMouseDown && !isResizing) {
+//         pywebview.api.start_resizing();
+//         isResizing = true;
+//       }
+//     } else {
+//       document.body.style.cursor = 'default';
+//     }
+//   });
+// });
 
 
 

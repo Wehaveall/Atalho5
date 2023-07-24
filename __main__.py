@@ -259,8 +259,8 @@ class Api:
         self.window = webview.create_window(
             title=WINDOW_TITLE,
             url="index.html",
-            frameless=True,
-            resizable=False,
+            frameless=False,
+            resizable=True,
             js_api=api,
             min_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
         )
