@@ -8,6 +8,32 @@
 }
 
 
+
+#header {
+    font-family: 'Work Sans', sans-serif;
+    font-size: small;
+    display: none;
+    background-color: #f1f1f1;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#header.showing {
+    display: table;
+}
+
+#header td:first-child {
+    width: 70%;
+}
+
+#header td:last-child {
+    width: 30%;
+    text-align: right;
+}
+
+
+
+
 #myTable {
     background-color: f1f1f1;
     width: 100%;

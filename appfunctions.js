@@ -295,22 +295,24 @@ function createCollapsible(directory, db_files) {
 
       databaseChildSelected = true;
 
+      // Get reference to the header element
+      var headerElem = document.getElementById('header');
+
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
           tableNames.forEach(function (tableName) {
             window.pywebview.api.get_data(directory, databaseFile, tableName)
               .then(data => {
                 if (databaseChildSelected) {
-
-                  document.getElementById('myTable').style.display = 'table';  // Make it visible
-                  document.getElementById('header').style.display = 'block';
+                  document.getElementById('myTable').style.display = 'table';
+                  headerElem.style.display = 'table';
+                  headerElem.classList.add('showing');
                   populateTable(data);
                 } else {
-
                   document.getElementById('myTable').innerHTML = "";
-                  document.getElementById('myTable').style.display = 'none';  // Hide it
-                  document.getElementById('header').style.display = 'none';
-
+                  document.getElementById('myTable').style.display = 'none';
+                  headerElem.style.display = 'none';
+                  headerElem.classList.remove('showing');
                 }
               })
               .catch(error => console.error('Error:', error));
@@ -320,6 +322,7 @@ function createCollapsible(directory, db_files) {
           console.log('Error in get_tables:', error);
         });
     });
+
 
     // Append the p element to the content div
     contentDiv.appendChild(db_file_elem);
@@ -350,15 +353,20 @@ function populateTable(data) {
   for (var i = 0; i < data.length; i++) {
     var row = table.insertRow(-1); // Insert a new row at the end
 
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
+    var cell1 = row.insertCell(0); // Expansion or Label if Expansion is empty
+    var cell2 = row.insertCell(1); // Shortcut
 
-    cell1.innerHTML = data[i]['shortcut']; // Shortcut
-    cell2.innerHTML = data[i]['expansion']; // Expansion
-    cell3.innerHTML = data[i]['label']; // Label
+    if (data[i]['expansion'] === "") {
+      cell1.innerHTML = data[i]['label'];
+    } else {
+      cell1.innerHTML = data[i]['expansion'];
+    }
+
+    cell2.innerHTML = data[i]['shortcut'];
+    cell2.style.textAlign = "right"; // aligns the content to the right
   }
 }
+
 
 
 
