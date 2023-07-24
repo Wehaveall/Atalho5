@@ -38,8 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-
 document.addEventListener('DOMContentLoaded', function () {
   let isMouseDown = false;
   let isResizing = false;
@@ -57,11 +55,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.style.cursor = 'default';
   });
 
-  const contentWrapper = document.querySelector('#content-wrapper');
+  const edgeDetection = document.querySelector('#edge-detection');
   const margin = 10; // Adjust the margin as needed
 
-  contentWrapper.addEventListener('mousemove', function (e) {
-    const rect = contentWrapper.getBoundingClientRect();
+  edgeDetection.addEventListener('mousemove', function (e) {
+    const rect = edgeDetection.getBoundingClientRect();
     const mouseX = e.clientX;
     const mouseY = e.clientY;
 
@@ -91,6 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
 
 
 window.onload = function () {

@@ -10,6 +10,8 @@ html {
 
 
 #edge-detection {
+
+  /* this makes the absolute positioning of #bottomPanel relative to this div */
   background-color: coral;
   display: flex;
   flex-direction: column;
@@ -21,10 +23,11 @@ html {
   background-color: chartreuse;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  /* add this line to make content wrapper fill all available space */
   overflow: auto;
-  /* add this line to allow scrolling inside content wrapper if content exceeds its height */
+  height: calc(100% - 55px);
+  /* Adjust the height to leave space for #bottomPanel and the gap */
+
+
 }
 
 
@@ -39,11 +42,10 @@ html {
 
 
 #bottomPanel {
-  background-color: blue;
   height: 50px;
-  /* fixed height of 50px */
+  background-color: blue;
   width: 100%;
-  /* take up full width */
+  /* Make sure it takes the full width */
 }
 
 
