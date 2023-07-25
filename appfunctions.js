@@ -162,7 +162,9 @@ let databaseChildSelected = false;
 
 function createCollapsible(directory, db_files) {
   console.log('createCollapsible called for directory:', directory);
+
   var leftPanel = document.getElementById('leftPanel');
+  var docFrag = document.createDocumentFragment();
 
   // Check if the button and the content div already exist
   var collapsibleButton = document.getElementById(directory);
@@ -255,7 +257,8 @@ function createCollapsible(directory, db_files) {
     });
 
     // Append the button to the left panel
-    leftPanel.appendChild(collapsibleButton);
+    //leftPanel.appendChild(collapsibleButton);
+    docFrag.appendChild(collapsibleButton);
   }
 
   // If the content div doesn't exist, create it
@@ -277,7 +280,8 @@ function createCollapsible(directory, db_files) {
     }
 
     // Append the content div to the left panel
-    leftPanel.appendChild(contentDiv);
+    //leftPanel.appendChild(contentDiv);
+    docFrag.appendChild(contentDiv);
   }
 
   // Clear the content div before appending new database file names
@@ -362,8 +366,16 @@ function createCollapsible(directory, db_files) {
 
 
     // Append the p element to the content div
+    //contentDiv.appendChild(db_file_elem);
     contentDiv.appendChild(db_file_elem);
   });
+
+
+
+
+  // Append the main DocumentFragment to the left panel
+  leftPanel.appendChild(docFrag);
+
 }
 
 
