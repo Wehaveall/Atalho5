@@ -1,11 +1,21 @@
 #middlePanel {
+
     margin: 0;
     padding: 0;
-    align-self: flex-start;
-    width: 35%;
-    /* adjust as needed */
+    flex: 0 0 35%;
+    /* align-self: flex-start; */
+    /* width: 35%; Remove this line */
 
 }
+
+
+
+#tableContainer {
+    max-height: 400px;
+    /* Adjust to the desired maximum height */
+    overflow-y: auto;
+}
+
 
 
 
@@ -35,6 +45,7 @@
 
 
 #myTable {
+
     padding: 0;
     font-size: small;
     font-family: 'Work Sans', sans-serif;
@@ -43,12 +54,6 @@
     border-collapse: collapse;
     /* Add this line */
 
-    /* height: 80vh; */
-    /* 50% of the viewport's height */
-    /* width: 25vw; */
-    /* Não sei pq é um a menos do que o parent quando está minimizado */
-    overflow: auto;
-    /* this will add scrollbars if the content exceeds the height or width */
 }
 
 

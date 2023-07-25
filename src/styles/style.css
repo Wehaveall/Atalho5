@@ -9,29 +9,13 @@ html {
 }
 
 
-#edge-detection {
-
-  /* this makes the absolute positioning of #bottomPanel relative to this div */
-  background-color: coral;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-#content-wrapper {
-
-  background-color: chartreuse;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  height: calc(100% - 55px);
-  /* Adjust the height to leave space for #bottomPanel and the gap */
 
 
-}
+
 
 
 .content {
+  background-color: rgb(255, 255, 255);
   /* flex-grow: 1; */
   /* expand to take up remaining space */
   display: flex;

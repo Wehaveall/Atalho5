@@ -126,22 +126,21 @@
         </table>
 
 
-        <table id="myTable">
-          <tr id="nomeDatabase"></tr>
 
-          <!-- Rows will be injected here from the Python code -->
-        </table>
+        <div id="tableContainer">
+          <table id="myTable">
+            <tr id="nomeDatabase"></tr>
+            <!-- Table content goes here -->
+          </table>
+        </div>
+
 
       </div>
 
 
-
-
-
       <div id="rightPanel">
 
-        <div id="editor">
-        </div>
+        <div id="editor"></div>
 
         <div id="labelRight">
 
@@ -168,66 +167,66 @@
       </div>
 
 
+
+
+
+
+
+
+
     </div>
+    <!-- End of Content -->
 
 
 
 
 
-
-  </div>
-  <!-- End of Content -->
+    <!-- Existing content -->
 
 
+    <div id="Tab2" class="tabcontent">
+      <div class="flex-container">
+        <div id="language_choice">Escolha seu idioma:</div>
+
+        <div>
+          <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
+            title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
+          <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
+            onclick="changeLanguage('en')">
+          <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
+            onclick="changeLanguage('es')">
+          <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
+            onclick="changeLanguage('it')">
+          <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
+            onclick="changeLanguage('de')">
+          <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
+            onclick="changeLanguage('fr')">
+        </div>
 
 
 
-  <!-- Existing content -->
-
-
-  <div id="Tab2" class="tabcontent">
-    <div class="flex-container">
-      <div id="language_choice">Escolha seu idioma:</div>
-
-      <div>
-        <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
-          title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
-        <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
-          onclick="changeLanguage('en')">
-        <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
-          onclick="changeLanguage('es')">
-        <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
-          onclick="changeLanguage('it')">
-        <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
-          onclick="changeLanguage('de')">
-        <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
-          onclick="changeLanguage('fr')">
       </div>
+    </div>
 
+    <div id="Tab3" class="tabcontent">
+      <!-- Tab3 content goes here -->
+    </div>
 
+    <div id="Tab4" class="tabcontent">
 
     </div>
-  </div>
-
-  <div id="Tab3" class="tabcontent">
-    <!-- Tab3 content goes here -->
-  </div>
-
-  <div id="Tab4" class="tabcontent">
-
-  </div>
 
 
 
 
-  <!-- </div>
+    <!-- </div>
     Content Wrapper -->
 
 
-  <div id=bottomPanel></div>
+    <div id=bottomPanel></div>
 
 
-  <!-- </div>
+    <!-- </div>
   Edge detection -->
 
 
@@ -237,7 +236,7 @@
 
 
 
-  <script> </script>
+    <script> </script>
 
 
 

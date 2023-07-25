@@ -100,11 +100,11 @@ def handle_database_operations(groupName, databaseName, tableName):
             rows = [row2dict(row) for row in result]
 
             # Print the rows for debugging
-            print(f"Fetched {len(rows)} row(s) from {tableName}:")
+            # print(f"Fetched {len(rows)} row(s) from {tableName}:")
             for row in rows:
-                print(row)
+                # print(row)
 
-            return rows
+                return rows
 
     except Exception as e:
         print(f"An error occurred: {e}")

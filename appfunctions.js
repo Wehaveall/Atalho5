@@ -4,6 +4,27 @@ var activeCollapsibleButton = null;  /// For the rounded border
 var buttonStates = {};
 var allDbFiles = {};
 
+
+let cache = {};
+
+function getCachedData(directory, databaseFile, tableName) {
+  let key = directory + '|' + databaseFile + '|' + tableName;
+  return cache[key];
+}
+
+function setCachedData(directory, databaseFile, tableName, data) {
+  let key = directory + '|' + databaseFile + '|' + tableName;
+  cache[key] = data;
+}
+
+
+
+
+
+
+
+
+
 // Wait until the document is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
   // Ensure pywebview API is ready
@@ -301,21 +322,37 @@ function createCollapsible(directory, db_files) {
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
           tableNames.forEach(function (tableName) {
-            window.pywebview.api.get_data(directory, databaseFile, tableName)
-              .then(data => {
-                if (databaseChildSelected) {
-                  document.getElementById('myTable').style.display = 'table';
-                  headerElem.style.display = 'table';
-                  headerElem.classList.add('showing');
-                  populateTable(data);
-                } else {
-                  document.getElementById('myTable').innerHTML = "";
-                  document.getElementById('myTable').style.display = 'none';
-                  headerElem.style.display = 'none';
-                  headerElem.classList.remove('showing');
-                }
-              })
-              .catch(error => console.error('Error:', error));
+            let data = getCachedData(directory, databaseFile, tableName);
+            if (data) {
+              if (databaseChildSelected) {
+                document.getElementById('myTable').style.display = 'table';
+                headerElem.style.display = 'table';
+                headerElem.classList.add('showing');
+                populateTable(data);
+              } else {
+                document.getElementById('myTable').innerHTML = "";
+                document.getElementById('myTable').style.display = 'none';
+                headerElem.style.display = 'none';
+                headerElem.classList.remove('showing');
+              }
+            } else {
+              window.pywebview.api.get_data(directory, databaseFile, tableName)
+                .then(data => {
+                  setCachedData(directory, databaseFile, tableName, data);
+                  if (databaseChildSelected) {
+                    document.getElementById('myTable').style.display = 'table';
+                    headerElem.style.display = 'table';
+                    headerElem.classList.add('showing');
+                    populateTable(data);
+                  } else {
+                    document.getElementById('myTable').innerHTML = "";
+                    document.getElementById('myTable').style.display = 'none';
+                    headerElem.style.display = 'none';
+                    headerElem.classList.remove('showing');
+                  }
+                })
+                .catch(error => console.error('Error:', error));
+            }
           });
         })
         .catch(function (error) {

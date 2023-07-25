@@ -1,11 +1,8 @@
 #rightPanel {
-    margin-right: 5px;
-    height: 10%;
-    width: 45%;
-    background-color: rgb(245, 245, 245);
-    /* adjust as needed */
-
-
+    flex: 0 0 45%;
+    /* Add this line */
+    width: 40%;
+    background-color: #f1f1f1
 }
 
 #atalhoRight,
@@ -19,9 +16,9 @@
     font-family: 'Work Sans', sans-serif;
     border: none;
     height: 30px;
-    /* adjust this value to fit your needs */
+
     width: 100%;
     box-sizing: border-box;
     border-radius: 15px;
-    /* adjust this value to fit your needs */
+
 }
