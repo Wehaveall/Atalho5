@@ -356,16 +356,47 @@ function populateTable(data) {
     var cell1 = row.insertCell(0); // Expansion or Label if Expansion is empty
     var cell2 = row.insertCell(1); // Shortcut
 
-    if (data[i]['expansion'] === "") {
-      cell1.innerHTML = data[i]['label'];
+    var expansion = data[i]['expansion'];
+    var label = data[i]['label'];
+    var shortcut = data[i]['shortcut'];
+
+    // Store full texts as data attributes
+    row.dataset.expansion = expansion;
+    row.dataset.shortcut = shortcut;
+
+    if (expansion === "") {
+      cell1.innerHTML = truncateText(label, 20);
     } else {
-      cell1.innerHTML = data[i]['expansion'];
+      cell1.innerHTML = truncateText(expansion, 20);
     }
 
-    cell2.innerHTML = data[i]['shortcut'];
+    cell2.innerHTML = truncateText(shortcut, 20);
     cell2.style.textAlign = "right"; // aligns the content to the right
+
+    // Add click event to the row
+    row.onclick = function () {
+      var selected = document.getElementsByClassName("selected");
+      if (selected[0]) selected[0].className = '';
+      this.className = 'selected';
+
+      // Get the full "expansion" and "shortcut" texts from the data attributes
+      var expansion = this.dataset.expansion;
+      var shortcut = this.dataset.shortcut;
+
+      // Load the full "expansion" content into the TinyMCE editor
+      tinyMCE.get('editor').setContent(expansion);
+
+      // Load the full "shortcut" content into the input field
+      document.getElementById('shortcutInput').value = shortcut;
+    };
   }
 }
+
+// Truncate text if it's longer than the specified length
+function truncateText(text, maxLength) {
+  return text.length > maxLength ? text.substr(0, maxLength - 1) + '...' : text;
+}
+
 
 
 

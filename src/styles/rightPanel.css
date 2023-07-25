@@ -11,10 +11,12 @@
 #atalhoRight,
 #caseRight {
     display: inline-block;
+    font-family: 'Work Sans', sans-serif;
 }
 
 #atalhoRight input,
 #caseRight select {
+    font-family: 'Work Sans', sans-serif;
     border: none;
     height: 30px;
     /* adjust this value to fit your needs */
