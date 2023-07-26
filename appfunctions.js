@@ -433,7 +433,19 @@ function populateTable(data) {
     cell2.innerHTML = truncateText(shortcut, 20);
     cell2.style.textAlign = "right"; // aligns the content to the right
 
+
+
+
+
+
+
+
+
+
     // Add click event to the row
+    // Inside your row.onclick event
+
+
     row.onclick = function () {
       var selected = document.getElementsByClassName("selected");
       if (selected[0]) selected[0].className = '';
@@ -443,14 +455,37 @@ function populateTable(data) {
       var expansion = this.dataset.expansion;
       var shortcut = this.dataset.shortcut;
 
-      // Load the full "expansion" content into the TinyMCE editor
-      tinyMCE.get('editor').setContent(expansion);
+      // Format the expansion
+      var formattedExpansion = formatArticle(expansion);
+
+      // Load the formatted "expansion" content into the TinyMCE editor
+      tinyMCE.get('editor').setContent(formattedExpansion);
 
       // Load the full "shortcut" content into the input field
       document.getElementById('shortcutInput').value = shortcut;
     };
   }
 }
+
+
+
+// Adicione esta função em algum lugar do seu código JavaScript
+function formatArticle(article) {
+  return article.replace(/\*/g, "<br/>")
+    .replace(/#/g, "<br/>")
+    .replace(/%/g, "<br/>")
+    .replace(/@/g, "<br/>")
+    .replace(/\$/g, "<br/>");
+}
+
+
+
+
+
+
+
+
+
 
 // Truncate text if it's longer than the specified length
 function truncateText(text, maxLength) {

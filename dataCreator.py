@@ -53,11 +53,25 @@ def extract_fields(html, prefix):
         if shortcut_match:
             # Extract and clean up the shortcut, converting letter to lowercase
             shortcut = shortcut_match.group().replace("-", "").replace(" ", "").lower()
-            expansion = "*" + article
-            fields.append(
-                (prefix, prefix + shortcut, expansion, True, "true")
-            )  # Add new fields here
 
+            # Replace the delimiters with newlines only for the full articles
+            if article.startswith("*Art."):
+                expansion = (
+                    article.replace("*", "")
+                    .replace("#", "\n")
+                    .replace("%", "\n")
+                    .replace("@", "\n")
+                    .replace("$", "\n")
+                )
+            else:
+                expansion = article
+
+            # Remove extra whitespace
+            expansion = re.sub(r"\s+", " ", expansion).strip()
+
+            fields.append(
+                (prefix, prefix + shortcut, expansion, False, "true")
+            )  # Add new fields here
             # Split the article into incisos at the '$' delimiter
             incisos = re.split(r"\$", expansion)
 
@@ -66,7 +80,7 @@ def extract_fields(html, prefix):
                     continue
 
                 # The 'expansion' of the new row should be the text of the inciso
-                new_expansion = "*" + inciso.strip()
+                new_expansion = inciso.strip()  # Removed "*" here
 
                 # Extract the Roman numeral after the '$' delimiter and convert it to a decimal number
                 roman_numeral = re.search(r"[IVXLCDM]+", inciso)
@@ -81,10 +95,35 @@ def extract_fields(html, prefix):
                             prefix,
                             prefix + new_shortcut_inciso,
                             new_expansion,
-                            True,
+                            False,
                             "true",
                         )
-                    )  # And here
+                    )  # Changed format to False here
+
+                # Split the inciso into alíneas at the '@' delimiter
+                alineas = re.split(r"\@", inciso)
+
+                for j, alinea in enumerate(alineas, start=0):
+                    if j == 0:  # Skip the first alinea because it's already added
+                        continue
+
+                    # The 'expansion' of the new row should be the text of the alinea
+                    new_expansion = alinea.strip()  # Removed "*" here
+
+                    # Create a new shortcut for the alinea with 'a' suffix and the alinea letter
+                    new_shortcut_alinea = (
+                        new_shortcut_inciso + "a" + alinea.strip()[0].lower()
+                    )
+
+                    fields.append(
+                        (
+                            prefix,
+                            prefix + new_shortcut_alinea,
+                            new_expansion,
+                            False,
+                            "true",
+                        )
+                    )  # Changed format to False here
 
             # Check if '#' delimiter is present in the 'expansion'
             if "#" in expansion:
@@ -95,39 +134,11 @@ def extract_fields(html, prefix):
                 new_shortcut = shortcut + "pu"
 
                 # The 'expansion' of the new row should be the text after the '#' delimiter
-                new_expansion = "*" + after_delimiter.strip()
+                new_expansion = after_delimiter.strip()  # Removed "*" here
 
                 fields.append(
-                    (prefix, prefix + new_shortcut, new_expansion, True, "true")
-                )  # And here
-
-                # Split the expansion into incisos at the '$' delimiter
-                incisos = re.split(r"\$", new_expansion)
-
-                for k, inciso in enumerate(incisos, start=0):
-                    if k == 0:  # Skip the first inciso because it's already added
-                        continue
-
-                    # The 'expansion' of the new row should be the text of the inciso
-                    new_expansion = "*" + inciso.strip()
-
-                    # Extract the Roman numeral after the '$' delimiter and convert it to a decimal number
-                    roman_numeral = re.search(r"[IVXLCDM]+", inciso)
-                    if roman_numeral:
-                        decimal_number = roman_to_decimal(roman_numeral.group())
-
-                        # Create a new shortcut for the inciso with 'i' suffix and the inciso number
-                        new_shortcut_inciso = new_shortcut + "i" + str(decimal_number)
-
-                        fields.append(
-                            (
-                                prefix,
-                                prefix + new_shortcut_inciso,
-                                new_expansion,
-                                True,
-                                "true",
-                            )
-                        )  # And here
+                    (prefix, prefix + new_shortcut, new_expansion, False, "true")
+                )  # Changed format to False here
 
             # Split the article into paragraphs at the '%' delimiter
             paragraphs = re.split(r"%", article)
@@ -137,42 +148,20 @@ def extract_fields(html, prefix):
                     continue
 
                 # The 'expansion' of the new row should be the text of the paragraph
-                new_expansion = "*" + paragraph.strip()
+                new_expansion = paragraph.strip()  # Removed "*" here
 
                 # Create a new shortcut for the paragraph with 'p' suffix and the paragraph number
-                new_shortcut = shortcut + "p" + str(j)
+                new_shortcut_paragraph = shortcut + "p" + str(j)
 
                 fields.append(
-                    (prefix, prefix + new_shortcut, new_expansion, True, "true")
+                    (
+                        prefix,
+                        prefix + new_shortcut_paragraph,
+                        new_expansion,
+                        False,
+                        "true",
+                    )
                 )  # And here
-
-                # Split the paragraph into incisos at the '$' delimiter
-                incisos = re.split(r"\$", new_expansion)
-
-                for k, inciso in enumerate(incisos, start=0):
-                    if k == 0:  # Skip the first inciso because it's already added
-                        continue
-
-                    # The 'expansion' of the new row should be the text of the inciso
-                    new_expansion = "*" + inciso.strip()
-
-                    # Extract the Roman numeral after the '$' delimiter and convert it to a decimal number
-                    roman_numeral = re.search(r"[IVXLCDM]+", inciso)
-                    if roman_numeral:
-                        decimal_number = roman_to_decimal(roman_numeral.group())
-
-                        # Create a new shortcut for the inciso with 'i' suffix and the inciso number
-                        new_shortcut_inciso = new_shortcut + "i" + str(decimal_number)
-
-                        fields.append(
-                            (
-                                prefix,
-                                prefix + new_shortcut_inciso,
-                                new_expansion,
-                                True,
-                                "true",
-                            )
-                        )  # And here
 
     return fields
 
@@ -183,8 +172,8 @@ def create_db(fields, db_name="E:/legal.db"):
     c = conn.cursor()
     c.execute(
         """
-    CREATE TABLE Articles
-    (prefix text, shortcut text, expansion text, format boolean, "case" text)
+        CREATE TABLE Articles
+        (prefix text, shortcut text, expansion text, format boolean, "case" text)
     """
     )
     c.executemany(
@@ -207,6 +196,7 @@ fields = extract_fields(html, prefix)
 
 # Create the database and insert the data
 create_db(fields)
+##----------------------------------------------------------------
 
 
 # import re
