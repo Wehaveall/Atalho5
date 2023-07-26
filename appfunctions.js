@@ -470,6 +470,7 @@ function populateTable(data) {
 
 
 // Adicione esta função em algum lugar do seu código JavaScript
+//Inserir quebra de linha nos delimitadores
 function formatArticle(article) {
   return article.replace(/\*/g, "<br/>")
     .replace(/#/g, "<br/>")

@@ -10,6 +10,69 @@
 
 
 
+
+#groupManage {
+    position: relative;
+    /* This allows absolute positioning for children */
+    height: 25px;
+    /* Set the height of the div */
+}
+
+#dataSettings,
+#dataAdd {
+    position: absolute;
+    /* This will position the button relative to groupManage div */
+    top: 0;
+    /* Align it to the top */
+    width: 25px;
+    /* Set the width of the button */
+    height: 25px;
+    /* Set the height of the button */
+    display: flex;
+    /* Use flexbox to center the image */
+    align-items: center;
+    /* Center the image vertically */
+    justify-content: center;
+    /* Center the image horizontally */
+    padding: 0;
+    /* Remove padding to fit the image in 25px x 25px area */
+    border: none;
+    /* Remove border to fit the image in 25px x 25px area */
+    background: none;
+    /* Remove background to make the button transparent */
+}
+
+#dataSettings img,
+#dataAdd img {
+    height: 25px;
+    /* Set the height of the image. You might need to adjust this based on your image's aspect ratio. */
+    width: auto;
+    /* Let the browser set the width automatically to maintain aspect ratio. */
+}
+
+#dataSettings:hover,
+#dataAdd:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    /* Change the background color on hover */
+}
+
+#dataSettings {
+    right: 0;
+    /* Align it to the right */
+}
+
+#dataAdd {
+    right: 30px;
+    /* Align it to the left of the dataSettings button */
+}
+
+
+
+
+
+
+
+
 #tableContainer {
     max-height: 400px;
     /* Adjust to the desired maximum height */
