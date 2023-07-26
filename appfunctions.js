@@ -126,18 +126,27 @@ window.onload = function () {
 };
 
 function openTab(evt, tabName) {
+  console.log("openTab called with tabName: ", tabName); // Add this line
+
   var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
   tabcontent = document.getElementsByClassName("tabcontent");
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
   }
+
+  // Get all elements with class="tablinks" and remove the class "active"
   tablinks = document.getElementsByClassName("tablinks");
   for (i = 0; i < tablinks.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
-  document.getElementById(tabName).style.display = "block";
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(tabName).style.display = "block"; // change this to "flex" if you want to use Flexbox layout
   evt.currentTarget.className += " active";
 }
+
 
 document.addEventListener('DOMContentLoaded', (event) => {
   document.getElementById("content").addEventListener("click", function (event) {
@@ -300,6 +309,8 @@ function createCollapsible(directory, db_files) {
     db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
     db_file_elem.style.fontSize = "14px";
     db_file_elem.style.marginTop = "10px";
+
+
 
     db_file_elem.addEventListener('click', function () {
       // Remove 'focused' class from all children across all sections

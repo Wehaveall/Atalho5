@@ -54,14 +54,14 @@ def extract_fields(html, prefix):
             # Extract and clean up the shortcut, converting letter to lowercase
             shortcut = shortcut_match.group().replace("-", "").replace(" ", "").lower()
             expansion = "*" + article
-            fields.append((prefix, shortcut, expansion))
+            fields.append(
+                (prefix, prefix + shortcut, expansion, True, "true")
+            )  # Add new fields here
 
             # Split the article into incisos at the '$' delimiter
             incisos = re.split(r"\$", expansion)
 
-            for k, inciso in enumerate(
-                incisos, start=0
-            ):  # We start the enumeration at 0
+            for k, inciso in enumerate(incisos, start=0):
                 if k == 0:  # Skip the first inciso because it's already added
                     continue
 
@@ -76,7 +76,15 @@ def extract_fields(html, prefix):
                     # Create a new shortcut for the inciso with 'i' suffix and the inciso number
                     new_shortcut_inciso = shortcut + "i" + str(decimal_number)
 
-                    fields.append((prefix, new_shortcut_inciso, new_expansion))
+                    fields.append(
+                        (
+                            prefix,
+                            prefix + new_shortcut_inciso,
+                            new_expansion,
+                            True,
+                            "true",
+                        )
+                    )  # And here
 
             # Check if '#' delimiter is present in the 'expansion'
             if "#" in expansion:
@@ -89,14 +97,14 @@ def extract_fields(html, prefix):
                 # The 'expansion' of the new row should be the text after the '#' delimiter
                 new_expansion = "*" + after_delimiter.strip()
 
-                fields.append((prefix, new_shortcut, new_expansion))
+                fields.append(
+                    (prefix, prefix + new_shortcut, new_expansion, True, "true")
+                )  # And here
 
                 # Split the expansion into incisos at the '$' delimiter
                 incisos = re.split(r"\$", new_expansion)
 
-                for k, inciso in enumerate(
-                    incisos, start=0
-                ):  # We start the enumeration at 0
+                for k, inciso in enumerate(incisos, start=0):
                     if k == 0:  # Skip the first inciso because it's already added
                         continue
 
@@ -111,7 +119,15 @@ def extract_fields(html, prefix):
                         # Create a new shortcut for the inciso with 'i' suffix and the inciso number
                         new_shortcut_inciso = new_shortcut + "i" + str(decimal_number)
 
-                        fields.append((prefix, new_shortcut_inciso, new_expansion))
+                        fields.append(
+                            (
+                                prefix,
+                                prefix + new_shortcut_inciso,
+                                new_expansion,
+                                True,
+                                "true",
+                            )
+                        )  # And here
 
             # Split the article into paragraphs at the '%' delimiter
             paragraphs = re.split(r"%", article)
@@ -126,14 +142,14 @@ def extract_fields(html, prefix):
                 # Create a new shortcut for the paragraph with 'p' suffix and the paragraph number
                 new_shortcut = shortcut + "p" + str(j)
 
-                fields.append((prefix, new_shortcut, new_expansion))
+                fields.append(
+                    (prefix, prefix + new_shortcut, new_expansion, True, "true")
+                )  # And here
 
                 # Split the paragraph into incisos at the '$' delimiter
                 incisos = re.split(r"\$", new_expansion)
 
-                for k, inciso in enumerate(
-                    incisos, start=0
-                ):  # We start the enumeration at 0
+                for k, inciso in enumerate(incisos, start=0):
                     if k == 0:  # Skip the first inciso because it's already added
                         continue
 
@@ -148,7 +164,15 @@ def extract_fields(html, prefix):
                         # Create a new shortcut for the inciso with 'i' suffix and the inciso number
                         new_shortcut_inciso = new_shortcut + "i" + str(decimal_number)
 
-                        fields.append((prefix, new_shortcut_inciso, new_expansion))
+                        fields.append(
+                            (
+                                prefix,
+                                prefix + new_shortcut_inciso,
+                                new_expansion,
+                                True,
+                                "true",
+                            )
+                        )  # And here
 
     return fields
 
@@ -159,13 +183,13 @@ def create_db(fields, db_name="E:/legal.db"):
     c = conn.cursor()
     c.execute(
         """
-        CREATE TABLE Articles
-        (prefix text, shortcut text, expansion text)
+    CREATE TABLE Articles
+    (prefix text, shortcut text, expansion text, format boolean, "case" text)
     """
     )
     c.executemany(
         """
-        INSERT INTO Articles VALUES (?,?,?)
+        INSERT INTO Articles VALUES (?,?,?,?,?)
     """,
         fields,
     )
@@ -183,7 +207,6 @@ fields = extract_fields(html, prefix)
 
 # Create the database and insert the data
 create_db(fields)
-##----------------------------------------------------------------
 
 
 # import re

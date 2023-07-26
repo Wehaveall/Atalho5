@@ -15,7 +15,7 @@ html {
 
 
 .content {
-  background-color: rgb(255, 255, 255);
+  background-color: #f1f1f1;
   /* flex-grow: 1; */
   /* expand to take up remaining space */
   display: flex;
@@ -23,6 +23,8 @@ html {
   width: 100%;
   /* take up full width */
 }
+
+
 
 
 #bottomPanel {

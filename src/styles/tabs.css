@@ -30,6 +30,11 @@
 }
 
 .tabcontent {
-    display: none;
+
     border-top: none;
+}
+
+#Tab2 {
+
+    display: none;
 }

@@ -14,6 +14,7 @@
     max-height: 400px;
     /* Adjust to the desired maximum height */
     overflow-y: auto;
+
 }
 
 
@@ -49,7 +50,7 @@
     padding: 0;
     font-size: small;
     font-family: 'Work Sans', sans-serif;
-    background-color: f1f1f1;
+    background-color: white;
     width: 100%;
     border-collapse: collapse;
     /* Add this line */
