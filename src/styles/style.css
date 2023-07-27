@@ -22,7 +22,15 @@ html {
   /* align child elements in a row */
   width: 100%;
   /* take up full width */
+
+
+
 }
+
+
+
+
+
 
 
 
@@ -30,6 +38,8 @@ html {
 #bottomPanel {
   height: 50px;
   background-color: blue;
+  position: fixed;
+  bottom: 0;
   width: 100%;
   /* Make sure it takes the full width */
 }

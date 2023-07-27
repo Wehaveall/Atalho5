@@ -179,6 +179,8 @@ function createCollapsible(directory, db_files) {
   var collapsibleButton = document.getElementById(directory);
   var contentDiv = document.getElementById(directory + '-content');
 
+
+
   // If the button doesn't exist, create it
   if (!collapsibleButton) {
     collapsibleButton = document.createElement('button');
@@ -333,6 +335,10 @@ function createCollapsible(directory, db_files) {
 
       // Get reference to the header element
       var headerElem = document.getElementById('header');
+
+      // Get reference to the name of database
+      var selectedDbNameElem = document.getElementById('selectedDbName');
+      selectedDbNameElem.textContent = filenameWithoutExtension;
 
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {

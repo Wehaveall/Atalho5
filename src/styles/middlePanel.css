@@ -6,16 +6,24 @@
     /* align-self: flex-start; */
     /* width: 35%; Remove this line */
 
+
 }
 
 
 
 
 #groupManage {
+    font-family: 'Work Sans', sans-serif;
     position: relative;
     /* This allows absolute positioning for children */
-    height: 25px;
+    height: 20px;
     /* Set the height of the div */
+    align-self: flex-start;
+    border-bottom: 1px solid #777777;
+    /* Change the color as needed */
+    padding-bottom: 10px;
+    /* Adjust as needed */
+    margin-left: 10px;
 }
 
 #dataSettings,
@@ -84,6 +92,8 @@
 
 
 #header {
+    padding-top: 5px;
+    padding-bottom: 5px;
     font-family: 'Work Sans', sans-serif;
     font-size: small;
     display: none;

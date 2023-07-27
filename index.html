@@ -98,6 +98,7 @@
     <div id="content" class="content">
 
 
+
       <div id="leftPanel">
         <input type="text" placeholder="Pesquisar...">
       </div>
@@ -106,6 +107,7 @@
       <div id="middlePanel">
 
         <div id="groupManage">
+          <p id="selectedDbName"></p>
           <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
           <button id="dataSettings" onclick=""><img src="/src/images/data_Settings.png"></button>
         </div>
@@ -141,28 +143,36 @@
 
         </div>
 
-        <div id="atalhoRight">
 
-          <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+
+
+
+
+
+        <div id="inputContainer">
+
+
+          <div id="atalhoRight">
+            <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+          </div>
+
+          <div id="caseRight">
+            <select name="dog-names" id="dog-names">
+              <option value="rigatoni">Dif. maiúsculas/minúsculas</option>
+              <option value="dave">Não dif. maiúsculas/minúsculas</option>
+              <option value="pumpernickel">Adaptar ao atalho</option>
+            </select>
+
+          </div>
 
         </div>
 
-        <div id="caseRight">
-
-          <select name="dog-names" id="dog-names">
-            <option value="rigatoni">Considerar maiúsculas/minúsculas</option>
-            <option value="dave">Não considerar maiúsculas/minúsculas</option>
-            <option value="pumpernickel">Adaptar ao atalho</option>
-
-          </select>
-
-        </div>
       </div>
 
-
-
-
     </div>
+
+
+  </div>
 
 
 
