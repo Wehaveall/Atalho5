@@ -32,6 +32,8 @@
 .tabcontent {
 
     border-top: none;
+
+    /* adjust 50px if the bottomPanel height changes */
 }
 
 

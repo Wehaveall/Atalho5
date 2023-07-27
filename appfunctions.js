@@ -281,6 +281,7 @@ function createCollapsible(directory, db_files) {
     // Add CSS rules to ensure the div behaves as a block-level element
     contentDiv.style.width = "100%";
 
+
     // Set the display state of the content div based on the saved state
     if (buttonStates[directory] === 'block') {
       contentDiv.style.display = "block";
