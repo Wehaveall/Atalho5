@@ -314,6 +314,8 @@ function createCollapsible(directory, db_files) {
 
 
 
+
+
     db_file_elem.addEventListener('click', function () {
       // Remove 'focused' class from all children across all sections
       let allChildElements = document.getElementsByClassName('child-elem');
