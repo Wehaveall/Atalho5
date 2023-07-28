@@ -175,11 +175,15 @@ function createCollapsible(directory, db_files) {
   var leftPanel = document.getElementById('leftPanel');
   var docFrag = document.createDocumentFragment();
 
+
+  // Create a parent div for the collapsible and its content
+  var collapsibleParent = document.createElement('div');
+
+  // Check if the button and the content div already exist
+
   // Check if the button and the content div already exist
   var collapsibleButton = document.getElementById(directory);
   var contentDiv = document.getElementById(directory + '-content');
-
-
 
   // If the button doesn't exist, create it
   if (!collapsibleButton) {
@@ -241,7 +245,6 @@ function createCollapsible(directory, db_files) {
         }
         databaseChildSelected = false;
 
-
         // Hide the table and table headers when a group is collapsed
         document.getElementById('myTable').style.display = 'none';
         document.getElementById("header").style.display = "none";
@@ -267,11 +270,11 @@ function createCollapsible(directory, db_files) {
       window.pywebview.api.save_all_states(buttonStates);  // Save the states whenever a button is clicked
     });
 
-    // Append the button to the left panel
-    //leftPanel.appendChild(collapsibleButton);
-    docFrag.appendChild(collapsibleButton);
+    // Append the button to the new parent div
+    collapsibleParent.appendChild(collapsibleButton);
   }
 
+  // If the content div doesn't exist, create it
   // If the content div doesn't exist, create it
   if (!contentDiv) {
     contentDiv = document.createElement('div');
@@ -280,7 +283,6 @@ function createCollapsible(directory, db_files) {
 
     // Add CSS rules to ensure the div behaves as a block-level element
     contentDiv.style.width = "100%";
-
 
     // Set the display state of the content div based on the saved state
     if (buttonStates[directory] === 'block') {
@@ -291,9 +293,8 @@ function createCollapsible(directory, db_files) {
       arrowSpan.innerHTML = "▶ ";
     }
 
-    // Append the content div to the left panel
-    //leftPanel.appendChild(contentDiv);
-    docFrag.appendChild(contentDiv);
+    // Append the content div to the new parent div
+    collapsibleParent.appendChild(contentDiv);
   }
 
   // Clear the content div before appending new database file names
@@ -394,7 +395,7 @@ function createCollapsible(directory, db_files) {
 
 
   // Append the main DocumentFragment to the left panel
-  leftPanel.appendChild(docFrag);
+  leftPanel.appendChild(collapsibleParent);
 
 }
 

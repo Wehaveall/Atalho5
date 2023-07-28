@@ -1,14 +1,11 @@
 #middlePanel {
-
+    flex: 2;
     margin: 0;
     padding: 0;
-    flex: 1;
-    /* align-self: flex-start; */
-    /* width: 35%; Remove this line */
+    height: calc(100vh - 100px);
+    /* adjust this as necessary */
     display: flex;
     flex-direction: column;
-
-    height: 100vh;
 
 }
 
@@ -133,7 +130,7 @@
     background-color: white;
     width: 100%;
     border-collapse: collapse;
-    /* Add this line */
+    margin-bottom: 10px;
 
 }
 

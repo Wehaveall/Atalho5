@@ -32,8 +32,10 @@ html {
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   /* Add this line to enable scrolling if the content overflows */
+  margin-bottom: 10px;
+  /* Add this line */
 }
 
 
@@ -45,8 +47,7 @@ html {
   /* align child elements in a row */
   height: 100%;
   width: 100%;
-
-
+  flex: 1;
 
 
 
