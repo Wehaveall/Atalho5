@@ -5,25 +5,55 @@ html {
   margin: 0;
   padding: 0;
   overflow: hidden;
+
+
+  /* add this line to hide scrollbar */
+  display: flex;
+  flex-direction: column;
+
+
+
+
   /* add this line to hide scrollbar */
 }
 
 
 
 
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid red;
+}
+
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+  /* Add this line to enable scrolling if the content overflows */
+}
 
 
 
 .content {
   background-color: #f1f1f1;
-  /* flex-grow: 1; */
   /* expand to take up remaining space */
   display: flex;
   /* align child elements in a row */
+  height: 100%;
   width: 100%;
-  /* take up full width */
+
+
+
+
 
 }
+
+
+
 
 
 
@@ -31,10 +61,9 @@ html {
 #bottomPanel {
   height: 50px;
   background-color: blue;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  /* Make sure it takes the full width */
+
+
+
 }
 
 

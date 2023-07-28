@@ -2,10 +2,13 @@
 
     margin: 0;
     padding: 0;
-    flex: 0 0 35%;
+    flex: 1;
     /* align-self: flex-start; */
     /* width: 35%; Remove this line */
+    display: flex;
+    flex-direction: column;
 
+    height: 100vh;
 
 }
 
@@ -13,35 +16,37 @@
 
 
 #groupManage {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-family: 'Work Sans', sans-serif;
-    position: relative;
-    /* This allows absolute positioning for children */
-    height: 20px;
-    /* Set the height of the div */
-    align-self: flex-start;
     border-bottom: 1px solid #777777;
     /* Change the color as needed */
-    padding-bottom: 10px;
-    /* Adjust as needed */
-    margin-left: 10px;
+    padding: 4px 0;
+    /* Add vertical padding */
+
 }
+
+
+
+#iconContainer {
+    display: flex;
+    align-items: center;
+}
+
+
+
 
 #dataSettings,
 #dataAdd {
-    position: absolute;
-    /* This will position the button relative to groupManage div */
-    top: 0;
-    /* Align it to the top */
+
+
     width: 25px;
     /* Set the width of the button */
     height: 25px;
     /* Set the height of the button */
-    display: flex;
-    /* Use flexbox to center the image */
-    align-items: center;
-    /* Center the image vertically */
-    justify-content: center;
-    /* Center the image horizontally */
+
     padding: 0;
     /* Remove padding to fit the image in 25px x 25px area */
     border: none;
@@ -52,6 +57,7 @@
 
 #dataSettings img,
 #dataAdd img {
+
     height: 25px;
     /* Set the height of the image. You might need to adjust this based on your image's aspect ratio. */
     width: auto;
@@ -65,11 +71,13 @@
 }
 
 #dataSettings {
+
     right: 0;
     /* Align it to the right */
 }
 
 #dataAdd {
+
     right: 30px;
     /* Align it to the left of the dataSettings button */
 }
@@ -79,10 +87,8 @@
 
 
 
-
-
 #tableContainer {
-    max-height: 400px;
+    flex: 1;
     /* Adjust to the desired maximum height */
     overflow-y: auto;
 
@@ -92,6 +98,7 @@
 
 
 #header {
+    flex: 0;
     padding-top: 5px;
     padding-bottom: 5px;
     font-family: 'Work Sans', sans-serif;
@@ -119,7 +126,7 @@
 
 
 #myTable {
-
+    flex: 1;
     padding: 0;
     font-size: small;
     font-family: 'Work Sans', sans-serif;

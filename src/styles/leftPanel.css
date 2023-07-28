@@ -1,20 +1,22 @@
 #leftPanel {
-    flex: 0 0 20%;
+    flex: 1;
     background-color: #f1f1f1;
     /* width: 20%; */
     margin-top: 5px #f1f1f1;
     /* adjust as needed */
-    flex-grow: 1;
+
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+
     height: 100vh;
+
 
 
 }
 
 .collapsible {
+
     background-color: #f1f1f1;
     color: white;
     cursor: pointer;
@@ -39,6 +41,7 @@
 
 .listing {
 
+
     padding: 0 18px;
     max-height: 0;
     overflow: hidden;
@@ -48,11 +51,13 @@
 
 .arrow-right,
 .arrow-down {
+
     margin-right: 5px;
 }
 
 
 input[type=text] {
+
     background-color: white;
     padding: 6px;
     margin-top: 10px;
@@ -64,6 +69,7 @@ input[type=text] {
 }
 
 input[type="text"]:focus {
+
     border: 2px solid rgb(232, 159, 15);
     /* outline:remover a borda padrão preta, senão não adianta setar cor */
     outline: none;

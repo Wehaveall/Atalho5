@@ -49,19 +49,19 @@
 
 
 
+  <div class="mainContainer">
 
+    <div class="contentWrapper">
 
-
-
-  <!-- --------------------------------Edge Detection - Content Wrapper-------------------------------- -->
-  <!-- <div id="edge-detection">
+      <!-- --------------------------------Edge Detection - Content Wrapper-------------------------------- -->
+      <!-- <div id="edge-detection">
 
     <div id="content-wrapper"> -->
-  <!-- ------------------------------------------------------------------------- -->
+      <!-- ------------------------------------------------------------------------- -->
 
 
-  <!-- ----------------------Title Bar-------------------- -->
-  <!-- <div id="titleBar" class="pywebview-drag-region">
+      <!-- ----------------------Title Bar-------------------- -->
+      <!-- <div id="titleBar" class="pywebview-drag-region">
         <span id="icon"><img src="/src/images/atalho.png" alt=""></span>
         <span id="name">Atalho</span>
 
@@ -77,155 +77,176 @@
       </div> -->
 
 
-  <!-- ////////////////////////TABS ////////////////////////// -->
+      <!-- ////////////////////////TABS ////////////////////////// -->
 
 
 
-  <div class="tab">
-    <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
-    <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
-    <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
-    <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
-  </div>
-
-
-  <div id="Tab1" class="tabcontent">
-    <!-- Your existing div "content" goes here -->
-
-
-
-    <!-- --------------------Content------------------------------ -->
-    <div id="content" class="content">
-
-
-
-      <div id="leftPanel">
-        <input type="text" placeholder="Pesquisar...">
+      <div class="tab">
+        <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
+        <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
+        <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
+        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
       </div>
 
 
-      <div id="middlePanel">
-
-        <div id="groupManage">
-          <p id="selectedDbName"></p>
-          <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
-          <button id="dataSettings" onclick=""><img src="/src/images/data_Settings.png"></button>
-        </div>
-
-
-        <table id="header">
-          <tr>
-            <td>Descrição/Expansão</td>
-            <td>Atalho</td>
-          </tr>
-        </table>
+      <div id="Tab1" class="tabcontent">
+        <!-- Your existing div "content" goes here -->
 
 
 
-        <div id="tableContainer">
-          <table id="myTable">
-            <tr id="nomeDatabase"></tr>
-            <!-- Table content goes here -->
-          </table>
-        </div>
-
-
-      </div>
-
-
-      <div id="rightPanel">
-
-        <div id="editor"></div>
-
-        <div id="labelRight">
-
-          <input type="text" placeholder="Descrição:" size="60">
-
-        </div>
+        <!-- --------------------Content------------------------------ -->
+        <div id="content" class="content">
 
 
 
-
-
-
-
-        <div id="inputContainer">
-
-
-          <div id="atalhoRight">
-            <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+          <div id="leftPanel">
+            <input type="text" placeholder="Pesquisar...">
           </div>
 
-          <div id="caseRight">
-            <select name="dog-names" id="dog-names">
-              <option value="rigatoni">Dif. maiúsculas/minúsculas</option>
-              <option value="dave">Não dif. maiúsculas/minúsculas</option>
-              <option value="pumpernickel">Adaptar ao atalho</option>
-            </select>
+
+          <div id="middlePanel" class="content">
+
+            <div id="groupManage">
+              <p id="selectedDbName"></p>
+              <div id="iconContainer">
+                <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
+                <button id="dataSettings" onclick=""><img src="/src/images/data_Settings.png"></button>
+              </div>
+            </div>
+
+
+            <table id="header" class="content">
+              <tr>
+                <td>Descrição/Expansão</td>
+                <td>Atalho</td>
+              </tr>
+            </table>
+
+
+
+            <div id="tableContainer" class="content">
+
+              <table id="myTable">
+
+                <thead>
+                  <tr id="nomeDatabase"></tr>
+                </thead>
+
+
+                <tbody>
+                </tbody>
+
+                <!-- Table content goes here -->
+              </table>
+            </div>
+
 
           </div>
 
+
+          <div id="rightPanel" class="content">
+
+            <div id="editor" class="content"></div>
+
+            <div id="labelRight">
+
+              <input type="text" placeholder="Descrição:" size="60">
+
+            </div>
+
+
+
+
+
+
+
+            <div id="inputContainer">
+
+
+              <div id="atalhoRight">
+                <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+              </div>
+
+              <div id="caseRight">
+                <select name="dog-names" id="dog-names">
+                  <option value="rigatoni">Dif. maiúsculas/minúsculas</option>
+                  <option value="dave">Não dif. maiúsculas/minúsculas</option>
+                  <option value="pumpernickel">Adaptar ao atalho</option>
+                </select>
+
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
-
-      </div>
-
-    </div>
-
-
-  </div>
-
-
-
-  </div>
-
-
-
-
-
-
-
-
-
-  <div id="Tab2" class="tabcontent">
-
-    <div id="content2" class="content">
-
-      <div class="flex-container">
-        <div id="language_choice">Escolha seu idioma:</div>
-
-        <div>
-          <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
-            title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
-          <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
-            onclick="changeLanguage('en')">
-          <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
-            onclick="changeLanguage('es')">
-          <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
-            onclick="changeLanguage('it')">
-          <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
-            onclick="changeLanguage('de')">
-          <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
-            onclick="changeLanguage('fr')">
-        </div>
-
 
 
       </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+      <div id="Tab2" class="tabcontent">
+
+        <div id="content2" class="content">
+
+          <div class="flex-container">
+            <div id="language_choice">Escolha seu idioma:</div>
+
+            <div>
+              <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
+                title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
+              <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
+                onclick="changeLanguage('en')">
+              <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
+                onclick="changeLanguage('es')">
+              <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
+                onclick="changeLanguage('it')">
+              <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
+                onclick="changeLanguage('de')">
+              <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
+                onclick="changeLanguage('fr')">
+            </div>
+
+
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+
+      <div id="Tab3" class="tabcontent">
+        <!-- Tab3 content goes here -->
+      </div>
+
+      <div id="Tab4" class="tabcontent">
+
+      </div>
+
+
+
+
+
     </div>
+    <!-- end of content-wrapper -->
 
-  </div>
+    <div id=bottomPanel class="mainContainer"></div>
 
-
-
-
-  <div id="Tab3" class="tabcontent">
-    <!-- Tab3 content goes here -->
-  </div>
-
-  <div id="Tab4" class="tabcontent">
-
-  </div>
 
 
 
@@ -233,16 +254,7 @@
 
 
 
-  <div id=bottomPanel></div>
-
-
-
-  <!-- End of Content -->
-
-
-
-
-
+  </div>
 
 
 

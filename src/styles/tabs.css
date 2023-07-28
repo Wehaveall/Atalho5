@@ -1,19 +1,27 @@
 .tab {
-    overflow: hidden;
+
+    display: inline-block;
+    /* Add this line */
     border: 1px solid #ccc;
     background-color: #f1f1f1;
 }
 
 
 .tablinks {
+
     height: 30px;
 }
 
 
 .tab button {
+
     font-family: 'Work Sans', sans-serif;
     background-color: inherit;
-    float: left;
+
+    display: inline-block;
+    /* Add this line */
+
+
     border: none;
     outline: none;
     cursor: pointer;
@@ -30,6 +38,7 @@
 }
 
 .tabcontent {
+    display: flex;
 
     border-top: none;
 
