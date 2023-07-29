@@ -15,7 +15,7 @@
 
 #groupManage {
 
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
     font-family: 'Work Sans', sans-serif;

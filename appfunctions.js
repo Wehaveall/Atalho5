@@ -236,6 +236,8 @@ function createCollapsible(directory, db_files) {
         contentDiv.style.display = "none";
         buttonStates[directory] = 'none';
         arrowSpan.innerHTML = "▶ ";
+        var groupManage = document.getElementById('groupManage');
+        groupManage.style.display = 'none';
 
         // When collapsing the group, deselect any selected database
         // When collapsing the group or expanding, deselect any selected database in any group
@@ -246,8 +248,8 @@ function createCollapsible(directory, db_files) {
         databaseChildSelected = false;
 
         // Hide the table and table headers when a group is collapsed
-        document.getElementById('myTable').style.display = 'hidden';
-        document.getElementById("header").style.display = "hidden";
+        document.getElementById('myTable').style.display = 'none';
+        document.getElementById("header").style.display = "none";
 
       } else {
         contentDiv.style.display = "block";
@@ -338,7 +340,12 @@ function createCollapsible(directory, db_files) {
       databaseChildSelected = true;
 
       // Get reference to the header element
+
       var headerElem = document.getElementById('header');
+
+      //Group Manager State
+      var groupManage = document.getElementById('groupManage');
+      groupManage.style.display = 'flex';
 
       // Get reference to the name of database
       var selectedDbNameElem = document.getElementById('selectedDbName');
