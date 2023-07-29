@@ -347,6 +347,7 @@ function createCollapsible(directory, db_files) {
       var groupManage = document.getElementById('groupManage');
       groupManage.style.display = 'flex';
 
+
       // Get reference to the name of database
       var selectedDbNameElem = document.getElementById('selectedDbName');
       selectedDbNameElem.textContent = filenameWithoutExtension;
