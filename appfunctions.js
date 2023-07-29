@@ -246,8 +246,8 @@ function createCollapsible(directory, db_files) {
         databaseChildSelected = false;
 
         // Hide the table and table headers when a group is collapsed
-        document.getElementById('myTable').style.display = 'none';
-        document.getElementById("header").style.display = "none";
+        document.getElementById('myTable').style.display = 'hidden';
+        document.getElementById("header").style.display = "hidden";
 
       } else {
         contentDiv.style.display = "block";
