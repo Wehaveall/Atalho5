@@ -104,17 +104,21 @@ class KeyListener:
             if key == keyboard.Key.space:
                 expansion = lookup_word_in_all_databases(self.typed_keys)
                 if expansion is not None:
-                    # Format the expansion (the full article text)
-                    formatted_expansion = format_article(expansion)
+                    # Save the current clipboard content
+                    original_clipboard_content = pyperclip.paste()
 
                     # Simulate pressing ctrl+shift+left to select the last word
                     pyautogui.hotkey("ctrl", "shift", "left")
                     # Simulate pressing backspace to delete the selected text
                     pyautogui.press("backspace")
-                    # Copy the formatted expansion to clipboard
-                    pyperclip.copy(formatted_expansion)
-                    # Paste the formatted expansion
+                    # Copy the expansion to clipboard
+                    pyperclip.copy(expansion)
+                    # Paste the expansion
                     pyautogui.hotkey("ctrl", "v")
+
+                    # Restore the original clipboard content
+                    pyperclip.copy(original_clipboard_content)
+
                 self.typed_keys = ""
             return
         if self.stop_listener.is_set():
@@ -130,10 +134,10 @@ class KeyListener:
         else:
             self.typed_keys += key_char
 
-    def handle_accent_key(self, key_char):
-        self.accent = False
-        combination = self.last_key + key_char
-        self.typed_keys += self.accent_mapping[combination]
+        def handle_accent_key(self, key_char):
+            self.accent = False
+            combination = self.last_key + key_char
+            self.typed_keys += self.accent_mapping[combination]
 
 
 def start_listener():
