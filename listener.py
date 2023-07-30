@@ -5,6 +5,15 @@ import pyautogui
 from src.database.data_connect import lookup_word_in_all_databases
 import pyperclip  # We add this import for clipboard manipulation
 
+from src.utils.num import number_to_words
+
+
+def format_article(article):
+    delimiters = ["*", "#", "%", "@", "$"]
+    for delimiter in delimiters:
+        article = article.replace(delimiter, "\n")
+    return article
+
 
 class KeyListener:
     def __init__(self):
@@ -102,22 +111,32 @@ class KeyListener:
     def on_key_release(self, key):
         if key in self.omitted_keys:
             if key == keyboard.Key.space:
-                expansion = lookup_word_in_all_databases(self.typed_keys)
-                if expansion is not None:
-                    # Save the current clipboard content
-                    original_clipboard_content = pyperclip.paste()
+                # Check if the typed keys end with "e" and its preceding characters form a number
+                if (
+                    self.typed_keys[-1] == "e"
+                    and self.typed_keys[:-1].replace(".", "").isdigit()
+                ):
+                    # Convert the number to words
+                    number_in_words = number_to_words(self.typed_keys[:-1])
+                    # Replace the typed keys with the number and its word form
+                    self.typed_keys = f"{self.typed_keys[:-1]} ({number_in_words})"
+                else:
+                    expansion = lookup_word_in_all_databases(self.typed_keys)
+                    if expansion is not None:
+                        # Save the current clipboard content
+                        original_clipboard_content = pyperclip.paste()
 
-                    # Simulate pressing ctrl+shift+left to select the last word
-                    pyautogui.hotkey("ctrl", "shift", "left")
-                    # Simulate pressing backspace to delete the selected text
-                    pyautogui.press("backspace")
-                    # Copy the expansion to clipboard
-                    pyperclip.copy(expansion)
-                    # Paste the expansion
-                    pyautogui.hotkey("ctrl", "v")
+                        # Simulate pressing ctrl+shift+left to select the last word
+                        pyautogui.hotkey("ctrl", "shift", "left")
+                        # Simulate pressing backspace to delete the selected text
+                        pyautogui.press("backspace")
+                        # Copy the expansion to clipboard
+                        pyperclip.copy(format_article(expansion))
+                        # Paste the expansion
+                        pyautogui.hotkey("ctrl", "v")
 
-                    # Restore the original clipboard content
-                    pyperclip.copy(original_clipboard_content)
+                        # Restore the original clipboard content
+                        pyperclip.copy(original_clipboard_content)
 
                 self.typed_keys = ""
             return
@@ -134,10 +153,10 @@ class KeyListener:
         else:
             self.typed_keys += key_char
 
-        def handle_accent_key(self, key_char):
-            self.accent = False
-            combination = self.last_key + key_char
-            self.typed_keys += self.accent_mapping[combination]
+    def handle_accent_key(self, key_char):
+        self.accent = False
+        combination = self.last_key + key_char
+        self.typed_keys += self.accent_mapping[combination]
 
 
 def start_listener():
@@ -150,10 +169,3 @@ def start_listener():
 def stop_keyboard_listener(listener, pynput_listener):
     listener.stop_listener.set()
     pynput_listener.join()
-
-
-def format_article(article):
-    delimiters = ["*", "#", "%", "@", "$"]
-    for delimiter in delimiters:
-        article = article.replace(delimiter, "\n")
-    return article
