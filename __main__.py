@@ -1,5 +1,7 @@
 api = None  # Declare api as a global variable
 
+import traceback
+
 import glob
 import webview
 import threading
@@ -80,9 +82,7 @@ from sqlalchemy import inspect
 
 def handle_database_operations(groupName, databaseName, tableName):
     database_path = get_database_path(groupName, databaseName)
-    engine = create_engine(
-        f"sqlite:///./src/database/groups/{groupName}/{databaseName}"
-    )
+    engine = create_engine(f"sqlite:///{database_path}")
     metadata = MetaData()
 
     try:
@@ -135,7 +135,9 @@ class Api:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
         database_files = glob.glob(os.path.join(groups_dir, "*.db"))
-        database_names = [os.path.basename(db_file) for db_file in database_files]
+        database_names = [
+            os.path.splitext(os.path.basename(db_file))[0] for db_file in database_files
+        ]
 
         return database_names
 
@@ -146,7 +148,10 @@ class Api:
 
         all_db_files = {}
         for subdirectory in subdirectories:
-            db_files = get_db_files_in_directory(subdirectory)
+            db_files = [
+                os.path.splitext(os.path.basename(db_file))[0]
+                for db_file in get_db_files_in_directory(subdirectory)
+            ]
             directory_name = os.path.basename(subdirectory)
             all_db_files[directory_name] = db_files
 
@@ -162,8 +167,14 @@ class Api:
         return all_db_files
 
     def get_data(self, groupName, databaseName, tableName):
-        rows = handle_database_operations(groupName, databaseName, tableName)
-        return rows
+        print("get_data called with", groupName, databaseName, tableName)
+        try:
+            rows = handle_database_operations(groupName, databaseName, tableName)
+            return rows
+        except Exception as e:
+            print(f"Error in get_data: {e}")
+            print(traceback.format_exc())
+            return None
 
     def get_tables(self, groupName, databaseName):
         conn = sqlite3.connect(get_database_path(groupName, databaseName))

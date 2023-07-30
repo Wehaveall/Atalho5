@@ -302,6 +302,7 @@ function createCollapsible(directory, db_files) {
   // Clear the content div before appending new database file names
   contentDiv.innerHTML = '';
 
+
   db_files.forEach(function (databaseFile) {
     var db_file_elem = document.createElement('p');
     var filenameWithoutExtension = databaseFile.replace('.db', '');
@@ -316,11 +317,8 @@ function createCollapsible(directory, db_files) {
     db_file_elem.style.fontSize = "14px";
     db_file_elem.style.marginTop = "10px";
 
-
-
-
-
     db_file_elem.addEventListener('click', function () {
+      console.log("Database clicked!");
       // Remove 'focused' class from all children across all sections
       let allChildElements = document.getElementsByClassName('child-elem');
       for (let i = 0; i < allChildElements.length; i++) {
@@ -340,17 +338,20 @@ function createCollapsible(directory, db_files) {
       databaseChildSelected = true;
 
       // Get reference to the header element
-
       var headerElem = document.getElementById('header');
 
       //Group Manager State
       var groupManage = document.getElementById('groupManage');
       groupManage.style.display = 'flex';
 
-
       // Get reference to the name of database
       var selectedDbNameElem = document.getElementById('selectedDbName');
       selectedDbNameElem.textContent = filenameWithoutExtension;
+
+      // Split the full path into components to get the groupName and databaseName
+      var groupName = directory;  // directory is passed into createCollapsible function
+      var databaseName = databaseFile.replace('.db', '');  // remove the .db extension
+
 
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
@@ -369,8 +370,15 @@ function createCollapsible(directory, db_files) {
                 headerElem.classList.remove('showing');
               }
             } else {
-              window.pywebview.api.get_data(directory, databaseFile, tableName)
+
+
+
+
+
+
+              window.pywebview.api.get_data(groupName, databaseName, tableName)
                 .then(data => {
+                  console.log(data);  // This will print the returned data to the JavaScript console
                   setCachedData(directory, databaseFile, tableName, data);
                   if (databaseChildSelected) {
                     document.getElementById('myTable').style.display = 'table';

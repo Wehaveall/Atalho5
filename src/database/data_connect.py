@@ -53,10 +53,15 @@ def get_db_files_in_directory(directory):
     if not os.path.exists(directory):
         raise ValueError(f"Directory '{directory}' does not exist.")
 
-    db_files = glob.glob(os.path.join(directory, "*.db"))
-    db_file_names = [os.path.basename(db_file) for db_file in db_files]
+    db_files = []
+    # os.walk returns a generator, that creates a tuple of values
+    # (current_path, directories in current_path, files in current_path).
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for file in filenames:
+            if file.endswith(".db"):
+                db_files.append(os.path.join(dirpath, file))
 
-    return db_file_names
+    return db_files
 
 
 def load_db_into_memory(database_path):
@@ -78,3 +83,44 @@ def save_db_from_memory(dest, database_path):
 
     # Copy data from dest (in-memory database) to src (file-based database)
     dest.backup(src)
+
+
+# ----------------------------------------------------Olhar listeners nos bds
+
+
+def lookup_word_in_all_databases(word):
+    # Get the list of all database files
+    db_files = get_db_files_in_directory(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
+    )
+    print(f"Database files found: {db_files}")
+
+    for db_file in db_files:
+        # Load the database into memory
+        conn = load_db_into_memory(db_file)
+
+        # Create a cursor
+        c = conn.cursor()
+
+        # Get the names of all tables in the database
+        c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        table_names = c.fetchall()
+        print(f"Table names in {db_file}: {table_names}")
+
+        # For each table, try to find the word
+        for table_name in table_names:
+            # Execute the query
+            c.execute(
+                f"SELECT expansion FROM {table_name[0]} WHERE shortcut=?", (word,)
+            )
+
+            # Fetch the result
+            result = c.fetchone()
+            print(f"Result for {word} in {table_name[0]}: {result}")
+
+            # If a result was found, return it
+            if result is not None:
+                return result[0]
+
+    # If no result was found in any database, return None
+    return None
