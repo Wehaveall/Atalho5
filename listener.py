@@ -4,8 +4,8 @@ from threading import Event
 import pyautogui
 from src.database.data_connect import lookup_word_in_all_databases
 import pyperclip  # We add this import for clipboard manipulation
-
-from src.utils.num import number_to_words
+from src.utils import number_utils
+import time
 
 
 def format_article(article):
@@ -112,14 +112,20 @@ class KeyListener:
         if key in self.omitted_keys:
             if key == keyboard.Key.space:
                 # Check if the typed keys end with "e" and its preceding characters form a number
-                if (
-                    self.typed_keys[-1] == "e"
-                    and self.typed_keys[:-1].replace(".", "").isdigit()
+                if self.typed_keys.endswith("e") and number_utils.is_number(
+                    self.typed_keys[:-1]
                 ):
                     # Convert the number to words
-                    number_in_words = number_to_words(self.typed_keys[:-1])
-                    # Replace the typed keys with the number and its word form
-                    self.typed_keys = f"{self.typed_keys[:-1]} ({number_in_words})"
+                    number_in_words = number_utils.number_to_words(self.typed_keys)
+
+                    # Replace the number with its word representation
+                    pyautogui.hotkey("ctrl", "shift", "left")
+                    pyautogui.press("backspace")
+                    pyperclip.copy(number_in_words)
+                    pyautogui.hotkey("ctrl", "v")
+
+                    self.typed_keys = ""
+
                 else:
                     expansion = lookup_word_in_all_databases(self.typed_keys)
                     if expansion is not None:
@@ -138,7 +144,9 @@ class KeyListener:
                         # Restore the original clipboard content
                         pyperclip.copy(original_clipboard_content)
 
-                self.typed_keys = ""
+                        self.typed_keys = ""
+
+            self.typed_keys = ""
             return
         if self.stop_listener.is_set():
             return False  # Returning False stops the pynput listener
