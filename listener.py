@@ -111,17 +111,39 @@ class KeyListener:
     def on_key_release(self, key):
         if key in self.omitted_keys:
             if key == keyboard.Key.space:
+                # Replace comma with dot for number conversion
+                typed_keys_for_conversion = self.typed_keys.replace(",", ".")
+
                 # Check if the typed keys end with "e" and its preceding characters form a number
-                if self.typed_keys.endswith("e") and number_utils.is_number(
-                    self.typed_keys[:-1]
-                ):
+                # Check if the typed keys end with "e" and its preceding characters form a number
+                number_type = number_utils.is_number(typed_keys_for_conversion[:-1])
+                if self.typed_keys.endswith("e") and number_type:
                     # Convert the number to words
-                    number_in_words = number_utils.number_to_words(self.typed_keys)
+                    number_in_words = number_utils.number_to_words(
+                        typed_keys_for_conversion
+                    )
 
                     # Replace the number with its word representation
                     pyautogui.hotkey("ctrl", "shift", "left")
                     pyautogui.press("backspace")
                     pyperclip.copy(number_in_words)
+                    pyautogui.hotkey("ctrl", "v")
+
+                    self.typed_keys = ""
+
+                # Check if the typed keys end with "m" and its preceding characters form a number
+                elif self.typed_keys.endswith("m") and number_utils.is_number(
+                    typed_keys_for_conversion[:-1]
+                ):
+                    # Convert the number to currency
+                    number_as_currency = number_utils.number_to_currency(
+                        typed_keys_for_conversion
+                    )
+
+                    # Replace the number with its currency representation
+                    pyautogui.hotkey("ctrl", "shift", "left")
+                    pyautogui.press("backspace")
+                    pyperclip.copy(number_as_currency)
                     pyautogui.hotkey("ctrl", "v")
 
                     self.typed_keys = ""
@@ -160,6 +182,8 @@ class KeyListener:
             self.last_key = key_char
         else:
             self.typed_keys += key_char
+
+            # ----------------------------------------------------------------
 
     def handle_accent_key(self, key_char):
         self.accent = False
