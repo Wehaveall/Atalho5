@@ -104,13 +104,16 @@ class KeyListener:
             if key == keyboard.Key.space:
                 expansion = lookup_word_in_all_databases(self.typed_keys)
                 if expansion is not None:
+                    # Format the expansion (the full article text)
+                    formatted_expansion = format_article(expansion)
+
                     # Simulate pressing ctrl+shift+left to select the last word
                     pyautogui.hotkey("ctrl", "shift", "left")
                     # Simulate pressing backspace to delete the selected text
                     pyautogui.press("backspace")
-                    # Copy the expansion to clipboard
-                    pyperclip.copy(expansion)
-                    # Paste the expansion
+                    # Copy the formatted expansion to clipboard
+                    pyperclip.copy(formatted_expansion)
+                    # Paste the formatted expansion
                     pyautogui.hotkey("ctrl", "v")
                 self.typed_keys = ""
             return
@@ -143,3 +146,10 @@ def start_listener():
 def stop_keyboard_listener(listener, pynput_listener):
     listener.stop_listener.set()
     pynput_listener.join()
+
+
+def format_article(article):
+    delimiters = ["*", "#", "%", "@", "$"]
+    for delimiter in delimiters:
+        article = article.replace(delimiter, "\n")
+    return article

@@ -4,6 +4,7 @@ import json
 # for the collapsible
 import os
 import glob
+import psutil
 
 
 def process_all_databases():
@@ -69,12 +70,12 @@ def load_db_into_memory(database_path):
     src = sqlite3.connect(database_path)
 
     # Connect to a new in-memory database
-    dest = sqlite3.connect("file::memory:", uri=True)
+    dest = sqlite3.connect(":memory:")
 
     # Copy data from src to dest
     src.backup(dest)
 
-    return dest
+    return src, dest
 
 
 def save_db_from_memory(dest, database_path):
@@ -88,6 +89,14 @@ def save_db_from_memory(dest, database_path):
 # ----------------------------------------------------Olhar listeners nos bds
 
 
+def close_db_in_memory(src, dest):
+    # Close the in-memory database
+    dest.close()
+
+    # Close the file-based database
+    src.close()
+
+
 def lookup_word_in_all_databases(word):
     # Get the list of all database files
     db_files = get_db_files_in_directory(
@@ -96,8 +105,23 @@ def lookup_word_in_all_databases(word):
     print(f"Database files found: {db_files}")
 
     for db_file in db_files:
-        # Load the database into memory
-        conn = load_db_into_memory(db_file)
+        file_size_in_bytes = os.path.getsize(db_file)
+        file_size_in_megabytes = file_size_in_bytes / (1024 * 1024)
+        print(f"File size of {db_file}: {file_size_in_megabytes} MB")
+
+        mem = psutil.virtual_memory()
+        available_memory_in_megabytes = mem.available / (1024 * 1024)
+        print(f"Available memory: {available_memory_in_megabytes} MB")
+
+        if (
+            file_size_in_megabytes < 100
+            and file_size_in_megabytes < available_memory_in_megabytes
+        ):
+            # Load the database into memory
+            src, conn = load_db_into_memory(db_file)
+        else:
+            # Connect to the file-based database
+            conn = sqlite3.connect(db_file)
 
         # Create a cursor
         c = conn.cursor()
@@ -120,7 +144,18 @@ def lookup_word_in_all_databases(word):
 
             # If a result was found, return it
             if result is not None:
+                if (
+                    file_size_in_megabytes < 100
+                    and file_size_in_megabytes < available_memory_in_megabytes
+                ):
+                    close_db_in_memory(src, conn)
                 return result[0]
+
+        if (
+            file_size_in_megabytes < 100
+            and file_size_in_megabytes < available_memory_in_megabytes
+        ):
+            close_db_in_memory(src, conn)
 
     # If no result was found in any database, return None
     return None
