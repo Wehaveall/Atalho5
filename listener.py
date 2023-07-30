@@ -20,6 +20,8 @@ class KeyListener:
         self.accent = False
         self.last_key = None
         self.typed_keys = ""
+        # Added this line to store the pynput listener
+        self.pynput_listener = None
         self.accent_mapping = defaultdict(
             lambda: "",
             {
@@ -105,73 +107,70 @@ class KeyListener:
                 keyboard.Key.enter,
             ]
         )
+        self.resetting_keys = set([keyboard.Key.space])
 
     stop_listener = Event()
 
     def on_key_release(self, key):
         if key in self.omitted_keys:
+            if key == keyboard.Key.backspace:
+                self.typed_keys = self.typed_keys[:-1]
+                return
+
             if key == keyboard.Key.space:
-                # Replace comma with dot for number conversion
                 typed_keys_for_conversion = self.typed_keys.replace(",", ".")
 
-                # Check if the typed keys end with "e" and its preceding characters form a number
-                # Check if the typed keys end with "e" and its preceding characters form a number
                 number_type = number_utils.is_number(typed_keys_for_conversion[:-1])
                 if self.typed_keys.endswith("e") and number_type:
-                    # Convert the number to words
                     number_in_words = number_utils.number_to_words(
                         typed_keys_for_conversion
                     )
 
-                    # Replace the number with its word representation
+                    self.pynput_listener.stop()  # Stop the listener
                     pyautogui.hotkey("ctrl", "shift", "left")
                     pyautogui.press("backspace")
                     pyperclip.copy(number_in_words)
                     pyautogui.hotkey("ctrl", "v")
+                    self.start_listener()  # Start a new listener
 
                     self.typed_keys = ""
 
-                # Check if the typed keys end with "m" and its preceding characters form a number
                 elif self.typed_keys.endswith("m") and number_utils.is_number(
                     typed_keys_for_conversion[:-1]
                 ):
-                    # Convert the number to currency
                     number_as_currency = number_utils.number_to_currency(
                         typed_keys_for_conversion
                     )
 
-                    # Replace the number with its currency representation
+                    self.pynput_listener.stop()  # Stop the listener
                     pyautogui.hotkey("ctrl", "shift", "left")
                     pyautogui.press("backspace")
                     pyperclip.copy(number_as_currency)
                     pyautogui.hotkey("ctrl", "v")
+                    self.start_listener()  # Start a new listener
 
                     self.typed_keys = ""
 
                 else:
                     expansion = lookup_word_in_all_databases(self.typed_keys)
                     if expansion is not None:
-                        # Save the current clipboard content
                         original_clipboard_content = pyperclip.paste()
 
-                        # Simulate pressing ctrl+shift+left to select the last word
+                        self.pynput_listener.stop()  # Stop the listener
                         pyautogui.hotkey("ctrl", "shift", "left")
-                        # Simulate pressing backspace to delete the selected text
                         pyautogui.press("backspace")
-                        # Copy the expansion to clipboard
                         pyperclip.copy(format_article(expansion))
-                        # Paste the expansion
                         pyautogui.hotkey("ctrl", "v")
+                        self.start_listener()  # Start a new listener
 
-                        # Restore the original clipboard content
                         pyperclip.copy(original_clipboard_content)
 
                         self.typed_keys = ""
 
-            self.typed_keys = ""
             return
+
         if self.stop_listener.is_set():
-            return False  # Returning False stops the pynput listener
+            return False
 
         key_char = key.char if hasattr(key, "char") else str(key)
 
@@ -183,19 +182,14 @@ class KeyListener:
         else:
             self.typed_keys += key_char
 
-            # ----------------------------------------------------------------
+    def start_listener(self):
+        self.pynput_listener = keyboard.Listener(on_release=self.on_key_release)
+        self.pynput_listener.start()
 
     def handle_accent_key(self, key_char):
         self.accent = False
         combination = self.last_key + key_char
         self.typed_keys += self.accent_mapping[combination]
-
-
-def start_listener():
-    listener = KeyListener()
-    pynput_listener = keyboard.Listener(on_release=listener.on_key_release)
-    pynput_listener.start()
-    return listener, pynput_listener
 
 
 def stop_keyboard_listener(listener, pynput_listener):

@@ -39,7 +39,10 @@ logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-listener_instance, pynput_listener = listener.start_listener()
+# Create an instance of KeyListener
+listener_instance = KeyListener()
+# Start the listener in a new thread
+
 
 WINDOW_TITLE = "Atalho"
 WINDOW_WIDTH = 1200
@@ -346,7 +349,8 @@ def start_app():
     webview.start(http_server=True)
 
 
-listener_thread = threading.Thread(target=KeyListener, daemon=True)
+# Start the listener in a new thread
+listener_thread = threading.Thread(target=listener_instance.start_listener, daemon=True)
 listener_thread.start()
 
 try:
