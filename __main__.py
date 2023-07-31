@@ -35,6 +35,13 @@ from threading import Lock
 
 state_lock = Lock()
 
+
+from pynput import keyboard, mouse
+from macrosFunction import MacroFunctions
+
+macro_functions = MacroFunctions()
+
+
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -132,7 +139,40 @@ class Api:
         self.is_maximized = False
         self.is_window_open = True
         self.window = None
-        self.is_resizing = False  # Add a state variable for resizing
+
+        # --------------------------------------------------------------------------
+
+        self.macro_functions = MacroFunctions()  # Create an instance of MacroFunctions
+        self.keyboard_listener = keyboard.Listener(
+            on_press=self.macro_functions.on_key_press,  # Use methods of macro_functions
+            on_release=self.macro_functions.on_key_release,
+        )
+        self.mouse_listener = mouse.Listener(
+            on_move=self.macro_functions.on_move,
+            on_click=self.macro_functions.on_click,
+            on_scroll=self.macro_functions.on_scroll,
+        )
+
+    def start_recording(self, callback):
+        result = self.macro_functions.start_recording()
+        callback(result)
+
+    def stop_recording(self):
+        return self.macro_functions.stop_recording()
+
+    def pause_recording(self):
+        return self.macro_functions.pause_recording()
+
+    def resume_recording(self):
+        return self.macro_functions.resume_recording()
+
+    def save_macro(self, filename):
+        return self.macro_functions.save_macro(filename)
+
+    def get_macro(self):
+        return self.macro_functions.get_macro()
+
+    # ----------------------------------------------------------------------
 
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -233,36 +273,6 @@ class Api:
             with open("state.json", "w") as file:
                 json.dump(states, file)
 
-    def close_window(self):
-        self.is_window_open = False
-        if webview.windows:
-            self.window.destroy()
-            listener.stop_keyboard_listener(listener_instance, pynput_listener)
-
-    def minimize_window(self):
-        window = get_window()
-        if window:
-            window.minimize()
-
-    def maximize_or_restore_window(self):
-        window = get_window()
-        if window:
-            monitor = get_monitors()[0]
-            screen_width = monitor.width
-            screen_height = monitor.height
-            window_size = window.size
-
-            if window_size.width < screen_width or window_size.height < screen_height:
-                window.maximize()
-                self.window.evaluate_js(
-                    'document.getElementById("maxRestore").children[0].src="/src/images/restoreBtn_white.png"'
-                )
-            else:
-                window.restore()
-                self.window.evaluate_js(
-                    'document.getElementById("maxRestore").children[0].src="/src/images/maxBtn_white.png"'
-                )
-
     def create_and_position_window(self):
         monitor = get_monitors()[0]
         screen_width = monitor.width
@@ -290,47 +300,6 @@ class Api:
     def call_load_handler_after_delay(self):
         time.sleep(0.5)
         load_handler(self.window)
-
-    # ----------------------------------------------Resizing
-
-    # def start_resizing(self):
-    #     self.is_resizing = True
-    #     threading.Thread(target=self.doresize).start()
-
-    # def stop_resizing(self):
-    #     self.is_resizing = False
-
-    # def doresize(self):
-    #     state_left = windll.user32.GetKeyState(0x01)
-    #     winWbefore = self.window.width
-    #     winHbefore = self.window.height
-
-    #     mouseactive = queryMousePosition()
-    #     beforex = mouseactive["x"]
-    #     beforey = mouseactive["y"]
-
-    #     while self.is_resizing:
-    #         mouseactive = queryMousePosition()
-    #         afterx = mouseactive["x"]
-    #         aftery = mouseactive["y"]
-    #         try:
-    #             totalx = int(beforex) - int(afterx)
-    #             totaly = int(beforey) - int(aftery)
-    #         except:
-    #             print("fail")
-    #         if totalx > 0:
-    #             changerx = winWbefore + (totalx * -1)
-    #         else:
-    #             changerx = winWbefore + (totalx * -1)
-
-    #         if totaly > 0:
-    #             changerY = winHbefore + (totaly * -1)
-    #         else:
-    #             changerY = winHbefore + (totaly * -1)
-
-    #         self.window.resize(changerx, changerY)
-
-    #         time.sleep(0.01)
 
 
 def get_window():

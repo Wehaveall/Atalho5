@@ -17,7 +17,7 @@
   <title>Atalho</title>
 
   <link rel="stylesheet" type="text/css" href="src/styles/style.css">
-  <!-- <link rel="stylesheet" type="text/css" href="src/styles/titleBar.css"> -->
+
   <link rel="stylesheet" type="text/css" href="src/styles/leftPanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/middlePanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/rightPanel.css">
@@ -30,6 +30,7 @@
   <script src="database.js"></script>
   <script src="richTextEditor.js"></script>
   <script src="/tinymce/tinymce.min.js"></script>
+  <script src="macros.js"></script>
 
 
 
@@ -53,31 +54,6 @@
 
     <div class="contentWrapper">
 
-      <!-- --------------------------------Edge Detection - Content Wrapper-------------------------------- -->
-      <!-- <div id="edge-detection">
-
-    <div id="content-wrapper"> -->
-      <!-- ------------------------------------------------------------------------- -->
-
-
-      <!-- ----------------------Title Bar-------------------- -->
-      <!-- <div id="titleBar" class="pywebview-drag-region">
-        <span id="icon"><img src="/src/images/atalho.png" alt=""></span>
-        <span id="name">Atalho</span>
-
-        <div id="buttonContainer">
-          <button id="minimize" onclick="pywebview.api.minimize_window()"><img src="/src/images/minimizeBtn_white.png"
-              alt="Minimize"></button>
-          <button id="maxRestore" onclick="pywebview.api.maximize_or_restore_window()"><img
-              src="/src/images/maxBtn_white.png" alt="Max/Restore"></button>
-          <button id="close" onclick="pywebview.api.close_window()"><img src="/src/images/closeBtn_White2.png"
-              alt="Close"></button>
-        </div>
-
-      </div> -->
-
-
-      <!-- ////////////////////////TABS ////////////////////////// -->
 
 
 
@@ -85,7 +61,8 @@
         <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
         <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
         <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
-        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
+        <button id="macros" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
+        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab5')">""</button>
       </div>
 
 
@@ -238,7 +215,23 @@
       </div>
 
       <div id="Tab4" class="tabcontent">
+        <h2>Gravar Macro</h2>
+        <button id="startRecording">Iniciar gravação</button>
+        <button id="pauseRecording">Pausar gravação</button>
+        <button id="resumeRecording">Retomar gravação</button>
+        <button id="stopRecording">Parar gravação</button>
+        <form id="saveMacroForm" onsubmit="event.preventDefault(); saveMacro();">
+          <label for="filename">Nome do arquivo:</label>
+          <input type="text" id="filename" name="filename">
+          <input id="saveMacroButton" type="submit" value="Salvar Macro">
+        </form>
+        <div id="status"></div>
+      </div>
 
+
+
+      <div id="Tab5" class="tabcontent">
+        <!-- Tab3 content goes here -->
       </div>
 
 
@@ -262,7 +255,14 @@
 
 
 
+  <script>
+    // Your existing JavaScript code
 
+    // Simulate a click on the "principal" tab button
+    document.getElementById("principal").click();
+
+
+  </script>
 
 
 
