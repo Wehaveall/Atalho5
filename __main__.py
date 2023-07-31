@@ -1,5 +1,3 @@
-api = None  # Declare api as a global variable
-
 import traceback
 
 import glob
@@ -34,12 +32,6 @@ from sqlalchemy import inspect
 from threading import Lock
 
 state_lock = Lock()
-
-
-from pynput import keyboard, mouse
-from macrosFunction import MacroFunctions
-
-macro_functions = MacroFunctions()
 
 
 logging.basicConfig(
@@ -139,38 +131,12 @@ class Api:
         self.is_maximized = False
         self.is_window_open = True
         self.window = None
-
+        pass
         # --------------------------------------------------------------------------
 
-        self.macro_functions = MacroFunctions()  # Create an instance of MacroFunctions
-        self.keyboard_listener = keyboard.Listener(
-            on_press=self.macro_functions.on_key_press,  # Use methods of macro_functions
-            on_release=self.macro_functions.on_key_release,
-        )
-        self.mouse_listener = mouse.Listener(
-            on_move=self.macro_functions.on_move,
-            on_click=self.macro_functions.on_click,
-            on_scroll=self.macro_functions.on_scroll,
-        )
-
-    def start_recording(self, callback):
-        result = self.macro_functions.start_recording()
-        callback(result)
-
-    def stop_recording(self):
-        return self.macro_functions.stop_recording()
-
-    def pause_recording(self):
-        return self.macro_functions.pause_recording()
-
-    def resume_recording(self):
-        return self.macro_functions.resume_recording()
-
-    def save_macro(self, filename):
-        return self.macro_functions.save_macro(filename)
-
-    def get_macro(self):
-        return self.macro_functions.get_macro()
+    def hello(self, params):
+        print("Hello from Python!")
+        return "Hello from Python!"
 
     # ----------------------------------------------------------------------
 

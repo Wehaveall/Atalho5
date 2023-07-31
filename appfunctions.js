@@ -464,6 +464,15 @@ function truncateText(text, maxLength) {
 
 
 
+
+
+
+
+
+
+
+
+
 window.onbeforeunload = function () {
   // Save all states before the window closes
   if (window.pywebview && window.pywebview.api) {
