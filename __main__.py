@@ -193,6 +193,9 @@ class Api:
         conn.close()
         return tables
 
+
+#----------------------------------------------------------------LANGUAGE
+
     def load_translations(self):
         try:
             logging.debug("load_translations called")
