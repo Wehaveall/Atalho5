@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     startButton.addEventListener('click', function () {
         console.log('startButton clicked');
         status.innerHTML = "Gravação iniciada";
+        startButton.blur();
         window.pywebview.api.start_recording().then(startStatusUpdates);
     });
 
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pauseButton.addEventListener('click', function () {
             console.log('pauseButton clicked');
             status.innerHTML = "Gravação pausada";
+            pauseButton.blur();
             window.pywebview.api.pause_recording().then(stopStatusUpdates);
         });
     }
@@ -49,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
         resumeButton.addEventListener('click', function () {
             console.log('resumeButton clicked');
             status.innerHTML = "Gravação retomada";
+            resumeButton.blur();
             window.pywebview.api.resume_recording().then(startStatusUpdates);
         });
     }
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         stopButton.addEventListener('click', function () {
             console.log('stopButton clicked');
             status.innerHTML = "Gravação parada";
+            stopButton.blur();
             window.pywebview.api.stop_recording().then(function () {
                 stopStatusUpdates();
                 updateEvents();

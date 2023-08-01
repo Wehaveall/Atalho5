@@ -122,6 +122,7 @@ class KeyListener:
 
     def stopRecordingMacro(self):
         self.isRecordingMacro = False
+        self.typed_keys = ""  # Add this line
 
     def on_key_release(self, key):
         # Check silent mode is enabled
@@ -210,14 +211,21 @@ class KeyListener:
     def start_listener(self):
         self.typed_keys = ""  # Clear the typed keys
         self.pynput_listener = keyboard.Listener(on_release=self.on_key_release)
+        print("Starting listener...")
         self.pynput_listener.start()
 
     def stop_listener(self):
-        self.typed_keys = ""  # Clear the typed keys
         if self.pynput_listener is not None:
-            self.pynput_listener.stop()
-            self.pynput_listener.join()
-            self.pynput_listener = None
+            if self.pynput_listener.running:
+                print("Stopping listener...")
+                self.pynput_listener.stop()
+                self.pynput_listener.join()
+                self.pynput_listener = None
+                self.typed_keys = ""  # Move this line here
+            else:
+                print("Listener is not running, no need to stop it.")
+        else:
+            print("No listener to stop.")
 
     def handle_accent_key(self, key_char):
         self.accent = False
