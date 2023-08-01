@@ -1,21 +1,19 @@
 
 // The DOMContentLoaded event listener and the populateTable function remain unchanged
 
-window.onload = function () {
+window.addEventListener('load', function () {
     // First part of the script
-    document.addEventListener('DOMContentLoaded', function () {
-        window.pywebview.api.get_database_names()
-            .then(function (databaseNames) {
-                var container = document.getElementById('collapsible');
-                for (var i = 0; i < databaseNames.length; i++) {
-                    var databaseName = databaseNames[i];
-                    // This code has been removed, since it's now in the createCollapsible function in appfunctions.js
-                }
-            })
-            .catch(function (error) {
-                console.log('Error in get_database_names:', error);
-            });
-    });
+    window.pywebview.api.get_database_names()
+        .then(function (databaseNames) {
+            var container = document.getElementById('collapsible');
+            for (var i = 0; i < databaseNames.length; i++) {
+                var databaseName = databaseNames[i];
+                // This code has been removed, since it's now in the createCollapsible function in appfunctions.js
+            }
+        })
+        .catch(function (error) {
+            console.log('Error in get_database_names:', error);
+        });
 
     // Second part of the script
     var table = document.getElementById("myTable");
@@ -36,9 +34,7 @@ window.onload = function () {
             document.querySelector('input[placeholder="Atalho:"]').value = shortcut;
         };
     }
-};
-
-
+});
 
 
 
