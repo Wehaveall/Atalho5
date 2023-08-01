@@ -191,6 +191,12 @@ class KeyListener:
         combination = self.last_key + key_char
         self.typed_keys += self.accent_mapping[combination]
 
+    def start(self):
+        self.listener.start()
+
+    def stop(self):
+        self.listener.stop()
+
 
 def stop_keyboard_listener(listener, pynput_listener):
     listener.stop_listener.set()
