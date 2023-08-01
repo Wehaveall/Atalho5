@@ -9,7 +9,7 @@ import time
 import pygetwindow as gw
 from screeninfo import get_monitors
 
-import listener  # import listener.py
+
 from listener import KeyListener
 
 # Import database
@@ -136,6 +136,9 @@ class Api:
 
     # ----------------------------------------------------------------------
 
+    def teste(self, arg):
+        print("Testing with argument:", arg)
+
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
@@ -247,7 +250,7 @@ class Api:
             url="index.html",
             frameless=False,
             resizable=True,
-            js_api=api,
+            js_api=self,
             min_size=(screen_width // 2, WINDOW_HEIGHT),
         )
 
@@ -271,12 +274,11 @@ def get_window():
 
 
 def load_handler(window):
-    global api
-    api = Api()
+    pass
 
 
 def start_app():
-    global api
+    global api  # Add this line
     api = Api()
     api.create_and_position_window()
     webview.start(http_server=True)
