@@ -16,12 +16,15 @@ def format_article(article):
 
 
 class KeyListener:
-    def __init__(self):
+    def __init__(self, api):
         self.accent = False
         self.last_key = None
         self.typed_keys = ""
         # Added this line to store the pynput listener
         self.pynput_listener = None
+        self.api = api  # Armazene api para uso posterior
+        self.silent_mode = False
+        self.isRecordingMacro = False
         self.accent_mapping = defaultdict(
             lambda: "",
             {
@@ -109,10 +112,29 @@ class KeyListener:
         )
         self.resetting_keys = set([keyboard.Key.space])
 
-    stop_listener = Event()
+    stop_event = Event()  # Renamed from stop_listener to stop_event
+
+    def set_silent_mode(self, value):
+        self.silent_mode = value
+
+    def startRecordingMacro(self):
+        self.isRecordingMacro = True
+
+    def stopRecordingMacro(self):
+        self.isRecordingMacro = False
 
     def on_key_release(self, key):
+        # Check silent mode is enabled
+        if self.isRecordingMacro:
+            return
+
+        if self.silent_mode:
+            return
+
         if key in self.omitted_keys:
+            if self.api.is_recording:
+                return
+
             if key == keyboard.Key.backspace:
                 self.typed_keys = self.typed_keys[:-1]
                 return
@@ -166,10 +188,13 @@ class KeyListener:
                         pyperclip.copy(original_clipboard_content)
 
                         self.typed_keys = ""
+                    else:
+                        # If no expansion was found, clear the typed keys
+                        self.typed_keys = ""
 
             return
 
-        if self.stop_listener.is_set():
+        if self.stop_event.is_set():
             return False
 
         key_char = key.char if hasattr(key, "char") else str(key)
@@ -183,8 +208,16 @@ class KeyListener:
             self.typed_keys += key_char
 
     def start_listener(self):
+        self.typed_keys = ""  # Clear the typed keys
         self.pynput_listener = keyboard.Listener(on_release=self.on_key_release)
         self.pynput_listener.start()
+
+    def stop_listener(self):
+        self.typed_keys = ""  # Clear the typed keys
+        if self.pynput_listener is not None:
+            self.pynput_listener.stop()
+            self.pynput_listener.join()
+            self.pynput_listener = None
 
     def handle_accent_key(self, key_char):
         self.accent = False
@@ -192,12 +225,11 @@ class KeyListener:
         self.typed_keys += self.accent_mapping[combination]
 
     def start(self):
-        self.listener.start()
+        self.start_listener()  # Change self.listener.start() to self.start_listener()
 
     def stop(self):
-        self.listener.stop()
+        self.stop_listener()  # Change self.listener.stop() to self.stop_listener()
 
 
-def stop_keyboard_listener(listener, pynput_listener):
-    listener.stop_listener.set()
-    pynput_listener.join()
+def stop_keyboard_listener(listener):
+    listener.stop_listener()  # Remove the second argument, pynput_listener

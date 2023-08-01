@@ -22,7 +22,7 @@ from src.database.data_connect import (
 
 from ctypes import windll, Structure, c_long, byref
 
-# Save/Restore States
+# ------------------------------------ Save/Restore States
 import json
 import os
 import logging
@@ -33,6 +33,9 @@ from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy import inspect
 from threading import Lock
 
+# --------------------------------------macros
+from pynput import keyboard, mouse
+
 state_lock = Lock()
 
 
@@ -40,8 +43,9 @@ logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+
 # Create an instance of KeyListener
-listener_instance = KeyListener()
+# listener_instance = KeyListener()
 # Start the listener in a new thread
 
 
@@ -132,13 +136,81 @@ class Api:
     def __init__(self):
         self.is_maximized = False
         self.is_window_open = True
-        # self.window = None
+        self.is_recording = False
+        self.events = []
+        self.listener_instance = KeyListener(self)
+        self.listener = None
+        self.mouse_listener = None
 
-    # ----------------------------------------------------------------------
+    def get_events(self):
+        return self.events
 
-    def teste(self, arg):
-        print("Testing with argument:", arg)
+    def clear_events(self):
+        self.events = []
 
+    def on_press(self, key):
+        if self.is_recording:
+            self.events.append(("key", str(key), time.time()))
+
+    def on_click(self, x, y, button, pressed):
+        if self.is_recording and pressed:
+            self.events.append(("click", (x, y), time.time()))
+
+    def start_recording(self):
+        self.is_recording = True
+        listener_instance.startRecordingMacro()
+
+        # Stop the global listener
+        listener_instance.stop_listener()
+
+        self.events = []
+
+        # Check if the listeners already exist and stop them if they do
+        if self.listener is not None:
+            self.listener.stop()
+        if self.mouse_listener is not None:
+            self.mouse_listener.stop()
+
+        self.listener = keyboard.Listener(on_press=self.on_press)
+        self.listener.start()
+        self.mouse_listener = mouse.Listener(on_click=self.on_click)
+        self.mouse_listener.start()
+
+    def stop_recording(self):
+        self.is_recording = False
+        listener_instance.stopRecordingMacro()
+        # Start the global listener
+        listener_instance.start_listener()
+
+        if self.listener:
+            self.listener.stop()
+        if self.mouse_listener:
+            self.mouse_listener.stop()
+
+    def save_macro(self, filename):
+        # Get the path to the current file (__file__)
+        current_file_path = os.path.abspath(__file__)
+
+        # Get the parent directory of the current file
+        parent_directory = os.path.dirname(current_file_path)
+
+        # Get the path to the macros directory
+        macros_directory = os.path.join(parent_directory, "src", "macros")
+
+        # Create the full file path
+        full_file_path = os.path.join(macros_directory, filename)
+
+        # Save your recording to the file
+        # ...
+        try:
+            with open(full_file_path, "w") as f:
+                json.dump(self.events, f)
+            return full_file_path
+        except Exception as e:
+            print(f"An error occurred while saving the macro: {e}")
+            return None
+
+    # ----------------------------------------------------------------   --------------------------------
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
@@ -266,6 +338,10 @@ class Api:
     def call_load_handler_after_delay(self):
         time.sleep(0.5)
         load_handler(self.window)
+
+
+api = Api()
+listener_instance = KeyListener(api)
 
 
 def get_window():
