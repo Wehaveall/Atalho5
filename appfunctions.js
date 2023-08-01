@@ -56,17 +56,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-window.onload = function () {
-  // Load all states once at the start of the program
-  window.pywebview.api.load_all_states()
-    .then(states => {
-      buttonStates = states;
-      // Now that the states have been loaded, create the collapsibles
-      for (let directory in allDbFiles) {
-        createCollapsible(directory, allDbFiles[directory]);
-      }
-    });
-};
+window.addEventListener('load', function () {
+  // Listen for the webviewready event
+  window.addEventListener('webviewready', function () {
+    // Load all states once at the start of the program
+    window.pywebview.api.load_all_states()
+      .then(states => {
+        buttonStates = states;
+        // Now that the states have been loaded, create the collapsibles
+        for (let directory in allDbFiles) {
+          createCollapsible(directory, allDbFiles[directory]);
+        }
+      });
+  });
+});
+
+//Aqui também era window.onload - ok
+//Aqui dá erro no edge tools - undefined apI
+//Colocar webviewready dentro de window.onload parecer resolver o erro
+
+
 
 function openTab(evt, tabName) {
   var i, tabcontent, tablinks;
@@ -453,15 +462,6 @@ function formatArticle(article) {
 function truncateText(text, maxLength) {
   return text.length > maxLength ? text.substr(0, maxLength - 1) + '...' : text;
 }
-
-
-
-
-
-
-
-
-
 
 
 

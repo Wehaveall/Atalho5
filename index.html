@@ -23,12 +23,15 @@
   <link rel="stylesheet" type="text/css" href="src/styles/rightPanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/tabs.css">
 
+
   <script src="https://cdn.jsdelivr.net/npm/pywebview@latest/dist/webview.js"></script>
-  <script src="/tinymce/tinymce.min.js"></script> <!-- Moved up -->
+  <script src="/tinymce/tinymce.min.js"></script>
+  <script src="lang.js"></script>
   <script src="appfunctions.js"></script>
   <script src="database.js"></script>
-  <script src="macros.js"></script>
   <script src="richTextEditor.js"></script>
+  <script src="macros.js"></script>
+
 
 
 
@@ -213,10 +216,10 @@
 
       <div id="Tab4" class="tabcontent">
         <h2>Gravar Macro</h2>
-        <button id="startRec">Iniciar gravação</button>
-        <button id="pauseRec">Pausar gravação</button>
-        <button id="resumeRe">Retomar gravação</button>
-        <button id="stopRec">Parar gravação</button>
+        <button id="startRecording">Iniciar gravação</button>
+        <button id="pauseRecording">Pausar gravação</button>
+        <button id="resumeRecording">Retomar gravação</button>
+        <button id="stopRecording">Parar gravação</button>
         <form id="saveMacroForm" onsubmit="event.preventDefault(); saveMacro();">
           <label for="filename">Nome do arquivo:</label>
           <input type="text" id="filename" name="filename">

@@ -3,17 +3,20 @@
 
 window.addEventListener('load', function () {
     // First part of the script
-    window.pywebview.api.get_database_names()
-        .then(function (databaseNames) {
-            var container = document.getElementById('collapsible');
-            for (var i = 0; i < databaseNames.length; i++) {
-                var databaseName = databaseNames[i];
-                // This code has been removed, since it's now in the createCollapsible function in appfunctions.js
-            }
-        })
-        .catch(function (error) {
-            console.log('Error in get_database_names:', error);
-        });
+    document.addEventListener('DOMContentLoaded', function () {
+        window.pywebview.api.get_database_names()
+            .then(function (databaseNames) {
+                var container = document.getElementById('collapsible');
+                for (var i = 0; i < databaseNames.length; i++) {
+                    var databaseName = databaseNames[i];
+                    // This code has been removed, since it's now in the createCollapsible function in appfunctions.js
+                }
+            })
+            .catch(function (error) {
+                console.log('Error in get_database_names:', error);
+            });
+    });
+
 
     // Second part of the script
     var table = document.getElementById("myTable");
@@ -35,6 +38,9 @@ window.addEventListener('load', function () {
         };
     }
 });
+
+//Aqui também era windows.onload - ok
+
 
 
 
