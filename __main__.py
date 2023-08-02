@@ -35,6 +35,7 @@ from threading import Lock
 
 # --------------------------------------macros
 from pynput import keyboard, mouse
+from macroPlayer import Executor
 
 
 # --------------------------------Imagem bandeja do sistema
@@ -148,22 +149,9 @@ class Api:
         self.mouse_listener = None
         self.last_event_time = None
 
-    def create_image():
-        # Gere uma imagem e inverta-a.
-        width = 64
-        height = 64
-        color1 = "red"
-        color2 = "blue"
-
-        data = [
-            color1 if i % 2 ^ j % 2 else color2
-            for i in range(width)
-            for j in range(height)
-        ]
-
-        image = Image.new("RGB", (width, height))
-        image.putdata(data)
-        return image
+        self.executor = Executor()
+        self.execution_thread = None
+        self.should_execute = False
 
     def minimize_window(self):
         self.window.minimize()
@@ -225,15 +213,6 @@ class Api:
 
         self.events = []
 
-        image_path = os.path.join(
-            os.path.dirname(__file__), "src", "images", "stop_icon.png"
-        )
-        image = Image.open(image_path)
-        menu = (
-            pystray.MenuItem("Stop Recording", api.stop_recording_icon),
-        )  # Aqui está a atualização
-        icon = pystray.Icon("name", image, "My System Tray Icon", menu)
-
         # Check if the listeners already exist and stop them if they do
         if self.listener is not None:
             self.listener.stop()
@@ -278,6 +257,14 @@ class Api:
         except Exception as e:
             print(f"An error occurred while saving the macro: {e}")
             return None
+
+    # ---------------------------------------------------------------- EXECUÇAO MACROs--------------------------------
+
+    def get_macro_filename(self):
+        return self.executor.get_macro_filename()
+
+    def start_macro(self, filename):
+        self.executor.start_macro(filename)
 
     # ----------------------------------------------------------------   --------------------------------
     def get_database_names(self):

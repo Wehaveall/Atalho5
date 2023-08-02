@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    ////////////////////////////////////////////////////////////////START 
+    ////////////////////////////////////////////////////////////////GRAVAÇÃO DA MACRO
 
     var startButton = document.getElementById('startRecording');
     if (!startButton) {
@@ -108,4 +108,60 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+
+    //----------------------------------------------------------------EXECUÇÂO DA MACRO
+
+
+
+    document.getElementById('executeMacroButton').addEventListener('click', function () {
+        window.pywebview.api.get_macro_filename().then(function (filename) {
+            window.pywebview.api.start_macro(filename);
+        });
+    });
+    document.getElementById('pauseExecutionButton').addEventListener('click', pauseExecution);
+    document.getElementById('resumeExecutionButton').addEventListener('click', resumeExecution);
+    document.getElementById('stopExecutionButton').addEventListener('click', stopExecution);
+
+    function executeMacro() {
+        let filename = document.getElementById('executeFilename').value;
+        window.pywebview.api.execute_macro(filename).then(function () {
+            alert('Macro execution started!');
+        });
+    }
+
+    function pauseExecution() {
+        window.pywebview.api.pause_execution().then(function () {
+            alert('Macro execution paused!');
+        });
+    }
+
+    function resumeExecution() {
+        window.pywebview.api.resume_execution().then(function () {
+            alert('Macro execution resumed!');
+        });
+    }
+
+    function stopExecution() {
+        window.pywebview.api.stop_execution().then(function () {
+            alert('Macro execution stopped!');
+        });
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });

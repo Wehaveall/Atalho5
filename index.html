@@ -226,9 +226,18 @@
           <input type="text" id="filename" name="filename">
           <input id="saveMacroButton" type="submit" value="Salvar Macro">
         </form>
+        <button id="executeMacroButton">Executar Macro</button>
+        <form id="executeMacroForm" onsubmit="event.preventDefault(); executeMacro();">
+          <label for="executeFilename">Arquivo para Executar:</label>
+          <input type="text" id="executeFilename" name="executeFilename">
+          <button id="pauseExecutionButton">Pausar Execução</button>
+          <button id="resumeExecutionButton">Retomar Execução</button>
+          <button id="stopExecutionButton">Parar Execução</button>
+        </form>
         <div id="status"></div>
         <div id="eventos"></div>
       </div>
+
 
 
 
