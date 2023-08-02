@@ -141,23 +141,54 @@ class Api:
         self.listener_instance = KeyListener(self)
         self.listener = None
         self.mouse_listener = None
+        self.last_event_time = None
 
     def get_events(self):
-        return self.events
+        # Initialize an empty list to hold the events with intervals
+        events_with_intervals = []
+
+        # Iterate through the events
+        for i in range(len(self.events) - 1):  # Subtract 1 here to avoid an IndexError
+            event = self.events[i]
+            next_event = self.events[i + 1]
+
+            # Calculate the interval as the difference in elapsed time between the next event and this one
+            interval = next_event[2] - event[2]
+
+            # Add the event to the list, along with the interval until the next event
+            events_with_intervals.append((event[0], event[1], interval))
+
+        # Add the last event manually to avoid an IndexError
+        if self.events:  # Check if the list is not empty
+            last_event = self.events[-1]
+            events_with_intervals.append((last_event[0], last_event[1], 0))
+
+        # Return the modified list of events
+        return events_with_intervals
 
     def clear_events(self):
         self.events = []
 
     def on_press(self, key):
         if self.is_recording:
-            self.events.append(("key", str(key), time.time()))
+            current_time = time.time()
+            elapsed_time = (
+                current_time - self.start_time if self.start_time is not None else 0
+            )
+            self.events.append(("key", str(key), elapsed_time))
 
     def on_click(self, x, y, button, pressed):
         if self.is_recording and pressed:
-            self.events.append(("click", (x, y), time.time()))
+            current_time = time.time()
+            elapsed_time = (
+                current_time - self.start_time if self.start_time is not None else 0
+            )
+            self.events.append(("click", (x, y), elapsed_time))
 
     def start_recording(self):
         self.is_recording = True
+        self.start_time = time.time()
+
         listener_instance.startRecordingMacro()
 
         # Stop the global listener

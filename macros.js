@@ -19,9 +19,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateEvents() {
         window.pywebview.api.get_events().then(function (eventsList) {
-            events.innerHTML = eventsList.join('<br>');
+            let eventsStr = '';
+            for (let i = 0; i < eventsList.length; i++) {
+                let event = eventsList[i];
+                let eventStr;
+                // If this is not a wait event, format the string differently
+                if (event[0] !== 'espera') {
+                    eventStr = `${event[0]}: ${event[1]}<br>`;
+                    // If this is not the last event, add the wait time
+                    if (i < eventsList.length - 1) {
+                        eventStr += `espera: ${event[2].toFixed(2)} segundos<br>`;
+                    }
+                } else {
+                    eventStr = `${event[0]}: ${event[2].toFixed(2)} segundos<br>`;
+                }
+                eventsStr += eventStr;
+            }
+            events.innerHTML = eventsStr;
         });
     }
+
+
+
+
+
+
 
     var startButton = document.getElementById('startRecording');
     if (!startButton) {
