@@ -36,6 +36,11 @@ from threading import Lock
 # --------------------------------------macros
 from pynput import keyboard, mouse
 
+
+# --------------------------------Imagem bandeja do sistema
+import pystray
+from PIL import Image
+
 state_lock = Lock()
 
 
@@ -143,6 +148,26 @@ class Api:
         self.mouse_listener = None
         self.last_event_time = None
 
+    def create_image():
+        # Gere uma imagem e inverta-a.
+        width = 64
+        height = 64
+        color1 = "red"
+        color2 = "blue"
+
+        data = [
+            color1 if i % 2 ^ j % 2 else color2
+            for i in range(width)
+            for j in range(height)
+        ]
+
+        image = Image.new("RGB", (width, height))
+        image.putdata(data)
+        return image
+
+    def minimize_window(self):
+        self.window.minimize()
+
     def get_events(self):
         # Initialize an empty list to hold the events with intervals
         events_with_intervals = []
@@ -185,6 +210,10 @@ class Api:
             )
             self.events.append(("click", (x, y), elapsed_time))
 
+    def stop_recording_icon(icon, item):
+        icon.stop()  # Isso irá parar o ícone pystray
+        api.stop_recording()  # Isso irá parar a gravação
+
     def start_recording(self):
         self.is_recording = True
         self.start_time = time.time()
@@ -195,6 +224,15 @@ class Api:
         listener_instance.stop_listener()
 
         self.events = []
+
+        image_path = os.path.join(
+            os.path.dirname(__file__), "src", "images", "stop_icon.png"
+        )
+        image = Image.open(image_path)
+        menu = (
+            pystray.MenuItem("Stop Recording", api.stop_recording_icon),
+        )  # Aqui está a atualização
+        icon = pystray.Icon("name", image, "My System Tray Icon", menu)
 
         # Check if the listeners already exist and stop them if they do
         if self.listener is not None:

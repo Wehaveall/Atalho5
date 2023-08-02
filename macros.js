@@ -43,25 +43,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
+    ////////////////////////////////////////////////////////////////START 
 
     var startButton = document.getElementById('startRecording');
     if (!startButton) {
-        console.log('startButton not found');
         return;
     }
 
     startButton.addEventListener('click', function () {
         console.log('startButton clicked');
-        status.innerHTML = "Gravação iniciada";
+        status.innerHTML = "Gravação iniciada: a janela será minimizada em 3 segundos";
         startButton.blur();
         window.pywebview.api.start_recording().then(startStatusUpdates);
+        setTimeout(function () {
+            window.pywebview.api.minimize_window();
+        }, 3000);
     });
+
 
     var pauseButton = document.getElementById('pauseRecording');
     if (pauseButton) {
         pauseButton.addEventListener('click', function () {
-            console.log('pauseButton clicked');
             status.innerHTML = "Gravação pausada";
             pauseButton.blur();
             window.pywebview.api.pause_recording().then(stopStatusUpdates);
@@ -71,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var resumeButton = document.getElementById('resumeRecording');
     if (resumeButton) {
         resumeButton.addEventListener('click', function () {
-            console.log('resumeButton clicked');
             status.innerHTML = "Gravação retomada";
             resumeButton.blur();
             window.pywebview.api.resume_recording().then(startStatusUpdates);
@@ -81,8 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var stopButton = document.getElementById('stopRecording');
     if (stopButton) {
         stopButton.addEventListener('click', function () {
-            console.log('stopButton clicked');
             status.innerHTML = "Gravação parada";
+            status.style.backgroundColor = "#EC471F";
             stopButton.blur();
             window.pywebview.api.stop_recording().then(function () {
                 stopStatusUpdates();
@@ -96,7 +97,6 @@ document.addEventListener('DOMContentLoaded', function () {
         saveButton.addEventListener('click', function () {
             var filename = document.getElementById('filename').value;
             if (filename) {
-                console.log('saveButton clicked');
                 window.pywebview.api.save_macro(filename).then(function (filepath) {
                     stopStatusUpdates();
                     updateEvents();

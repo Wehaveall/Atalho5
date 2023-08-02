@@ -37,7 +37,8 @@ function updateLanguage() {
             document.getElementById('principal').textContent = translations['Tab1'];
             document.getElementById('config').textContent = translations['Tab2'];
             document.getElementById('rascunho').textContent = translations['Tab3'];
-            document.getElementById('ajuda').textContent = translations['Tab4'];
+            document.getElementById('macros').textContent = translations['Tab4'];
+            document.getElementById('ajuda').textContent = translations['Tab5'];
             document.getElementById('language_choice').textContent = translations['language_choice'];
         })
         .catch((error) => console.log('Error in load_translations:', error));
