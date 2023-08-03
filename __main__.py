@@ -1,5 +1,15 @@
 api = None  # Declare api as a global variable
 
+# pywebview
+import webview
+
+# Dialog box
+import tkinter
+from tkinter import messagebox
+import queue
+from queue import Queue, Empty  # Don't forget to import Empty
+
+
 import traceback
 
 import glob
@@ -135,6 +145,18 @@ def row2dict(row):
     return dict(row._mapping)
 
 
+def show_message(title, message):
+    # Create a root window and immediately withdraw it (hide it)
+    root = tkinter.Tk()
+    root.withdraw()
+    # Make the message box appear on top
+    root.attributes("-topmost", True)
+    # Show the message box
+    messagebox.showinfo(title, message)
+    # Destroy the root window after the message box is closed
+    root.destroy()
+
+
 ##--------------------------------------------------------------------------
 
 
@@ -149,6 +171,7 @@ class Api:
         self.mouse_listener = None
         self.last_event_time = None
 
+        # Execução da Macro
         self.executor = Executor()
         self.execution_thread = None
         self.should_execute = False
@@ -186,15 +209,18 @@ class Api:
         return self.is_recording
 
     def on_press(self, key):
-        if key == keyboard.Key.esc:
-            self.stop_recording()
-
+        # Se está gravando
         if self.is_recording:
-            current_time = time.time()
-            elapsed_time = (
-                current_time - self.start_time if self.start_time is not None else 0
-            )
-            self.events.append(("key", str(key), elapsed_time))
+            # Se apertou escape
+            if key == keyboard.Key.esc:
+                self.stop_recording()
+                show_message("Atalho", "Gravação Parada.")
+
+            else:
+                # If any other key is pressed, add it to the events list
+                current_time = time.time()
+                elapsed_time = current_time - self.start_time if self.start_time else 0
+                self.events.append(("key", str(key), elapsed_time))
 
     def on_click(self, x, y, button, pressed):
         if self.is_recording and pressed:
@@ -416,6 +442,7 @@ def start_app():
     api = Api()
     api.create_and_position_window()
     webview.start(http_server=True)
+    # Check the flag and show messagebox after the webview starts
 
 
 # Start the listener in a new thread

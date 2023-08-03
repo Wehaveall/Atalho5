@@ -153,15 +153,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    window.addEventListener('DOMContentLoaded', function () {
-        // Evento para detectar quando a tecla 'Escape' é pressionada
-        window.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                alert('Gravação parada');
-            }
-        });
-    });
-
+    // window.addEventListener('DOMContentLoaded', function () {
+    //     console.log('DOMContentLoaded event fired');
+    
+    //     // Rest of your code...
+    
+    //     // Evento para detectar quando a tecla 'Escape' é pressionada
+    //     window.addEventListener('keydown', function (event) {
+    //         if (event.key === 'Escape') {
+    //             console.log('keydown event fired');
+    //             window.pywebview.api.is_recording().then(function (isRecording) {
+    //                 console.log('Is recording:', isRecording);
+    //                 if (isRecording) {
+    //                     console.log('Stopping recording...');
+    //                     window.pywebview.api.stop_recording();
+    //                     alert('Gravação parada');
+    //                 }
+    //             });
+    //         }
+    //     });
+    // });
+    
 
 
 
