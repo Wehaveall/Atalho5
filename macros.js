@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     startButton.addEventListener('click', function () {
         console.log('startButton clicked');
-        status.innerHTML = "Gravação iniciada: a janela será minimizada em 3 segundos";
+        status.innerHTML = "Gravação iniciada: a janela será minimizada em 3 segundos. Pressione ESC a qualquer momento para parar";
         startButton.blur();
         window.pywebview.api.start_recording().then(startStatusUpdates);
         setTimeout(function () {
@@ -148,6 +148,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+
+
+
+
+    window.addEventListener('DOMContentLoaded', function () {
+        // Evento para detectar quando a tecla 'Escape' é pressionada
+        window.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                alert('Gravação parada');
+            }
+        });
+    });
+
+
+
+
+
 
 
 

@@ -56,6 +56,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
+
+
+
+
 window.addEventListener('load', function () {
   // Listen for the webviewready event
   window.addEventListener('webviewready', function () {
@@ -465,7 +470,7 @@ function truncateText(text, maxLength) {
 
 
 
-
+//----------------------------------------------------------------Verificar o ESC quando gravando macros
 
 
 

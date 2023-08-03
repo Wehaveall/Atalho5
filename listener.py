@@ -211,13 +211,13 @@ class KeyListener:
     def start_listener(self):
         self.typed_keys = ""  # Clear the typed keys
         self.pynput_listener = keyboard.Listener(on_release=self.on_key_release)
-        print("Starting listener...")
+        print("Starting GlobaL listener...")
         self.pynput_listener.start()
 
     def stop_listener(self):
         if self.pynput_listener is not None:
             if self.pynput_listener.running:
-                print("Stopping listener...")
+                print("Stopping Macro listener...")
                 self.pynput_listener.stop()
                 self.pynput_listener.join()
                 self.pynput_listener = None

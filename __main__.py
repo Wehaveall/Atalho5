@@ -182,7 +182,13 @@ class Api:
     def clear_events(self):
         self.events = []
 
+    def is_recording(self):
+        return self.is_recording
+
     def on_press(self, key):
+        if key == keyboard.Key.esc:
+            self.stop_recording()
+
         if self.is_recording:
             current_time = time.time()
             elapsed_time = (
@@ -197,10 +203,6 @@ class Api:
                 current_time - self.start_time if self.start_time is not None else 0
             )
             self.events.append(("click", (x, y), elapsed_time))
-
-    def stop_recording_icon(icon, item):
-        icon.stop()  # Isso irá parar o ícone pystray
-        api.stop_recording()  # Isso irá parar a gravação
 
     def start_recording(self):
         self.is_recording = True
