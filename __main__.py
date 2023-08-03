@@ -6,6 +6,11 @@ import webview
 # Dialog box
 import tkinter
 from tkinter import messagebox
+from tkinter import font
+
+# custom message box
+from tkinter import Toplevel, Label, Button, PhotoImage
+
 import queue
 from queue import Queue, Empty  # Don't forget to import Empty
 
@@ -145,16 +150,62 @@ def row2dict(row):
     return dict(row._mapping)
 
 
-def show_message(title, message):
+# Pegar o caminho relatiov ao programa do arquivo
+def get_relative_path(filename):
+    # Get the path of the current script
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+
+    # Combine the script directory with the filename
+    return os.path.join(script_dir, filename)
+
+
+def msg(title, message, icon_path):
     # Create a root window and immediately withdraw it (hide it)
     root = tkinter.Tk()
     root.withdraw()
+
+    # Create a top level window
+    top = Toplevel(root)
+
+    # Define the window's width and height
+    window_width = 400
+    window_height = 200
+
+    # Get the screen's width and height
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+
+    # Calculate the position to center the window
+    position_top = int(screen_height / 2 - window_height / 2)
+    position_right = int(screen_width / 2 - window_width / 2)
+
+    # Set the window's size and position
+    top.geometry(f"{window_width}x{window_height}+{position_right}+{position_top}")
+
+    # Load the icon
+    photo = PhotoImage(file=icon_path)
+
+    # Set the icon
+    top.iconphoto(False, photo)
+
+    # Set the title
+    top.title(title)
+
+    # Define the font size and type
+    my_font = font.Font(size=12, family="Work Sans")
+
+    # Add a label with the message
+    message_label = Label(top, text=message, font=my_font)
+    message_label.pack(pady=20)  # pady option adds vertical padding
+
+    # Add a button to close the dialog
+    close_button = Button(top, text="OK", command=top.destroy, font=my_font, width=10)
+    close_button.pack(pady=20)  # pady option adds vertical padding
+
     # Make the message box appear on top
-    root.attributes("-topmost", True)
-    # Show the message box
-    messagebox.showinfo(title, message)
-    # Destroy the root window after the message box is closed
-    root.destroy()
+    top.attributes("-topmost", True)
+
+    root.mainloop()
 
 
 ##--------------------------------------------------------------------------
@@ -214,7 +265,9 @@ class Api:
             # Se apertou escape
             if key == keyboard.Key.esc:
                 self.stop_recording()
-                show_message("Atalho", "Gravação Parada.")
+                icon_path = get_relative_path("src/images/atalho.png")
+                msg("Atalho", "Gravação Parada.", icon_path)
+                # show_message("Atalho", "Gravação Parada.")
 
             else:
                 # If any other key is pressed, add it to the events list
