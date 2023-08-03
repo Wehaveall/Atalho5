@@ -1,10 +1,11 @@
 #rightPanel {
     flex: 1;
     background-color: #f1f1f1;
+    display: flex;
     flex-direction: column;
-    height: calc(100vh - 100px);
-    /* adjust this as necessary */
-
+    height: auto;
+    align-items: stretch;
+    justify-content: flex-start;
 
 }
 
@@ -12,11 +13,18 @@
 #inputContainer {
 
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 0 0 50px;
+    flex-direction: column;
+    align-items: stretch;
+
 }
 
+
+#rightInputs {
+    display: flex;
+    /* Arrange atalhoRight and caseRight horizontally */
+    justify-content: space-between;
+    /* Put maximum space between atalhoRight and caseRight */
+}
 
 
 
@@ -25,8 +33,8 @@
     font-family: 'Work Sans', sans-serif;
     border: none;
     height: 30px;
-    max-height: calc(100vh - 50px);
-    width: 100%;
+    width: 175px;
+
     box-sizing: border-box;
     border-radius: 15px;
     margin-bottom: 10px;
@@ -39,16 +47,53 @@
     font-family: 'Work Sans', sans-serif;
     border: none;
     height: 30px;
-    width: 100%;
+
     box-sizing: border-box;
     border-radius: 15px;
 
 }
 
 
+
+#shortcutName {
+
+    height: 25px;
+}
+
+
+
+
 #editor {
     -ms-overflow-style: none;
     scrollbar-width: none;
-    height: calc(100vh - 100px);
     overflow: auto;
+    flex-grow: 1;
+    display: flex;
+    /* this line ensures that #editor behaves as a flex item */
+
+}
+
+
+#shortcutName {
+    flex-grow: 0;
+    /* This will prevent #shortcutName from growing and occupying unnecessary space */
+    height: 20px;
+    /* Adjust this value as needed */
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+#contentType {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    box-sizing: border-box;
+    font-family: 'Work Sans', sans-serif;
+    font-size: small;
+    height: 30px;
+    /* Adjust this value as needed */
+    flex-grow: 0;
+    /* This will prevent #contentType from growing and occupying unnecessary space */
 }

@@ -45,11 +45,9 @@ html {
   /* expand to take up remaining space */
   display: flex;
   /* align child elements in a row */
-  height: 100%;
   width: 100%;
   flex: 1;
-
-
+  font-family: 'Work Sans', sans-serif;
 
 }
 

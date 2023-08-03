@@ -3,6 +3,7 @@ function initTinyMCE() {
     if (window.tinymce) {
         tinymce.init({
             selector: '#editor',
+            height: '100%',
             plugins: ['code'],
             statusbar: false,
             forced_root_block: false,
