@@ -51,13 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     startButton.addEventListener('click', function () {
-        console.log('startButton clicked');
-        status.innerHTML = "Gravação iniciada: a janela será minimizada em 3 segundos. Pressione ESC a qualquer momento para parar";
+        status.innerHTML = "Gravação será iniciada após confirmação";
         startButton.blur();
         window.pywebview.api.start_recording().then(startStatusUpdates);
-        setTimeout(function () {
-            window.pywebview.api.minimize_window();
-        }, 3000);
     });
 
 
@@ -152,28 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-    // window.addEventListener('DOMContentLoaded', function () {
-    //     console.log('DOMContentLoaded event fired');
-    
-    //     // Rest of your code...
-    
-    //     // Evento para detectar quando a tecla 'Escape' é pressionada
-    //     window.addEventListener('keydown', function (event) {
-    //         if (event.key === 'Escape') {
-    //             console.log('keydown event fired');
-    //             window.pywebview.api.is_recording().then(function (isRecording) {
-    //                 console.log('Is recording:', isRecording);
-    //                 if (isRecording) {
-    //                     console.log('Stopping recording...');
-    //                     window.pywebview.api.stop_recording();
-    //                     alert('Gravação parada');
-    //                 }
-    //             });
-    //         }
-    //     });
-    // });
-    
 
 
 

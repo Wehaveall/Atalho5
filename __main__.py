@@ -159,53 +159,28 @@ def get_relative_path(filename):
     return os.path.join(script_dir, filename)
 
 
-def msg(title, message, icon_path):
+def msg(title, message):
+    # No need to create a root Tk() instance with tkinter.messagebox
+    messagebox.showinfo(title, message)
+
+
+def msgOC(title, message):
     # Create a root window and immediately withdraw it (hide it)
     root = tkinter.Tk()
     root.withdraw()
 
-    # Create a top level window
-    top = Toplevel(root)
+    result = messagebox.askokcancel(title, message)
 
-    # Define the window's width and height
-    window_width = 400
-    window_height = 200
+    if result:
+        print("User clicked OK")
+    else:
+        print("User clicked Cancel")
 
-    # Get the screen's width and height
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+    # Destroy the root window
+    root.destroy()
 
-    # Calculate the position to center the window
-    position_top = int(screen_height / 2 - window_height / 2)
-    position_right = int(screen_width / 2 - window_width / 2)
-
-    # Set the window's size and position
-    top.geometry(f"{window_width}x{window_height}+{position_right}+{position_top}")
-
-    # Load the icon
-    photo = PhotoImage(file=icon_path)
-
-    # Set the icon
-    top.iconphoto(False, photo)
-
-    # Set the title
-    top.title(title)
-
-    # Define the font size and type
-    my_font = font.Font(size=12, family="Work Sans")
-
-    # Add a label with the message
-    message_label = Label(top, text=message, font=my_font)
-    message_label.pack(pady=20)  # pady option adds vertical padding
-
-    # Add a button to close the dialog
-    close_button = Button(top, text="OK", command=top.destroy, font=my_font, width=10)
-    close_button.pack(pady=20)  # pady option adds vertical padding
-
-    # Make the message box appear on top
-    top.attributes("-topmost", True)
-
-    root.mainloop()
+    # Return the result
+    return result
 
 
 ##--------------------------------------------------------------------------
@@ -265,8 +240,7 @@ class Api:
             # Se apertou escape
             if key == keyboard.Key.esc:
                 self.stop_recording()
-                icon_path = get_relative_path("src/images/atalho.png")
-                msg("Atalho", "Gravação Parada.", icon_path)
+                msg("Atalho", "Gravação Parada.")
                 # show_message("Atalho", "Gravação Parada.")
 
             else:
@@ -283,27 +257,40 @@ class Api:
             )
             self.events.append(("click", (x, y), elapsed_time))
 
+    # ----------------------------------------------------------------START RECORDING
+    # ----------------------------------------------------------------
+
     def start_recording(self):
-        self.is_recording = True
-        self.start_time = time.time()
+        confirmation = msgOC(
+            "Atalho",
+            "Ao clicar em OK, a janela do Atalho será minimizada e a gravação da macro será iniciada.",
+        )
+        if confirmation:  # Only start recording if the user clicked OK
+            self.is_recording = True
+            self.start_time = time.time()
 
-        listener_instance.startRecordingMacro()
+            listener_instance.startRecordingMacro()
 
-        # Stop the global listener
-        listener_instance.stop_listener()
+            # Stop the global listener
+            listener_instance.stop_listener()
 
-        self.events = []
+            self.events = []
 
-        # Check if the listeners already exist and stop them if they do
-        if self.listener is not None:
-            self.listener.stop()
-        if self.mouse_listener is not None:
-            self.mouse_listener.stop()
+            # Check if the listeners already exist and stop them if they do
+            if self.listener is not None:
+                self.listener.stop()
+            if self.mouse_listener is not None:
+                self.mouse_listener.stop()
 
-        self.listener = keyboard.Listener(on_press=self.on_press)
-        self.listener.start()
-        self.mouse_listener = mouse.Listener(on_click=self.on_click)
-        self.mouse_listener.start()
+            self.listener = keyboard.Listener(on_press=self.on_press)
+            self.listener.start()
+            self.mouse_listener = mouse.Listener(on_click=self.on_click)
+            self.mouse_listener.start()
+        else:  # If the user clicked Cancel, you can define the behavior here
+            print("User cancelled the recording")
+
+    # ----------------------------------------------------------------STOP RECORDING
+    # ----------------------------------------------------------------
 
     def stop_recording(self):
         self.is_recording = False
