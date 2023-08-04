@@ -399,20 +399,22 @@ function populateTable(data) {
     row.dataset.expansion = expansion;
     row.dataset.shortcut = shortcut;
 
+    var cell1Div = document.createElement('div');
+    cell1Div.className = 'truncate';
     if (expansion === "") {
-      cell1.innerHTML = truncateText(label, 20);
+      cell1Div.innerText = label;
     } else {
-      cell1.innerHTML = truncateText(expansion, 20);
+      cell1Div.innerText = expansion;
     }
 
-    cell2.innerHTML = truncateText(shortcut, 20);
-    cell2.style.textAlign = "right"; // aligns the content to the right
+    cell1.appendChild(cell1Div);
 
+    var cell2Div = document.createElement('div');
+    cell2Div.className = 'truncate';
+    cell2Div.style.textAlign = 'right'; // add this line
+    cell2Div.innerText = shortcut;
 
-
-
-
-
+    cell2.appendChild(cell2Div);
 
 
 

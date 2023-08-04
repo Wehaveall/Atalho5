@@ -1,12 +1,12 @@
 #middlePanel {
-    flex: 2;
+    flex: 1;
     margin: 0;
     padding: 0;
     height: calc(100vh - 100px);
     /* adjust this as necessary */
     display: flex;
     flex-direction: column;
-
+    min-width: 250px;
 
 }
 
@@ -133,6 +133,8 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
+    table-layout: fixed;
+    /* Add this line */
 
 }
 
@@ -153,7 +155,20 @@
 }
 
 
-
 #myTable tr.selected {
     background-color: orange;
+}
+
+
+
+
+/* Middle Panel text space management */
+
+
+
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
