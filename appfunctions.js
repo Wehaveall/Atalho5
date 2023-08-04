@@ -394,10 +394,12 @@ function populateTable(data) {
     var expansion = data[i]['expansion'];
     var label = data[i]['label'];
     var shortcut = data[i]['shortcut'];
+    var format = data[i]['format'];
 
     // Store full texts as data attributes
     row.dataset.expansion = expansion;
     row.dataset.shortcut = shortcut;
+    row.dataset.format = format;
 
     var cell1Div = document.createElement('div');
     cell1Div.className = 'truncate';
@@ -416,13 +418,7 @@ function populateTable(data) {
 
     cell2.appendChild(cell2Div);
 
-
-
-
     // Add click event to the row
-    // Inside your row.onclick event
-
-
     row.onclick = function () {
       var selected = document.getElementsByClassName("selected");
       if (selected[0]) selected[0].className = '';
@@ -431,19 +427,26 @@ function populateTable(data) {
       // Get the full "expansion" and "shortcut" texts from the data attributes
       var expansion = this.dataset.expansion;
       var shortcut = this.dataset.shortcut;
+      var format = this.dataset.format;
 
       // Format the expansion
       var formattedExpansion = formatArticle(expansion);
+      console.log('Format: ' + format); // For debugging: check if format is retrieved correctly
 
       // Load the formatted "expansion" content into the TinyMCE editor
       tinyMCE.get('editor').setContent(formattedExpansion);
 
       // Load the full "shortcut" content into the input field
       document.getElementById('shortcutInput').value = shortcut;
+
+      // Assign the format value to the dropdown
+      document.getElementById('escolha').value = format === 'true' ? '1' : '0';
+      //In this revised version, we use a ternary operator to check the 'format' value, 
+      //and if it's 'true', we set the dropdown value to '1'. Otherwise, we set it to '0'.
+
     };
   }
 }
-
 
 
 // Adicione esta função em algum lugar do seu código JavaScript
