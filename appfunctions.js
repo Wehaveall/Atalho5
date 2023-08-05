@@ -396,6 +396,11 @@ function populateTable(data) {
     var label = data[i]['label'];
     var shortcut = data[i]['shortcut'];
     var format = data[i]['format'];
+   
+    // Pegar os valores para salvar as alterações no BD, por causa da função get_database_path - em dataconnect.py
+    var tableName = data[i]['tableName'];
+    var groupName = data[i]['groupName'];
+    var databaseName = data[i]['databaseName'];
 
     // Convert the HTML expansion to plain text
     var plainExpansion = decodeHtml(expansion.replace(/<[^>]*>/g, ''));
@@ -404,6 +409,11 @@ function populateTable(data) {
     row.dataset.expansion = expansion;
     row.dataset.shortcut = shortcut;
     row.dataset.format = format;
+
+    //---------------// Pegar os valores para salvar as alterações no BD, por causa da função get_database_path - em dataconnect.py
+    row.dataset.tableName = tableName;
+    row.dataset.groupName = groupName;
+    row.dataset.databaseName = databaseName;
 
 
 
