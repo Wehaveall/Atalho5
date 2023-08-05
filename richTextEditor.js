@@ -12,45 +12,62 @@ function initTinyMCE() {
             toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
             setup: function (editor) {
                 window.newContent = '';
-                editor.on('change', function () {
+                window.currentRow = null;
+                window.contentChanged = false;
+
+                editor.on('keyup', function () {
                     window.newContent = editor.getContent();
+                    window.contentChanged = true;
                 });
 
-                editor.on('blur', function () {
-                    // Get the currently selected row
-                    var selectedRow = document.querySelector(".selected");
+                // Set an interval to save changes every 1 second
+                setInterval(function () {
+                    // If the content hasn't changed, do nothing
+                    if (!window.contentChanged) {
+                        return;
+                    }
 
-                    // If there is no selected row, do nothing
-                    if (!selectedRow) {
+                    // If there is no current row, do nothing
+                    if (!window.currentRow) {
                         console.log('No row selected');
                         return;
                     }
 
                     // Get the full "shortcut" text from the data attributes
-                    var shortcut = selectedRow.dataset.shortcut;
+                    var shortcut = window.currentRow.dataset.shortcut;
 
                     // Get the "tableName", "groupName", and "db_name" from the data attributes
-                    var tableName = "Articles"
-                    var groupName = "Direito"
-                    var db_name = "legal"
+                    var tableName = "Articles";
+                    var groupName = "Direito";
+                    var db_name = "legal";
 
                     // Call your save_changes function here
                     window.pywebview.api.save_changes(groupName, db_name, tableName, shortcut, window.newContent).then(response => {
-                        alert("Changes saved successfully");
+                        console.log("Changes saved successfully");
 
                         // Update the data attributes of the row
-                        selectedRow.dataset.expansion = window.newContent;
+                        window.currentRow.dataset.expansion = window.newContent;
 
                         // Convert the HTML content to plain text
-                        var plainText = window.newContent.replace(/<[^>]*>/g, '');
+                        var plainText = decodeHtml(window.newContent.replace(/<[^>]*>/g, ''));
 
                         // Update the text in the table cell
-                        selectedRow.cells[0].firstChild.textContent = plainText;
-                    })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                        });
-                });
+                        window.currentRow.cells[0].firstChild.textContent = plainText;
+
+                        // Reset the "contentChanged" flag
+                        window.contentChanged = false;
+                    }).catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }, 1000); // 1000 milliseconds = 1 second
+            }
+        });
+
+        // When a row is selected, set window.currentRow to the selected row
+        document.querySelector('#myTable').addEventListener('click', function (e) {
+            var row = e.target.closest('tr');
+            if (row) {
+                window.currentRow = row;
             }
         });
     } else {
@@ -63,3 +80,15 @@ function initTinyMCE() {
 window.addEventListener('load', function () {
     initTinyMCE();
 });
+
+
+
+
+
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}
+
+

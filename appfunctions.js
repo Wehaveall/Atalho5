@@ -397,6 +397,9 @@ function populateTable(data) {
     var shortcut = data[i]['shortcut'];
     var format = data[i]['format'];
 
+    // Convert the HTML expansion to plain text
+    var plainExpansion = decodeHtml(expansion.replace(/<[^>]*>/g, ''));
+
     // Store full texts as data attributes
     row.dataset.expansion = expansion;
     row.dataset.shortcut = shortcut;
@@ -411,7 +414,7 @@ function populateTable(data) {
     } else {
       // Convert the HTML content to plain text and replace all &nbsp; with a space
       var plainText = expansion.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
-      cell1Div.textContent = plainText;
+      cell1Div.textContent = plainExpansion;
     }
 
     cell1.appendChild(cell1Div);
