@@ -44,7 +44,9 @@ import logging
 import sqlite3
 
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, MetaData, Table, select
+
+
+from sqlalchemy import create_engine, MetaData, Table, select, update
 from sqlalchemy import inspect
 from threading import Lock
 
@@ -334,7 +336,31 @@ class Api:
     def start_macro(self, filename):
         self.executor.start_macro(filename)
 
-    # ----------------------------------------------------------------   --------------------------------
+    # ---------------------------------------------------------------- DATABASE  -------------------------------------
+    # --------------------------------------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------------------------------------
+
+    def save_changes(self, groupName, databaseName, tableName, shortcut, newContent):
+        # Establish a connection to the database
+        database_path = get_database_path(groupName, databaseName)
+        engine = create_engine(f"sqlite:///{database_path}")
+        metadata = MetaData()
+
+        with Session(engine) as session:
+            # Reflect the table from the database
+            table = Table(tableName, metadata, autoload_with=engine)
+
+            # Prepare the update statement
+            stmt = (
+                update(table)
+                .where(table.c.shortcut == shortcut)
+                .values(expansion=newContent)
+            )
+
+            # Execute the update statement
+            session.execute(stmt)
+            session.commit()
+
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
@@ -388,6 +414,8 @@ class Api:
         conn.close()
         return tables
 
+    # ----------------------------------------------------------------SETTINGS----------------------------------------------------------------
+
     def load_translations(self):
         try:
             logging.debug("load_translations called")
@@ -433,6 +461,8 @@ class Api:
         with state_lock:
             with open("state.json", "w") as file:
                 json.dump(states, file)
+
+    # ----------------------------------------------------------------CREATE WINDOW
 
     def create_and_position_window(self):
         monitor = get_monitors()[0]

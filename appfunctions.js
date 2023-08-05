@@ -379,6 +379,7 @@ function populateTable(data) {
   console.log("populateTable called with data:", data);
   var table = document.getElementById('myTable');
 
+
   // Remove any existing rows (except for the header)
   while (table.rows.length > 1) {
     table.deleteRow(1);
@@ -401,12 +402,16 @@ function populateTable(data) {
     row.dataset.shortcut = shortcut;
     row.dataset.format = format;
 
+
+
     var cell1Div = document.createElement('div');
     cell1Div.className = 'truncate';
     if (expansion === "") {
-      cell1Div.innerText = label;
+      cell1Div.textContent = label;
     } else {
-      cell1Div.innerText = expansion;
+      // Convert the HTML content to plain text and replace all &nbsp; with a space
+      var plainText = expansion.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+      cell1Div.textContent = plainText;
     }
 
     cell1.appendChild(cell1Div);
@@ -428,6 +433,8 @@ function populateTable(data) {
       var expansion = this.dataset.expansion;
       var shortcut = this.dataset.shortcut;
       var format = this.dataset.format;
+      var tableName = this.dataset.tableName;
+
 
       // Format the expansion
       var formattedExpansion = formatArticle(expansion);
@@ -443,6 +450,9 @@ function populateTable(data) {
       document.getElementById('escolha').value = format === 'true' ? '1' : '0';
       //In this revised version, we use a ternary operator to check the 'format' value, 
       //and if it's 'true', we set the dropdown value to '1'. Otherwise, we set it to '0'.
+
+
+      saveChanges(tableName, shortcut, window.newContent);
 
     };
   }
@@ -473,9 +483,6 @@ function truncateText(text, maxLength) {
   return text.length > maxLength ? text.substr(0, maxLength - 1) + '...' : text;
 }
 
-
-
-//----------------------------------------------------------------Verificar o ESC quando gravando macros
 
 
 
