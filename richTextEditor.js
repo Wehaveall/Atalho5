@@ -14,22 +14,10 @@ function initTinyMCE() {
                 window.newContent = '';
                 window.currentRow = null;
                 window.contentChanged = false;
-                window.imageExists = false;
 
-                editor.on('keyup', function () {
+                editor.on('keyup change', function () {
                     window.newContent = editor.getContent();
                     window.contentChanged = true;
-
-                    var imgInContent = window.newContent.includes('<img');
-                    if (imgInContent && !window.imageExists) {
-                        // Image added
-                        window.newContent += ' (imagem)';
-                        window.imageExists = true;
-                    } else if (!imgInContent && window.imageExists) {
-                        // Image removed
-                        window.newContent = window.newContent.replace(' (imagem)', '');
-                        window.imageExists = false;
-                    }
                 });
 
                 // Set an interval to save changes every 1 second
@@ -63,9 +51,13 @@ function initTinyMCE() {
                         // Convert the HTML content to plain text
                         var plainText = decodeHtml(window.newContent.replace(/<[^>]*>/g, ''));
 
-                        // If an image exists in the content, append "(imagem)" to the plain text
-                        if (window.imageExists) {
-                            plainText += ' (imagem)';
+                        // Check if the content has an image
+                        if (window.newContent.includes('<img')) {
+                            if (!plainText.includes('(imagem)')) {
+                                plainText += ' (imagem)';
+                            }
+                        } else {
+                            plainText = plainText.replace(' (imagem)', '');
                         }
 
                         // Update the text in the table cell
@@ -98,7 +90,6 @@ window.addEventListener('load', function () {
     initTinyMCE();
 });
 
-// Function to decode HTML entities
 function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
