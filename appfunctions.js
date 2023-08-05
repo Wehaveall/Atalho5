@@ -382,6 +382,7 @@ function populateTable(data, groupName, databaseName, tableName) {
     cell2.appendChild(cell2Div);
 
     // Row click event
+    // Row click event
     row.onclick = function () {
       if (window.currentRow) {
         window.currentRow.className = '';
@@ -398,7 +399,17 @@ function populateTable(data, groupName, databaseName, tableName) {
       // Update the TinyMCE editor content to reflect the clicked row
       tinyMCE.get('editor').setContent(formattedExpansion);
       document.getElementById('shortcutInput').value = this.dataset.shortcut;
-      document.getElementById('escolha').value = format === 'true' ? '1' : '0';
+
+      // Update dropdown value
+      var escolhaDropdown = document.getElementById('escolha');
+      escolhaDropdown.value = format === 'true' ? '1' : '0';
+
+      // Dispatch the change event using your provided instantiation style
+      var event = new Event('change', {
+        'bubbles': true,
+        'cancelable': true
+      });
+      escolhaDropdown.dispatchEvent(event);
     };
   });
 }

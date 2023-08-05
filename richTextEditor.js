@@ -1,4 +1,116 @@
-function initTinyMCE() {
+
+
+// window.addEventListener('load', function () {
+//     initTinyMCE();
+// })
+
+
+// Here's where you put the event listener
+
+document.getElementById('escolha').addEventListener('change', initializeTinyMCE);
+
+window.addEventListener('load', function () {
+    initializeTinyMCE();
+});
+
+
+
+
+
+
+
+function initializeTinyMCE() {
+
+    var choice = document.getElementById('escolha').value;
+
+
+    destroyTinyMCE(); // Destroy any existing instances first
+
+    if (choice === "0") {
+
+        initBasicTinyMCE();
+    } else if (choice === "1") {
+
+        initAdvancedTinyMCE();
+    }
+}
+
+
+
+
+
+
+function initBasicTinyMCE() {
+    if (window.tinymce) {
+        tinymce.init({
+            selector: '#editor',
+            menubar: false,
+            plugins: ['paste'],  // Ensure the paste plugin is included
+            toolbar: 'undo redo',
+            paste_as_text: true,  // Force pasted content to be plain text
+            // ... other configurations
+            setup: function (editor) {
+                window.newContent = '';
+                window.currentRow = null;
+                window.contentChanged = false;
+                var editedRow = null;  // Newly added variable
+
+                editor.on('keyup change', function () {
+                    window.newContent = editor.getContent();
+                    window.contentChanged = true;
+                    editedRow = window.currentRow;  // Set the editedRow to the currentRow
+                });
+
+                setInterval(function () {
+                    // Updated condition to check if the editedRow matches the currentRow
+                    if (!window.contentChanged || !window.currentRow || editedRow !== window.currentRow) {
+                        return;
+                    }
+
+                    var shortcut = window.currentRow.dataset.shortcut;
+                    var tableName = window.currentRow.dataset.tableName;
+                    var groupName = window.currentRow.dataset.groupName;
+                    var db_name = window.currentRow.dataset.databaseName;
+
+                    window.pywebview.api.save_changes(groupName, db_name, tableName, shortcut, window.newContent).then(response => {
+                        console.log("Changes saved successfully");
+                        window.currentRow.dataset.expansion = window.newContent;
+
+                        var plainText = decodeHtml(window.newContent.replace(/<[^>]*>/g, ''));
+                        if (window.newContent.includes('<img')) {
+                            if (!plainText.includes('(imagem)')) {
+                                plainText += ' (imagem)';
+                            }
+                        } else {
+                            plainText = plainText.replace(' (imagem)', '');
+                        }
+
+                        window.currentRow.cells[0].firstChild.textContent = plainText;
+                        window.contentChanged = false;
+                    }).catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }, 1000);
+            }
+        });
+
+        document.querySelector('#myTable').addEventListener('click', function (e) {
+            var row = e.target.closest('tr');
+            if (row) {
+                window.currentRow = row;
+            }
+        });
+    } else {
+
+    }
+}
+
+
+
+
+
+
+function initAdvancedTinyMCE() {
     if (window.tinymce) {
         tinymce.init({
             selector: '#editor',
@@ -61,16 +173,27 @@ function initTinyMCE() {
             }
         });
     } else {
-        setTimeout(initTinyMCE, 100);
+
     }
 }
 
-window.addEventListener('load', function () {
-    initTinyMCE();
-});
+
 
 function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
 }
+
+
+
+
+
+
+
+function destroyTinyMCE() {
+    if (tinymce.get('editor')) {
+        tinymce.get('editor').remove();
+    }
+}
+
