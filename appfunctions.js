@@ -1,11 +1,11 @@
 
 var activeCollapsibleButton = null;  /// For the rounded border
-
 var buttonStates = {};
 var allDbFiles = {};
-
-
 const cache = new Map();
+
+
+//Funções
 
 function getCachedData(directory, databaseFile, tableName) {
   let key = directory + '|' + databaseFile + '|' + tableName;
@@ -17,68 +17,17 @@ function setCachedData(directory, databaseFile, tableName, data) {
   cache.set(key, data);
 }
 
+function decodeHtml(html) {
+  var txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}
 
 
+function formatArticle(article) {
+  return article.replace(/[\*\#%@\$]/g, "<br/>");
+}
 
-
-
-
-
-// Wait until the document is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-  // Ensure pywebview API is ready
-  window.addEventListener('pywebviewready', function () {
-    if (!window.pywebview || !window.pywebview.api) {
-      console.error('pywebview API is not available');
-      return;
-    }
-
-    // Load all states once at the start of the program
-    window.pywebview.api.load_all_states().then(function (states) {
-      console.log('load_all_states called');
-      buttonStates = states;
-
-      // Get all directories and database files
-      window.pywebview.api.get_all_db_files().then(function (allDbFiles) {
-        console.log('get_all_db_files called');
-        // Now that the states have been loaded, create the collapsibles
-        for (let directory in allDbFiles) {
-          var db_files = allDbFiles[directory];
-          createCollapsible(directory, db_files);
-        }
-      });
-    });
-  });
-});
-
-
-
-
-
-
-
-
-
-
-
-window.addEventListener('load', function () {
-  // Listen for the webviewready event
-  window.addEventListener('webviewready', function () {
-    // Load all states once at the start of the program
-    window.pywebview.api.load_all_states()
-      .then(states => {
-        buttonStates = states;
-        // Now that the states have been loaded, create the collapsibles
-        for (let directory in allDbFiles) {
-          createCollapsible(directory, allDbFiles[directory]);
-        }
-      });
-  });
-});
-
-//Aqui também era window.onload - ok
-//Aqui dá erro no edge tools - undefined apI
-//Colocar webviewready dentro de window.onload parecer resolver o erro
 
 
 
@@ -321,10 +270,6 @@ function createCollapsible(directory, db_files) {
             } else {
 
 
-
-
-
-
               window.pywebview.api.get_data(groupName, databaseName, tableName)
                 .then(data => {
                   console.log(data);  // This will print the returned data to the JavaScript console
@@ -333,8 +278,12 @@ function createCollapsible(directory, db_files) {
                     document.getElementById('myTable').style.display = 'table';
                     headerElem.style.display = 'table';
                     headerElem.classList.add('showing');
-                    populateTable(data);
-                  } else {
+
+                    //Where I call PopulateTable
+                    populateTable(data, groupName, databaseName, tableName);
+                  }
+
+                  else {
                     document.getElementById('myTable').innerHTML = "";
                     document.getElementById('myTable').style.display = 'none';
                     headerElem.style.display = 'none';
@@ -357,8 +306,6 @@ function createCollapsible(directory, db_files) {
   });
 
 
-
-
   // Append the main DocumentFragment to the left panel
   leftPanel.appendChild(collapsibleParent);
 
@@ -367,18 +314,32 @@ function createCollapsible(directory, db_files) {
 
 
 
+//----------------------------------------------------------------POPULATE TABLE----------------------------------------------------------------
+
+
+// Aqui tive que adicionar a função os parametros groupName, databaseName e tableName
+//pois, a função da API save_changes chama a função get_database_path que requer estes parâmetros:
+
+//I need groupName and databaseName because, inside my save_changes function, im my api,  :
+//def save_changes(self, groupName, databaseName, tableName, shortcut, newContent):
+
+////Yes, we can simplify the process and find a way to ensure that groupName and databaseName are available when needed. Here's a plan of action:
+
+//Storing groupName and databaseName in populateTable:
+//Instead of extracting the values of groupName and databaseName each time inside the loop, you can pass them as arguments to the populateTable function.
+// This ensures that the function always has access to the required values. 
+//This is especially useful since populateTable is already being called with data specific to a particular database.
+
+//So, modify the function definition to:
+//function populateTable(data, groupName, databaseName){}}
+
+// Por fim, dentro de createCollapsible, eu chamo a pupulateTable já modificada, com os novos parâmetros
 
 
 
-
-//----------------------------------------------------------------POPULATE DATA----------------------------------------------------------------
-
-
-
-function populateTable(data) {
+function populateTable(data, groupName, databaseName, tableName) {
   console.log("populateTable called with data:", data);
   var table = document.getElementById('myTable');
-
 
   // Remove any existing rows (except for the header)
   while (table.rows.length > 1) {
@@ -386,21 +347,15 @@ function populateTable(data) {
   }
 
   // Add new rows
-  for (var i = 0; i < data.length; i++) {
-    var row = table.insertRow(-1); // Insert a new row at the end
+  data.forEach(item => {
+    var row = table.insertRow(-1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
 
-    var cell1 = row.insertCell(0); // Expansion or Label if Expansion is empty
-    var cell2 = row.insertCell(1); // Shortcut
-
-    var expansion = data[i]['expansion'];
-    var label = data[i]['label'];
-    var shortcut = data[i]['shortcut'];
-    var format = data[i]['format'];
-   
-    // Pegar os valores para salvar as alterações no BD, por causa da função get_database_path - em dataconnect.py
-    var tableName = data[i]['tableName'];
-    var groupName = data[i]['groupName'];
-    var databaseName = data[i]['databaseName'];
+    var expansion = item['expansion'];
+    var label = item['label'];
+    var shortcut = item['shortcut'];
+    var format = item['format'];
 
     // Convert the HTML expansion to plain text
     var plainExpansion = decodeHtml(expansion.replace(/<[^>]*>/g, ''));
@@ -409,104 +364,92 @@ function populateTable(data) {
     row.dataset.expansion = expansion;
     row.dataset.shortcut = shortcut;
     row.dataset.format = format;
-
-    //---------------// Pegar os valores para salvar as alterações no BD, por causa da função get_database_path - em dataconnect.py
     row.dataset.tableName = tableName;
     row.dataset.groupName = groupName;
     row.dataset.databaseName = databaseName;
 
-
-
     var cell1Div = document.createElement('div');
     cell1Div.className = 'truncate';
-    if (expansion === "") {
-      cell1Div.textContent = label;
-    } else {
-      // Convert the HTML content to plain text and replace all &nbsp; with a space
-      var plainText = expansion.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
-      cell1Div.textContent = plainExpansion;
-    }
+    cell1Div.textContent = expansion === "" ? label : plainExpansion;
 
     cell1.appendChild(cell1Div);
 
     var cell2Div = document.createElement('div');
     cell2Div.className = 'truncate';
-    cell2Div.style.textAlign = 'right'; // add this line
+    cell2Div.style.textAlign = 'right';
     cell2Div.innerText = shortcut;
 
     cell2.appendChild(cell2Div);
 
-    // Add click event to the row
+    // Row click event
     row.onclick = function () {
-      var selected = document.getElementsByClassName("selected");
-      if (selected[0]) selected[0].className = '';
+      if (window.currentRow) {
+        window.currentRow.className = '';
+      }
       this.className = 'selected';
+      window.currentRow = this;
 
-      // Get the full "expansion" and "shortcut" texts from the data attributes
       var expansion = this.dataset.expansion;
-      var shortcut = this.dataset.shortcut;
       var format = this.dataset.format;
-      var tableName = this.dataset.tableName;
 
-
-      // Format the expansion
       var formattedExpansion = formatArticle(expansion);
-      console.log('Format: ' + format); // For debugging: check if format is retrieved correctly
+      console.log('Format: ' + format);
 
-      // Load the formatted "expansion" content into the TinyMCE editor
+      // Update the TinyMCE editor content to reflect the clicked row
       tinyMCE.get('editor').setContent(formattedExpansion);
-
-      // Load the full "shortcut" content into the input field
-      document.getElementById('shortcutInput').value = shortcut;
-
-      // Assign the format value to the dropdown
+      document.getElementById('shortcutInput').value = this.dataset.shortcut;
       document.getElementById('escolha').value = format === 'true' ? '1' : '0';
-      //In this revised version, we use a ternary operator to check the 'format' value, 
-      //and if it's 'true', we set the dropdown value to '1'. Otherwise, we set it to '0'.
-
-
-      saveChanges(tableName, shortcut, window.newContent);
-
     };
+  });
+}
+
+
+
+
+function initializePyWebView() {
+  if (!window.pywebview || !window.pywebview.api) {
+    console.error('pywebview API is not available');
+    return;
   }
-}
 
-
-// Adicione esta função em algum lugar do seu código JavaScript
-//Inserir quebra de linha nos delimitadores
-function formatArticle(article) {
-  return article.replace(/\*/g, "<br/>")
-    .replace(/#/g, "<br/>")
-    .replace(/%/g, "<br/>")
-    .replace(/@/g, "<br/>")
-    .replace(/\$/g, "<br/>");
-}
-
-
-
-
-
-
-
-
-
-
-// Truncate text if it's longer than the specified length
-function truncateText(text, maxLength) {
-  return text.length > maxLength ? text.substr(0, maxLength - 1) + '...' : text;
+  window.pywebview.api.load_all_states()
+    .then(states => {
+      buttonStates = states;
+      return window.pywebview.api.get_all_db_files();
+    })
+    .then(allDbFiles => {
+      for (let directory in allDbFiles) {
+        var db_files = allDbFiles[directory];
+        createCollapsible(directory, db_files);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 }
 
 
 
+//------------------------------------------------Lastly, the event handling and page initialization:
 
 
 
+document.addEventListener('DOMContentLoaded', function () {
+  window.addEventListener('pywebviewready', initializePyWebView);
+  document.getElementById("content").addEventListener("click", function (event) {
+    event.stopPropagation();
+  }, false);
+  var collapsibles = document.getElementsByClassName("content");
+  for (var i = 0; i < collapsibles.length; i++) {
+    collapsibles[i].addEventListener("click", function (event) {
+      event.stopPropagation();
+    }, false);
+  }
+});
 
 
 window.onbeforeunload = function () {
-  // Save all states before the window closes
   if (window.pywebview && window.pywebview.api) {
     window.pywebview.api.save_all_states(buttonStates);
   }
-  // Signal to Python that the window is closing
 };
