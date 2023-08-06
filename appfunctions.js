@@ -1,11 +1,17 @@
 
-var activeCollapsibleButton = null;  /// For the rounded border
-var buttonStates = {};
+var appState = {
+  buttonStates: {}
+};
+
+var activeCollapsibleButton = null;
+var buttonStates = appState.buttonStates;
 var allDbFiles = {};
 const cache = new Map();
 
 
 //Funções
+
+
 
 function getCachedData(directory, databaseFile, tableName) {
   let key = directory + '|' + databaseFile + '|' + tableName;
@@ -46,18 +52,6 @@ function openTab(evt, tabName) {
 }
 
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  document.getElementById("content").addEventListener("click", function (event) {
-    event.stopPropagation();
-  }, false);
-
-  var collapsibles = document.getElementsByClassName("content");
-  for (var i = 0; i < collapsibles.length; i++) {
-    collapsibles[i].addEventListener("click", function (event) {
-      event.stopPropagation();
-    }, false);
-  }
-});
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -339,83 +333,92 @@ function createCollapsible(directory, db_files) {
 
 function populateTable(data, groupName, databaseName, tableName) {
   console.log("populateTable called with data:", data);
+
+  // Reference to the table
   var table = document.getElementById('myTable');
 
-  // Remove any existing rows (except for the header)
+  // Clear existing rows (except for the header)
   while (table.rows.length > 1) {
     table.deleteRow(1);
   }
 
-  // Add new rows
+  // Iterate over data and add new rows
   data.forEach(item => {
+    // Extract the values from the item
+    const { expansion, label, shortcut, format } = item;
+
+    // Create a new row and cells
     var row = table.insertRow(-1);
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
 
-    var expansion = item['expansion'];
-    var label = item['label'];
-    var shortcut = item['shortcut'];
-    var format = item['format'];
-
     // Convert the HTML expansion to plain text
     var plainExpansion = decodeHtml(expansion.replace(/<[^>]*>/g, ''));
 
-    // Store full texts as data attributes
-    row.dataset.expansion = expansion;
-    row.dataset.shortcut = shortcut;
-    row.dataset.format = format;
-    row.dataset.tableName = tableName;
-    row.dataset.groupName = groupName;
-    row.dataset.databaseName = databaseName;
+    // Store the values as data attributes for the row
+    Object.assign(row.dataset, {
+      expansion,
+      shortcut,
+      format,
+      tableName,
+      groupName,
+      databaseName
+    });
 
-    var cell1Div = document.createElement('div');
-    cell1Div.className = 'truncate';
-    cell1Div.textContent = expansion === "" ? label : plainExpansion;
+    // Populate the cells with content
+    cell1.appendChild(createCellContent('truncate', expansion === "" ? label : plainExpansion));
+    cell2.appendChild(createCellContent('truncate', shortcut, 'right'));
 
-    cell1.appendChild(cell1Div);
-
-    var cell2Div = document.createElement('div');
-    cell2Div.className = 'truncate';
-    cell2Div.style.textAlign = 'right';
-    cell2Div.innerText = shortcut;
-
-    cell2.appendChild(cell2Div);
-
-    // Row click event
-    // Row click event
-    row.onclick = function () {
-      if (window.currentRow) {
-        window.currentRow.className = '';
-      }
-      this.className = 'selected';
-      window.currentRow = this;
-
-      var expansion = this.dataset.expansion;
-      var format = this.dataset.format;
-
-      var formattedExpansion = formatArticle(expansion);
-      console.log('Format: ' + format);
-
-      // Update the TinyMCE editor content to reflect the clicked row
-      tinyMCE.get('editor').setContent(formattedExpansion);
-      document.getElementById('shortcutInput').value = this.dataset.shortcut;
-
-      // Update dropdown value
-      var escolhaDropdown = document.getElementById('escolha');
-      escolhaDropdown.value = format === 'true' ? '1' : '0';
-
-      // Dispatch the change event using your provided instantiation style
-      var event = new Event('change', {
-        'bubbles': true,
-        'cancelable': true
-      });
-      escolhaDropdown.dispatchEvent(event);
-    };
+    // Add the row click event
+    row.addEventListener('click', handleRowClick);
   });
 }
 
+// Helper function to create cell content
+function createCellContent(className, textContent, textAlign = 'left') {
+  var div = document.createElement('div');
+  div.className = className;
+  div.textContent = textContent;
+  div.style.textAlign = textAlign;
+  return div;
+}
+
+// Row click handler
+function handleRowClick() {
+  // Deselect the previously selected row, if any
+  if (window.currentRow && window.currentRow !== this) {
+    window.currentRow.className = '';
+  }
+
+  // Highlight the current row
+  this.className = 'selected';
+  window.currentRow = this;
+
+  // Extract the relevant data from the clicked row
+  const { expansion, format } = this.dataset;
+
+  // Format and set the TinyMCE editor content
+  var formattedExpansion = formatArticle(expansion);
+  console.log('Format: ' + format);
+  tinyMCE.get('editor').setContent(formattedExpansion);
+  document.getElementById('shortcutInput').value = this.dataset.shortcut;
+
+  // Update the "escolha" dropdown based on the row's format
+  var escolhaDropdown = document.getElementById('escolha');
+  escolhaDropdown.value = format === 'true' ? '1' : '0';
+
+  // Dispatch the change event
+  var event = new Event('change', {
+    'bubbles': true,
+    'cancelable': true
+  });
+  escolhaDropdown.dispatchEvent(event);
+}
 
 
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
 function initializePyWebView() {
   if (!window.pywebview || !window.pywebview.api) {
@@ -425,42 +428,42 @@ function initializePyWebView() {
 
   window.pywebview.api.load_all_states()
     .then(states => {
-      buttonStates = states;
+      appState.buttonStates = states;
       return window.pywebview.api.get_all_db_files();
     })
     .then(allDbFiles => {
       for (let directory in allDbFiles) {
-        var db_files = allDbFiles[directory];
+        let db_files = allDbFiles[directory];
         createCollapsible(directory, db_files);
       }
     })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+    .catch(console.error);
 }
 
-
-
-//------------------------------------------------Lastly, the event handling and page initialization:
-
-
-
 document.addEventListener('DOMContentLoaded', function () {
-  window.addEventListener('pywebviewready', initializePyWebView);
+  window.addEventListener('pywebviewready', function () {
+    if (window.pywebview && window.pywebview.api) {
+      console.log("pywebview API is ready");
+      initializePyWebView();
+    } else {
+      console.error("Failed to load pywebview API");
+    }
+  });
+
   document.getElementById("content").addEventListener("click", function (event) {
     event.stopPropagation();
   }, false);
-  var collapsibles = document.getElementsByClassName("content");
-  for (var i = 0; i < collapsibles.length; i++) {
+
+  let collapsibles = document.getElementsByClassName("content");
+  for (let i = 0; i < collapsibles.length; i++) {
     collapsibles[i].addEventListener("click", function (event) {
       event.stopPropagation();
     }, false);
   }
 });
 
-
 window.onbeforeunload = function () {
   if (window.pywebview && window.pywebview.api) {
-    window.pywebview.api.save_all_states(buttonStates);
+    window.pywebview.api.save_all_states(appState.buttonStates);
   }
 };

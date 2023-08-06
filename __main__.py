@@ -361,6 +361,36 @@ class Api:
             session.execute(stmt)
             session.commit()
 
+    def update_format(self, groupName, databaseName, tableName, shortcut, formatValue):
+        # Construct the path to the database file
+        db_path = self.get_database_path(groupName, databaseName)
+
+        # Connect to the SQLite database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Update the specific record
+        try:
+            cursor.execute(
+                f"""
+                UPDATE {tableName}
+                SET format = ?
+                WHERE shortcut = ?
+            """,
+                (formatValue, shortcut),
+            )
+
+            # Commit the changes
+            conn.commit()
+
+            return {"status": "success", "message": "Format updated successfully"}
+        except Exception as e:
+            # If there's an error, rollback and return the error message
+            conn.rollback()
+            return {"status": "error", "message": str(e)}
+        finally:
+            conn.close()
+
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
