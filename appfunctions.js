@@ -384,10 +384,11 @@ function createCellContent(className, textContent, textAlign = 'left') {
 }
 
 // Row click handler
+// Row click handler
 function handleRowClick() {
   // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
-    window.currentRow.className = '';
+    window.currentRow.className = '';  // Deselect the previous row
   }
 
   // Highlight the current row
@@ -397,23 +398,29 @@ function handleRowClick() {
   // Extract the relevant data from the clicked row
   const { expansion, format } = this.dataset;
 
-  // Format and set the TinyMCE editor content
-  var formattedExpansion = formatArticle(expansion);
-  console.log('Format: ' + format);
-  tinyMCE.get('editor').setContent(formattedExpansion);
+  // Fetch the latest data for the clicked row
+  const latestExpansion = this.dataset.expansion;
+
+  // Set the latest content to the TinyMCE editor
+  tinyMCE.get('editor').setContent(latestExpansion);
+
+  // Set the shortcut value in the input field (assuming you still need this)
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 
   // Update the "escolha" dropdown based on the row's format
   var escolhaDropdown = document.getElementById('escolha');
   escolhaDropdown.value = format === 'true' ? '1' : '0';
 
-  // Dispatch the change event
+  // Manually trigger the change event for the dropdown, since programmatically 
+  // changing the value doesn't automatically trigger it
   var event = new Event('change', {
     'bubbles': true,
     'cancelable': true
   });
   escolhaDropdown.dispatchEvent(event);
 }
+
+
 
 
 //--------------------------------------------------------------------------------------

@@ -341,11 +341,14 @@ class Api:
     # --------------------------------------------------------------------------------------------------------------------------------
 
     def save_changes(self, groupName, databaseName, tableName, shortcut, newContent):
+        # Convert the format string to integer representation
+        format_value = 1 if format else 0
+        print(f"Converted format value: {format_value}")  # Add this line
+
         # Establish a connection to the database
         database_path = get_database_path(groupName, databaseName)
         engine = create_engine(f"sqlite:///{database_path}")
         metadata = MetaData()
-
         with Session(engine) as session:
             # Reflect the table from the database
             table = Table(tableName, metadata, autoload_with=engine)
@@ -358,38 +361,13 @@ class Api:
             )
 
             # Execute the update statement
+            print(
+                "vai salvar--------------------------------------------------------------"
+            )
             session.execute(stmt)
             session.commit()
 
-    def update_format(self, groupName, databaseName, tableName, shortcut, formatValue):
-        # Construct the path to the database file
-        db_path = self.get_database_path(groupName, databaseName)
-
-        # Connect to the SQLite database
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-
-        # Update the specific record
-        try:
-            cursor.execute(
-                f"""
-                UPDATE {tableName}
-                SET format = ?
-                WHERE shortcut = ?
-            """,
-                (formatValue, shortcut),
-            )
-
-            # Commit the changes
-            conn.commit()
-
-            return {"status": "success", "message": "Format updated successfully"}
-        except Exception as e:
-            # If there's an error, rollback and return the error message
-            conn.rollback()
-            return {"status": "error", "message": str(e)}
-        finally:
-            conn.close()
+    
 
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))

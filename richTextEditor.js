@@ -1,44 +1,28 @@
-
-
-// window.addEventListener('load', function () {
-//     initTinyMCE();
-// })
-
-
-// Here's where you put the event listener
-
-function setupEditor() {
-    initializeTinyMCE();
-    saveFormatToDatabase();
-}
-
 window.addEventListener('load', function () {
-    // Attach the change event listener to the dropdown
-    document.getElementById('escolha').addEventListener('change', setupEditor);
+    // Initialize the editor based on the current dropdown value
+    initializeTinyMCE();
 
-    // Initialize the editor based on the dropdown's initial value when the page loads
-    setupEditor();
 });
 
 
 
+
+
+
+
+
+
+
 function initializeTinyMCE() {
-
     var choice = document.getElementById('escolha').value;
-
-
-    destroyTinyMCE(); // Destroy any existing instances first
+    destroyTinyMCE();
 
     if (choice === "0") {
-
         initBasicTinyMCE();
     } else if (choice === "1") {
-
         initAdvancedTinyMCE();
     }
 }
-
-
 
 
 
@@ -75,6 +59,7 @@ function initBasicTinyMCE() {
                     var tableName = window.currentRow.dataset.tableName;
                     var groupName = window.currentRow.dataset.groupName;
                     var db_name = window.currentRow.dataset.databaseName;
+
 
                     window.pywebview.api.save_changes(groupName, db_name, tableName, shortcut, window.newContent).then(response => {
                         console.log("Changes saved successfully");
@@ -148,6 +133,8 @@ function initAdvancedTinyMCE() {
                     var groupName = window.currentRow.dataset.groupName;
                     var db_name = window.currentRow.dataset.databaseName;
 
+
+
                     window.pywebview.api.save_changes(groupName, db_name, tableName, shortcut, window.newContent).then(response => {
                         console.log("Changes saved successfully");
                         window.currentRow.dataset.expansion = window.newContent;
@@ -193,39 +180,9 @@ function decodeHtml(html) {
 
 
 
-
-
 function destroyTinyMCE() {
     if (tinymce.get('editor')) {
         tinymce.get('editor').remove();
     }
 }
 
-
-
-function saveFormatToDatabase() {
-    if (!window.currentRow) {
-        console.warn("No row is currently selected.");
-        return;
-    }
-
-    var formatValue = document.getElementById('escolha').value;
-    alert(formatValue); // Log the value for debugging
-
-    var shortcut = window.currentRow.dataset.shortcut;
-    var tableName = window.currentRow.dataset.tableName;
-    var groupName = window.currentRow.dataset.groupName;
-    var db_name = window.currentRow.dataset.databaseName;
-
-    window.pywebview.api.update_format(groupName, db_name, tableName, shortcut, formatValue)
-        .then(response => {
-            console.log("Format updated successfully");
-            window.currentRow.dataset.format = formatValue;  // This line updates the dataset
-
-            // You might want to reflect this change immediately on the dropdown as well:
-            document.getElementById('escolha').value = formatValue;
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-}
