@@ -2,6 +2,7 @@ window.addEventListener('load', function () {
     // Initialize the editor based on the current dropdown value
     initializeTinyMCE();
 
+
 });
 
 
@@ -13,6 +14,13 @@ window.addEventListener('load', function () {
 
 
 
+
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------------
 function initializeTinyMCE() {
     var choice = document.getElementById('escolha').value;
     destroyTinyMCE();
