@@ -385,6 +385,8 @@ function createCellContent(className, textContent, textAlign = 'left') {
 
 // Row click handler
 // Row click handler
+var rowSelected = false;  // Adicione esta variável de flag fora de qualquer função, no escopo global
+
 function handleRowClick() {
   // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
@@ -402,6 +404,7 @@ function handleRowClick() {
   const { expansion, format } = this.dataset;
 
   // Set the latest content to the TinyMCE editor
+  rowSelected = true;  // Ativar a flag quando uma linha for selecionada
   tinyMCE.get('editor').setContent(expansion);
 
   // Set the shortcut value in the input field (assuming you still need this)

@@ -1,9 +1,15 @@
+
+var dropdownChanged = false;
+
+
+
 window.addEventListener('load', function () {
     initializeEditorBasedOnDropdown();
     // attachTableClickHandler();
 });
 
 document.getElementById('escolha').addEventListener('change', function () {
+    dropdownChanged = true;
     var choice = document.getElementById('escolha').value;
     reinitializeEditor(choice);
 
@@ -54,6 +60,8 @@ function reinitializeEditor(choice) {
 }
 
 
+var saveTimeout = null;
+var rowSelected = false;  // Flag para determinar se uma linha foi selecionada
 
 function getTinyMCEConfig(isAdvanced, onEditorInit) {
     var basicConfig = {
@@ -64,27 +72,39 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
         toolbar: 'undo redo',
         paste_as_text: true,
         setup: function (editor) {
-            // editor.on('init', onEditorInit);  // Use the provided callback when the editor is initialized
-
-
-
-
             editor.on('keyup change', function () {
-                if (!window.currentRow) return;
+                clearTimeout(saveTimeout);  // Limpar o timer anterior
 
-                var shortcut = window.currentRow.dataset.shortcut;
-                var groupName = window.currentRow.dataset.groupName;
-                var databaseName = window.currentRow.dataset.databaseName;
-                var formatValue = document.getElementById('escolha').value === "1";
-                var editorContent = editor.getContent();
+                saveTimeout = setTimeout(function () {
+                    if (!window.currentRow) return;
 
-                window.pywebview.api.save_changes(groupName, databaseName, shortcut, editorContent, formatValue)
-                    .then(response => {
-                        console.log("Changes saved successfully.");
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
+                    // Se o dropdown foi alterado, não atualize o TinyMCE e redefina a flag
+                    if (dropdownChanged) {
+                        dropdownChanged = false;
+                        return;
+                    }
+
+                    var shortcut = window.currentRow.dataset.shortcut;
+                    var groupName = window.currentRow.dataset.groupName;
+                    var databaseName = window.currentRow.dataset.databaseName;
+                    var formatValue = document.getElementById('escolha').value === "1";
+                    var editorContent = editor.getContent();
+
+                    window.pywebview.api.save_changes(groupName, databaseName, shortcut, editorContent, formatValue)
+                        .then(response => {
+                            // Atualizar o dataset e o conteúdo visual da currentRow
+                            if (window.currentRow) {
+                                var expansionCell = window.currentRow.cells[0].querySelector('.truncate');  // Assume que a célula expansion é a primeira
+                                if (expansionCell) {
+                                    expansionCell.dataset.expansion = editorContent;
+                                    expansionCell.textContent = decodeHtml(editorContent.replace(/<[^>]*>/g, ''));
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                }, 1200);
             });
         }
     };
@@ -100,6 +120,9 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
 
     return basicConfig;
 }
+
+
+
 
 function getBasicTinyMCEConfig() {
     return getTinyMCEConfig(false);
