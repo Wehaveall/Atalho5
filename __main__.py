@@ -111,18 +111,15 @@ def setsizer(window, perW, perH):
 from sqlalchemy import inspect
 
 
-def handle_database_operations(groupName, databaseName, tableName):
+def handle_database_operations(groupName, databaseName, _):  # Changed tableName to _
     database_path = get_database_path(groupName, databaseName)
     engine = create_engine(f"sqlite:///{database_path}")
     metadata = MetaData()
 
     try:
-        # Ensure tableName is a string, not a list
-        if isinstance(tableName, list) and len(tableName) == 1:
-            tableName = tableName[0]
-
         with Session(engine) as session:
-            table = Table(tableName, metadata, autoload_with=engine)
+            # Always target the table "aTable"
+            table = Table("aTable", metadata, autoload_with=engine)
             result = session.execute(select(table)).fetchall()
             session.commit()
 
@@ -131,7 +128,7 @@ def handle_database_operations(groupName, databaseName, tableName):
             rows = [row2dict(row) for row in result]
 
             # Print the rows for debugging
-            # print(f"Fetched {len(rows)} row(s) from {tableName}:")
+            # print(f"Fetched {len(rows)} row(s) from aTable:")  # Changed tableName to aTable
             for row in rows:
                 # print(row)
 
@@ -340,34 +337,40 @@ class Api:
     # --------------------------------------------------------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
 
-    def save_changes(self, groupName, databaseName, tableName, shortcut, newContent):
-        # Convert the format string to integer representation
-        format_value = 1 if format else 0
-        print(f"Converted format value: {format_value}")  # Add this line
+    def save_changes(self, groupName, databaseName, shortcut, newContent, formatValue):
+        # Convert formatValue to 0 or 1 for SQLite storage
+        format_value_for_db = 1 if formatValue else 0
+        print(
+            f"Converted format value for DB: {format_value_for_db}"
+        )  # Just for debugging
 
         # Establish a connection to the database
         database_path = get_database_path(groupName, databaseName)
         engine = create_engine(f"sqlite:///{database_path}")
         metadata = MetaData()
+
         with Session(engine) as session:
-            # Reflect the table from the database
-            table = Table(tableName, metadata, autoload_with=engine)
+            # Always target the table "aTable"
+            table = Table("aTable", metadata, autoload_with=engine)
 
             # Prepare the update statement
+            update_values = {"format": format_value_for_db}
+
+            # If newContent is provided, update the expansion column
+            if newContent:
+                update_values["expansion"] = newContent
+
             stmt = (
                 update(table)
                 .where(table.c.shortcut == shortcut)
-                .values(expansion=newContent)
+                .values(**update_values)
             )
 
             # Execute the update statement
-            print(
-                "vai salvar--------------------------------------------------------------"
-            )
+            print("Saving changes to the database...")
             session.execute(stmt)
             session.commit()
-
-    
+            print("Changes saved successfully!")
 
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))

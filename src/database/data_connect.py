@@ -126,30 +126,28 @@ def lookup_word_in_all_databases(word):
         # Create a cursor
         c = conn.cursor()
 
-        # Get the names of all tables in the database
-        c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        table_names = c.fetchall()
-        print(f"Table names in {db_file}: {table_names}")
+        try:
+            # Execute the query on "aTable"
+            c.execute("SELECT expansion FROM aTable WHERE shortcut=?", (word,))
+        except sqlite3.OperationalError as e:
+            print(f"SQLite error in {db_file} for table aTable: {e}")
+            continue  # Skip to the next database
+        except Exception as e:
+            print(f"General error in {db_file} for table aTable: {e}")
+            continue  # Skip to the next database
 
-        # For each table, try to find the word
-        for table_name in table_names:
-            # Execute the query
-            c.execute(
-                f"SELECT expansion FROM {table_name[0]} WHERE shortcut=?", (word,)
-            )
+        # Fetch the result
+        result = c.fetchone()
+        print(f"Result for {word} in aTable: {result}")
 
-            # Fetch the result
-            result = c.fetchone()
-            print(f"Result for {word} in {table_name[0]}: {result}")
-
-            # If a result was found, return it
-            if result is not None:
-                if (
-                    file_size_in_megabytes < 100
-                    and file_size_in_megabytes < available_memory_in_megabytes
-                ):
-                    close_db_in_memory(src, conn)
-                return result[0]
+        # If a result was found, return it
+        if result is not None:
+            if (
+                file_size_in_megabytes < 100
+                and file_size_in_megabytes < available_memory_in_megabytes
+            ):
+                close_db_in_memory(src, conn)
+            return result[0]
 
         if (
             file_size_in_megabytes < 100

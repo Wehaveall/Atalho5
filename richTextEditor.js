@@ -1,196 +1,125 @@
 window.addEventListener('load', function () {
-    // Initialize the editor based on the current dropdown value
-    initializeTinyMCE();
+    initializeEditorBasedOnDropdown();
+    // attachTableClickHandler();
+});
 
+document.getElementById('escolha').addEventListener('change', function () {
+    var choice = document.getElementById('escolha').value;
+    reinitializeEditor(choice);
 
+    // If there's no currently selected row, just return
+    if (!window.currentRow) return;
+
+    var shortcut = window.currentRow.dataset.shortcut;
+    var groupName = window.currentRow.dataset.groupName;
+    var databaseName = window.currentRow.dataset.databaseName;
+    var formatValue = choice === "1";
+
+    // Only save the formatValue to the database
+    window.pywebview.api.save_changes(groupName, databaseName, shortcut, null, formatValue)
+        .then(response => {
+            console.log("Format value saved successfully.");
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 });
 
 
 
 
+function reinitializeEditor(choice) {
+    var currentContent = tinymce.get('editor').getContent();
 
+    // Ocultar o elemento do editor durante a transição
+    document.querySelector('#editor').style.display = 'none';
 
+    tinymce.get('editor').remove();
 
+    function onEditorInit() {
+        console.log("Editor initialized.");  // Log para verificar a inicialização
 
-
-
-
-
-
-
-
-
-//----------------------------------------------------------------------------------------------------------
-function initializeTinyMCE() {
-    var choice = document.getElementById('escolha').value;
-    destroyTinyMCE();
+        setTimeout(function () {
+            tinymce.get('editor').setContent(currentContent);
+            // Exibir o editor novamente
+            document.querySelector('#editor').style.display = '';
+        }, 100);  // 100ms delay
+    }
 
     if (choice === "0") {
-        initBasicTinyMCE();
+        tinymce.init(getTinyMCEConfig(false, onEditorInit));
     } else if (choice === "1") {
-        initAdvancedTinyMCE();
+        tinymce.init(getTinyMCEConfig(true, onEditorInit));
     }
 }
 
 
 
-
-function initBasicTinyMCE() {
-    if (window.tinymce) {
-        tinymce.init({
-            selector: '#editor',
-            menubar: false,
-            statusbar: false,
-            plugins: ['paste'],  // Ensure the paste plugin is included
-            toolbar: 'undo redo',
-            paste_as_text: true,  // Force pasted content to be plain text
-            // ... other configurations
-            setup: function (editor) {
-                window.newContent = '';
-                window.currentRow = null;
-                window.contentChanged = false;
-                var editedRow = null;  // Newly added variable
-
-                editor.on('keyup change', function () {
-                    window.newContent = editor.getContent();
-                    window.contentChanged = true;
-                    editedRow = window.currentRow;  // Set the editedRow to the currentRow
-                });
-
-                setInterval(function () {
-                    // Updated condition to check if the editedRow matches the currentRow
-                    if (!window.contentChanged || !window.currentRow || editedRow !== window.currentRow) {
-                        return;
-                    }
-
-                    var shortcut = window.currentRow.dataset.shortcut;
-                    var tableName = window.currentRow.dataset.tableName;
-                    var groupName = window.currentRow.dataset.groupName;
-                    var db_name = window.currentRow.dataset.databaseName;
+function getTinyMCEConfig(isAdvanced, onEditorInit) {
+    var basicConfig = {
+        selector: '#editor',
+        menubar: false,
+        statusbar: false,
+        plugins: ['paste'],
+        toolbar: 'undo redo',
+        paste_as_text: true,
+        setup: function (editor) {
+            // editor.on('init', onEditorInit);  // Use the provided callback when the editor is initialized
 
 
-                    window.pywebview.api.save_changes(groupName, db_name, tableName, shortcut, window.newContent).then(response => {
-                        console.log("Changes saved successfully");
-                        window.currentRow.dataset.expansion = window.newContent;
 
-                        var plainText = decodeHtml(window.newContent.replace(/<[^>]*>/g, ''));
-                        if (window.newContent.includes('<img')) {
-                            if (!plainText.includes('(imagem)')) {
-                                plainText += ' (imagem)';
-                            }
-                        } else {
-                            plainText = plainText.replace(' (imagem)', '');
-                        }
 
-                        window.currentRow.cells[0].firstChild.textContent = plainText;
-                        window.contentChanged = false;
-                    }).catch((error) => {
+            editor.on('keyup change', function () {
+                if (!window.currentRow) return;
+
+                var shortcut = window.currentRow.dataset.shortcut;
+                var groupName = window.currentRow.dataset.groupName;
+                var databaseName = window.currentRow.dataset.databaseName;
+                var formatValue = document.getElementById('escolha').value === "1";
+                var editorContent = editor.getContent();
+
+                window.pywebview.api.save_changes(groupName, databaseName, shortcut, editorContent, formatValue)
+                    .then(response => {
+                        console.log("Changes saved successfully.");
+                    })
+                    .catch((error) => {
                         console.error('Error:', error);
                     });
-                }, 1000);
-            }
-        });
+            });
+        }
+    };
 
-        document.querySelector('#myTable').addEventListener('click', function (e) {
-            var row = e.target.closest('tr');
-            if (row) {
-                window.currentRow = row;
-            }
-        });
-    } else {
-
-    }
-}
-
-
-
-
-
-
-function initAdvancedTinyMCE() {
-    if (window.tinymce) {
-        tinymce.init({
-            selector: '#editor',
+    if (isAdvanced) {
+        return Object.assign(basicConfig, {
             height: '100%',
             plugins: ['code'],
-            statusbar: false,
-            forced_root_block: false,
-            menubar: false,
             toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough',
-            toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-            setup: function (editor) {
-                window.newContent = '';
-                window.currentRow = null;
-                window.contentChanged = false;
-                var editedRow = null;  // Newly added variable
-
-                editor.on('keyup change', function () {
-                    window.newContent = editor.getContent();
-                    window.contentChanged = true;
-                    editedRow = window.currentRow;  // Set the editedRow to the currentRow
-                });
-
-                setInterval(function () {
-                    // Updated condition to check if the editedRow matches the currentRow
-                    if (!window.contentChanged || !window.currentRow || editedRow !== window.currentRow) {
-                        return;
-                    }
-
-                    var shortcut = window.currentRow.dataset.shortcut;
-                    var tableName = window.currentRow.dataset.tableName;
-                    var groupName = window.currentRow.dataset.groupName;
-                    var db_name = window.currentRow.dataset.databaseName;
-
-
-
-                    window.pywebview.api.save_changes(groupName, db_name, tableName, shortcut, window.newContent).then(response => {
-                        console.log("Changes saved successfully");
-                        window.currentRow.dataset.expansion = window.newContent;
-
-                        var plainText = decodeHtml(window.newContent.replace(/<[^>]*>/g, ''));
-                        if (window.newContent.includes('<img')) {
-                            if (!plainText.includes('(imagem)')) {
-                                plainText += ' (imagem)';
-                            }
-                        } else {
-                            plainText = plainText.replace(' (imagem)', '');
-                        }
-
-                        window.currentRow.cells[0].firstChild.textContent = plainText;
-                        window.contentChanged = false;
-                    }).catch((error) => {
-                        console.error('Error:', error);
-                    });
-                }, 1000);
-            }
+            toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat'
         });
-
-        document.querySelector('#myTable').addEventListener('click', function (e) {
-            var row = e.target.closest('tr');
-            if (row) {
-                window.currentRow = row;
-            }
-        });
-    } else {
-
     }
+
+    return basicConfig;
 }
 
+function getBasicTinyMCEConfig() {
+    return getTinyMCEConfig(false);
+}
 
+function getAdvancedTinyMCEConfig() {
+    return getTinyMCEConfig(true);
+}
+
+function initializeEditorBasedOnDropdown() {
+    var choice = document.getElementById('escolha').value;
+    if (choice === "0") {
+        tinymce.init(getBasicTinyMCEConfig());
+    } else if (choice === "1") {
+        tinymce.init(getAdvancedTinyMCEConfig());
+    }
+}
 
 function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
 }
-
-
-
-
-
-function destroyTinyMCE() {
-    if (tinymce.get('editor')) {
-        tinymce.get('editor').remove();
-    }
-}
-

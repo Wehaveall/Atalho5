@@ -395,14 +395,14 @@ function handleRowClick() {
   this.className = 'selected';
   window.currentRow = this;
 
+  // Store the index of the current row
+  window.currentRowIndex = Array.from(this.parentNode.children).indexOf(this);
+
   // Extract the relevant data from the clicked row
   const { expansion, format } = this.dataset;
 
-  // Fetch the latest data for the clicked row
-  const latestExpansion = this.dataset.expansion;
-
   // Set the latest content to the TinyMCE editor
-  tinyMCE.get('editor').setContent(latestExpansion);
+  tinyMCE.get('editor').setContent(expansion);
 
   // Set the shortcut value in the input field (assuming you still need this)
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
@@ -419,6 +419,7 @@ function handleRowClick() {
   });
   escolhaDropdown.dispatchEvent(event);
 }
+
 
 
 
