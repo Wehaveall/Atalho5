@@ -9,26 +9,31 @@ window.addEventListener('load', function () {
 });
 
 document.getElementById('escolha').addEventListener('change', function () {
-    dropdownChanged = true;
-    var choice = document.getElementById('escolha').value;
-    reinitializeEditor(choice);
+    if (isEditorUpdate || !window.currentRow) {
+        // Se a atualização do editor estiver em andamento ou nenhuma linha estiver selecionada, não faça nada
+        return;
+    }
 
-    // If there's no currently selected row, just return
-    if (!window.currentRow) return;
+    var choice = document.getElementById('escolha').value;
+    var formatValue = choice === "1";
 
     var shortcut = window.currentRow.dataset.shortcut;
     var groupName = window.currentRow.dataset.groupName;
     var databaseName = window.currentRow.dataset.databaseName;
-    var formatValue = choice === "1";
+    var currentContent = tinyMCE.get('editor').getContent();
 
-    // Only save the formatValue to the database
-    window.pywebview.api.save_changes(groupName, databaseName, shortcut, null, formatValue)
+    isSaving = true;  // Set the flag before saving
+    window.pywebview.api.save_changes(groupName, databaseName, shortcut, currentContent, formatValue)
         .then(response => {
-            console.log("Format value saved successfully.");
+            // Atualize o dataset da linha selecionada
+            window.currentRow.dataset.format = formatValue ? 'true' : 'false';
+            isSaving = false;  // Reset the flag after saving is done
         })
         .catch((error) => {
             console.error('Error:', error);
+            isSaving = false;  // Reset the flag in case of error
         });
+        reinitializeEditor(choice);
 });
 
 
@@ -63,6 +68,8 @@ function reinitializeEditor(choice) {
 var saveTimeout = null;
 var rowSelected = false;  // Flag para determinar se uma linha foi selecionada
 
+var isSaving = false;  // Flag para verificar se uma operação de salvamento está em andamento
+
 function getTinyMCEConfig(isAdvanced, onEditorInit) {
     var basicConfig = {
         selector: '#editor',
@@ -72,39 +79,30 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
         toolbar: 'undo redo',
         paste_as_text: true,
         setup: function (editor) {
-            editor.on('keyup change', function () {
-                clearTimeout(saveTimeout);  // Limpar o timer anterior
-
-                saveTimeout = setTimeout(function () {
-                    if (!window.currentRow) return;
-
-                    // Se o dropdown foi alterado, não atualize o TinyMCE e redefina a flag
-                    if (dropdownChanged) {
-                        dropdownChanged = false;
-                        return;
-                    }
-
+            editor.on('keyup', function () {
+                if (!isEditorUpdate && window.currentRow) {
+                    // Conteúdo mudou, salvar as alterações
                     var shortcut = window.currentRow.dataset.shortcut;
                     var groupName = window.currentRow.dataset.groupName;
                     var databaseName = window.currentRow.dataset.databaseName;
                     var formatValue = document.getElementById('escolha').value === "1";
-                    var editorContent = editor.getContent();
 
-                    window.pywebview.api.save_changes(groupName, databaseName, shortcut, editorContent, formatValue)
+                    isSaving = true;  // Set the flag before saving
+                    window.pywebview.api.save_changes(groupName, databaseName, shortcut, editor.getContent(), formatValue)
                         .then(response => {
                             // Atualizar o dataset e o conteúdo visual da currentRow
-                            if (window.currentRow) {
-                                var expansionCell = window.currentRow.cells[0].querySelector('.truncate');  // Assume que a célula expansion é a primeira
-                                if (expansionCell) {
-                                    expansionCell.dataset.expansion = editorContent;
-                                    expansionCell.textContent = decodeHtml(editorContent.replace(/<[^>]*>/g, ''));
-                                }
+                            var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
+                            if (expansionCell) {
+                                expansionCell.dataset.expansion = editor.getContent();
+                                expansionCell.textContent = decodeHtml(editor.getContent().replace(/<[^>]*>/g, ''));
                             }
+                            isSaving = false;  // Reset the flag after saving is done
                         })
                         .catch((error) => {
                             console.error('Error:', error);
+                            isSaving = false;  // Reset the flag in case of error
                         });
-                }, 1200);
+                }
             });
         }
     };
@@ -120,6 +118,7 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
 
     return basicConfig;
 }
+
 
 
 

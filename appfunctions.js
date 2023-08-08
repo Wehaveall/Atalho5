@@ -9,7 +9,40 @@ var allDbFiles = {};
 const cache = new Map();
 
 
-//Funções
+
+/////cache
+
+let dataCache = []; // Esta é uma representação simplificada do seu cache em memória.
+
+function updateMemoryOrCacheWithNewData(updatedData) {
+  // Nesta função, você irá atualizar a memória ou cache com os novos dados.
+  // Por exemplo, se o seu cache é uma lista de itens, você pode procurar o item relevante e atualizá-lo:
+
+  let itemToUpdate = dataCache.find(item => item.shortcut === updatedData.shortcut);
+  if (itemToUpdate) {
+    Object.assign(itemToUpdate, updatedData); // Atualiza o item com os novos dados.
+  } else {
+    dataCache.push(updatedData); // Se o item não existir no cache, adicione-o.
+  }
+}
+
+
+function setCachedData(directory, databaseFile, tableName, data) {
+  let key = directory + '|' + databaseFile + '|' + tableName;
+  let currentData = cache.get(key) || [];
+
+  // Vamos assumir que os dados são uma lista de itens. Se não, ajuste conforme necessário.
+  data.forEach(updatedItem => {
+    let itemToUpdate = currentData.find(item => item.shortcut === updatedItem.shortcut);
+    if (itemToUpdate) {
+      Object.assign(itemToUpdate, updatedItem); // Atualiza o item com os novos dados.
+    } else {
+      currentData.push(updatedItem); // Se o item não existir no cache, adicione-o.
+    }
+  });
+
+  cache.set(key, currentData);
+}
 
 
 
@@ -18,10 +51,15 @@ function getCachedData(directory, databaseFile, tableName) {
   return cache.get(key);
 }
 
-function setCachedData(directory, databaseFile, tableName, data) {
-  let key = directory + '|' + databaseFile + '|' + tableName;
-  cache.set(key, data);
-}
+
+
+
+
+//Funções
+
+
+
+
 
 function decodeHtml(html) {
   var txt = document.createElement("textarea");
@@ -386,8 +424,15 @@ function createCellContent(className, textContent, textAlign = 'left') {
 // Row click handler
 // Row click handler
 var rowSelected = false;  // Adicione esta variável de flag fora de qualquer função, no escopo global
+var isRowClick = false;  // Adicionado no início do seu script
+var preventSave = false;
+var isEditorUpdate = false;
+var isSaving = false;
 
 function handleRowClick() {
+  // Se uma operação de salvamento estiver em andamento, retorne imediatamente
+  if (isSaving) return;
+
   // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
     window.currentRow.className = '';  // Deselect the previous row
@@ -397,33 +442,33 @@ function handleRowClick() {
   this.className = 'selected';
   window.currentRow = this;
 
-  // Store the index of the current row
-  window.currentRowIndex = Array.from(this.parentNode.children).indexOf(this);
-
   // Extract the relevant data from the clicked row
-  const { expansion, format } = this.dataset;
+  const { groupName, databaseName, tableName, shortcut, format } = this.dataset;
 
-  // Set the latest content to the TinyMCE editor
-  rowSelected = true;  // Ativar a flag quando uma linha for selecionada
-  tinyMCE.get('editor').setContent(expansion);
+  // Fetch the most recent data from the cache or database
+  window.pywebview.api.get_data(groupName, databaseName, tableName)
+    .then(data => {
+      const rowData = data.find(item => item.shortcut === shortcut);
 
-  // Set the shortcut value in the input field (assuming you still need this)
+      isEditorUpdate = true;  // Set before updating the editor
+      if (rowData) {
+        tinyMCE.get('editor').setContent(rowData.expansion);
+
+        // Update dropdown based on the format value
+        var escolhaDropdown = document.getElementById('escolha');
+        escolhaDropdown.value = rowData.format ? '1' : '0';
+
+        // Reinitialize the editor based on the dropdown value
+        reinitializeEditor(escolhaDropdown.value);
+      } else {
+        tinyMCE.get('editor').setContent('');
+      }
+      isEditorUpdate = false;  // Reset after updating the editor
+    })
+    .catch(error => console.error("Error fetching recent data:", error));
+
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
-
-  // Update the "escolha" dropdown based on the row's format
-  var escolhaDropdown = document.getElementById('escolha');
-  escolhaDropdown.value = format === 'true' ? '1' : '0';
-
-  // Manually trigger the change event for the dropdown, since programmatically 
-  // changing the value doesn't automatically trigger it
-  var event = new Event('change', {
-    'bubbles': true,
-    'cancelable': true
-  });
-  escolhaDropdown.dispatchEvent(event);
 }
-
-
 
 
 
