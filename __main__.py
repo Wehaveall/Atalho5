@@ -111,37 +111,31 @@ def setsizer(window, perW, perH):
 from sqlalchemy import inspect
 
 
-def handle_database_operations(groupName, databaseName, _):  # Changed tableName to _
+def handle_database_operations(
+    groupName, databaseName, tableName
+):  # Added tableName as an argument
     database_path = get_database_path(groupName, databaseName)
     engine = create_engine(f"sqlite:///{database_path}")
     metadata = MetaData()
 
     try:
         with Session(engine) as session:
-            # Always target the table "aTable"
-            table = Table("aTable", metadata, autoload_with=engine)
+            table = Table(tableName, metadata, autoload_with=engine)
             result = session.execute(select(table)).fetchall()
             session.commit()
 
             # Convert the results into a list of dictionaries
-            # Modified this line to use row2dict
             rows = [row2dict(row) for row in result]
 
-            # Print the rows for debugging
-            # print(f"Fetched {len(rows)} row(s) from aTable:")  # Changed tableName to aTable
+            # Print the rows for debugging (if needed)
+            # print(f"Fetched {len(rows)} row(s) from {tableName}:")
             for row in rows:
                 # print(row)
 
                 return rows
-
     except Exception as e:
-        print(f"An error occurred: {e}")
-
-        # If the table doesn't exist, print the available tables for debugging
-        inspector = inspect(engine)
-        print(f"Available tables in {databaseName}: {inspector.get_table_names()}")
-
-        return None
+        print(f"Error handling operations for table {tableName}: {e}")
+        return []
 
 
 def row2dict(row):
@@ -337,7 +331,9 @@ class Api:
     # --------------------------------------------------------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
 
-    def save_changes(self, groupName, databaseName, shortcut, newContent, formatValue):
+    def save_changes(
+        self, groupName, databaseName, tableName, shortcut, newContent, formatValue
+    ):
         # Convert formatValue to 0 or 1 for SQLite storage
         format_value_for_db = 1 if formatValue else 0
         print(
@@ -350,8 +346,8 @@ class Api:
         metadata = MetaData()
 
         with Session(engine) as session:
-            # Always target the table "aTable"
-            table = Table("aTable", metadata, autoload_with=engine)
+            # Use the provided tableName instead of hardcoded "aTable"
+            table = Table(tableName, metadata, autoload_with=engine)
 
             # Prepare the update statement
             update_values = {"format": format_value_for_db}
@@ -407,8 +403,32 @@ class Api:
 
         return all_db_files
 
-    def get_data(self, groupName, databaseName, tableName):
+    # ----------------------------------------------------------------EXCLUIR - SQLITE_SEQUENCY TABLE
+    def get_target_table_name(self, engine):
+        inspector = inspect(engine)
+        table_names = inspector.get_table_names()
+        for name in table_names:
+            if name != "sqlite_sequence":
+                return name
+        return None  # Se não encontrar nenhuma tabela que não seja 'sqlite_sequence'
+
+    # -------------------------------------------------------------------
+
+    def get_data(
+        self, groupName, databaseName, _
+    ):  # Note que eu substituí tableName por _
+        database_path = get_database_path(groupName, databaseName)
+        engine = create_engine(f"sqlite:///{database_path}")
+
+        # Obtenha o nome da tabela que não é 'sqlite_sequence'
+        tableName = api.get_target_table_name(engine)
+
+        if not tableName:
+            print("No valid table found other than sqlite_sequence.")
+            return None
+
         print("get_data called with", groupName, databaseName, tableName)
+
         try:
             rows = handle_database_operations(groupName, databaseName, tableName)
             return rows

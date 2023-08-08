@@ -9,6 +9,10 @@ var allDbFiles = {};
 const cache = new Map();
 
 
+var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
+//preciso que seja global, para ajustar a quantidade de enters!!
+
+
 
 /////cache
 
@@ -69,8 +73,10 @@ function decodeHtml(html) {
 
 
 function formatArticle(article) {
-  return article.replace(/[\*\#%@\$]/g, "<br/>");
+  let replacement = "<br/>".repeat(numberOfEnters); // Repete a tag <br/> de acordo com o valor de numberOfEnters
+  return article.replace(/[\*\#%@\$]/g, replacement);
 }
+
 
 
 
@@ -452,7 +458,12 @@ function handleRowClick() {
 
       isEditorUpdate = true;  // Set before updating the editor
       if (rowData) {
-        tinyMCE.get('editor').setContent(rowData.expansion);
+        // Primeiro, decodificar as entidades HTML
+        let decodedExpansion = decodeHtml(rowData.expansion);
+        // Em seguida, formatar o artigo usando sua função
+        let formattedExpansion = formatArticle(decodedExpansion);
+
+        tinyMCE.get('editor').setContent(formattedExpansion);
 
         // Update dropdown based on the format value
         var escolhaDropdown = document.getElementById('escolha');
@@ -469,6 +480,7 @@ function handleRowClick() {
 
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 }
+
 
 
 

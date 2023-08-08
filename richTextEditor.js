@@ -84,11 +84,12 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
                     // Conteúdo mudou, salvar as alterações
                     var shortcut = window.currentRow.dataset.shortcut;
                     var groupName = window.currentRow.dataset.groupName;
+                    var tableName = window.currentRow.dataset.tableName;
                     var databaseName = window.currentRow.dataset.databaseName;
                     var formatValue = document.getElementById('escolha').value === "1";
 
                     isSaving = true;  // Set the flag before saving
-                    window.pywebview.api.save_changes(groupName, databaseName, shortcut, editor.getContent(), formatValue)
+                    window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, editor.getContent(), formatValue)
                         .then(response => {
                             // Atualizar o dataset e o conteúdo visual da currentRow
                             var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
