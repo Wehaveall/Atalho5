@@ -346,8 +346,16 @@ class Api:
         metadata = MetaData()
 
         with Session(engine) as session:
-            # Use the provided tableName instead of hardcoded "aTable"
-            table = Table(tableName, metadata, autoload_with=engine)
+            # Get the table names from the database using inspect
+            table_names = inspect(engine).get_table_names()
+
+            # Filter out 'sqlite_sequence' and get the desired table name
+            desired_table_name = next(
+                (name for name in table_names if name != "sqlite_sequence"), tableName
+            )
+
+            # Target the desired table
+            table = Table(desired_table_name, metadata, autoload_with=engine)
 
             # Prepare the update statement
             update_values = {"format": format_value_for_db}

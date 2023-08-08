@@ -6,6 +6,13 @@ from src.database.data_connect import lookup_word_in_all_databases
 import pyperclip  # We add this import for clipboard manipulation
 from src.utils import number_utils
 import time
+import logging
+
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 def format_article(article):
@@ -125,88 +132,108 @@ class KeyListener:
         self.typed_keys = ""  # Add this line
 
     def on_key_release(self, key):
-        # Check silent mode is enabled
-        if self.isRecordingMacro:
-            return
+        start_time = time.time()
 
-        if self.silent_mode:
-            return
-
-        if key in self.omitted_keys:
-            if self.api.is_recording:
+        try:
+            # Check silent mode is enabled
+            if self.isRecordingMacro:
                 return
 
-            if key == keyboard.Key.backspace:
-                self.typed_keys = self.typed_keys[:-1]
+            if self.silent_mode:
                 return
 
-            if key == keyboard.Key.space:
-                typed_keys_for_conversion = self.typed_keys.replace(",", ".")
+            if key in self.omitted_keys:
+                if self.api.is_recording:
+                    return
 
-                number_type = number_utils.is_number(typed_keys_for_conversion[:-1])
-                if self.typed_keys.endswith("e") and number_type:
-                    number_in_words = number_utils.number_to_words(
-                        typed_keys_for_conversion
-                    )
+                if key == keyboard.Key.backspace:
+                    self.typed_keys = self.typed_keys[:-1]
+                    return
 
-                    self.pynput_listener.stop()  # Stop the listener
-                    pyautogui.hotkey("ctrl", "shift", "left")
-                    pyautogui.press("backspace")
-                    pyperclip.copy(number_in_words)
-                    pyautogui.hotkey("ctrl", "v")
-                    self.start_listener()  # Start a new listener
+                if key == keyboard.Key.space:
+                    typed_keys_for_conversion = self.typed_keys.replace(",", ".")
 
-                    self.typed_keys = ""
-
-                elif self.typed_keys.endswith("m") and number_utils.is_number(
-                    typed_keys_for_conversion[:-1]
-                ):
-                    number_as_currency = number_utils.number_to_currency(
-                        typed_keys_for_conversion
-                    )
-
-                    self.pynput_listener.stop()  # Stop the listener
-                    pyautogui.hotkey("ctrl", "shift", "left")
-                    pyautogui.press("backspace")
-                    pyperclip.copy(number_as_currency)
-                    pyautogui.hotkey("ctrl", "v")
-                    self.start_listener()  # Start a new listener
-
-                    self.typed_keys = ""
-
-                else:
-                    expansion = lookup_word_in_all_databases(self.typed_keys)
-                    if expansion is not None:
-                        original_clipboard_content = pyperclip.paste()
+                    number_type = number_utils.is_number(typed_keys_for_conversion[:-1])
+                    if self.typed_keys.endswith("e") and number_type:
+                        number_in_words = number_utils.number_to_words(
+                            typed_keys_for_conversion
+                        )
 
                         self.pynput_listener.stop()  # Stop the listener
                         pyautogui.hotkey("ctrl", "shift", "left")
                         pyautogui.press("backspace")
-                        pyperclip.copy(format_article(expansion))
+                        pyperclip.copy(number_in_words)
                         pyautogui.hotkey("ctrl", "v")
                         self.start_listener()  # Start a new listener
 
-                        pyperclip.copy(original_clipboard_content)
+                        self.typed_keys = ""
+
+                    elif self.typed_keys.endswith("m") and number_utils.is_number(
+                        typed_keys_for_conversion[:-1]
+                    ):
+                        number_as_currency = number_utils.number_to_currency(
+                            typed_keys_for_conversion
+                        )
+
+                        self.pynput_listener.stop()  # Stop the listener
+                        pyautogui.hotkey("ctrl", "shift", "left")
+                        pyautogui.press("backspace")
+                        pyperclip.copy(number_as_currency)
+                        pyautogui.hotkey("ctrl", "v")
+                        self.start_listener()  # Start a new listener
 
                         self.typed_keys = ""
+
                     else:
-                        # If no expansion was found, clear the typed keys
-                        self.typed_keys = ""
+                        expansion = lookup_word_in_all_databases(self.typed_keys)
+                        if expansion is not None:
+                            original_clipboard_content = pyperclip.paste()
 
-            return
+                            self.pynput_listener.stop()  # Stop the listener
+                            pyautogui.hotkey("ctrl", "shift", "left")
+                            pyautogui.press("backspace")
+                            pyperclip.copy(format_article(expansion))
+                            pyautogui.hotkey("ctrl", "v")
+                            self.start_listener()  # Start a new listener
 
-        if self.stop_event.is_set():
-            return False
+                            pyperclip.copy(original_clipboard_content)
 
-        key_char = key.char if hasattr(key, "char") else str(key)
+                            self.typed_keys = ""
+                        else:
+                            # If no expansion was found, clear the typed keys
+                            self.typed_keys = ""
 
-        if self.accent:
-            self.handle_accent_key(key_char)
-        elif key_char in self.accents:
-            self.accent = True
-            self.last_key = key_char
-        else:
-            self.typed_keys += key_char
+                return
+
+            if self.stop_event.is_set():
+                return False
+
+            key_char = key.char if hasattr(key, "char") else str(key)
+
+            if self.accent:
+                self.handle_accent_key(key_char)
+            elif key_char in self.accents:
+                self.accent = True
+                self.last_key = key_char
+            else:
+                self.typed_keys += key_char
+
+        except Exception as e:
+            logging.error(f"Error in on_key_release: {e}")
+            self.restart_listener()  # Restart the listener in case of an error
+
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            logging.info(f"on_key_release processing took {elapsed_time:.2f} seconds")
+
+    # ----------------------------------------------------------------
+    # ----------------------------------------------------------------
+    # ----------------------------------------------------------------
+
+    def restart_listener(self):
+        logging.info("Restarting listener...")
+        self.stop_listener()
+        self.start_listener()
 
     def start_listener(self):
         self.typed_keys = ""  # Clear the typed keys
