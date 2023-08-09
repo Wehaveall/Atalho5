@@ -11,9 +11,6 @@ from tkinter import font
 # custom message box
 from tkinter import Toplevel, Label, Button, PhotoImage
 
-import queue
-from queue import Queue, Empty  # Don't forget to import Empty
-
 
 import traceback
 
@@ -361,7 +358,7 @@ class Api:
 
         # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)
-        engine = get_engine(database_path)  # Usando get_engine em vez de create_engine
+        engine = get_engine(database_path)  # Using get_engine instead of create_engine
         metadata = MetaData()
 
         with Session(engine) as session:
@@ -394,6 +391,13 @@ class Api:
             session.execute(stmt)
             session.commit()
             print("Changes saved successfully!")
+
+            # Notifique o JavaScript para invalidar o cache após atualizar o banco de dados
+            self.window.evaluate_js(
+                'invalidateCacheEntry("{groupName}", "{databaseName}", "{tableName}")'.format(
+                    groupName=groupName, databaseName=databaseName, tableName=tableName
+                )
+            )
 
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))

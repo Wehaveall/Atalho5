@@ -16,8 +16,6 @@ var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
 
 /////////////////////////////////////////////////////////////////////CACHE////////////////////////////////
 
-
-
 // Nesta implementação:
 
 // O cache é armazenado em dataCache.
@@ -30,9 +28,57 @@ var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
 //  você deve chamar dataCache.delete(cacheKey) para invalidar a entrada de cache relevante.
 
 
+// Dada a forma como o seu cache está estruturado e como você recupera dados do cache, 
+// o que está acontecendo é que, quando você salva as alterações com save_changes,
+//  está invalidando mais do que o necessário. O que você precisa fazer é simplesmente
+//   invalidar a chave do cache que corresponde aos dados que foram alterados.
+
+// Veja, a chave do cache é composta por groupName|databaseName|tableName. 
+// Quando você modifica dados em uma tabela específica, você não está alterando
+//  o nome do grupo, nome do banco de dados ou nome da tabela.
+//   O que está mudando são os valores dentro dessa tabela. 
+//   Portanto, a chave do cache não precisa incluir os valores de expansion, 
+//   shortcut ou format, porque esses valores não fazem parte da chave do cache.
+
+// A função invalidateCacheEntry que você tem agora é quase correta, 
+// mas tem um pequeno erro: está referenciando cache em vez de dataCache. Vamos corrigir isso:
+
+// javascript
+// Copy code
+// function invalidateCacheEntry(...args) {
+//   const cacheKey = args.join('|');
+//   if (dataCache.has(cacheKey)) {
+//     dataCache.delete(cacheKey);
+//   }
+// }
+// Agora, na sua função save_changes, você só precisa chamar invalidateCacheEntry
+//  com os três argumentos: groupName, databaseName, e tableName.
+
+// python
+// Copy code
+// self.window.evaluate_js(
+//   'invalidateCacheEntry("{groupName}", "{databaseName}", "{tableName}")'.format(
+//     groupName=groupName,
+//     databaseName=databaseName,
+//     tableName=tableName
+//   )
+// )
+// O que isso faz é simplesmente remover a entrada do cache para essa tabela específica.
+//  Da próxima vez que você tentar recuperar dados dessa tabela usando a função fetchData, 
+//  o cache não terá esses dados e a função buscará no banco de dados e recolocará os dados atualizados no cache.
+
+// Em resumo, a chave é entender que a chave do cache é baseada em identificadores 
+// que descrevem "onde" os dados estão (ou seja, em qual grupo, banco de dados, tabela),
+//  e não "o que" os dados são (ou seja, os valores de expansion, shortcut, etc.). 
+//  Ao modificar os dados, você simplesmente invalida a entrada do cache
+//   para essa localização e os dados são buscados novamente na próxima vez que você os solicitar.
+
+
+
+
 
 const CACHE_TTL = 60000; // 60 segundos de tempo de vida
-const dataCache = new Map();
+const dataCache = new Map();  //datacache é o nome da variável para o cache
 
 // Função para obter dados do cache
 function getFromCache(key) {
@@ -68,14 +114,16 @@ function fetchData(groupName, databaseName, tableName) {
     });
 }
 
+function invalidateCacheEntry(...args) {
+  const cacheKey = args.join('|');
+  if (dataCache.has(cacheKey)) {
+    dataCache.delete(cacheKey);
+  }
+}
 
 
 
 //Funções
-
-
-
-
 
 function decodeHtml(html) {
   var txt = document.createElement("textarea");
@@ -88,9 +136,6 @@ function formatArticle(article) {
   let replacement = "<br/>".repeat(numberOfEnters); // Repete a tag <br/> de acordo com o valor de numberOfEnters
   return article.replace(/[\*\#%@\$]/g, replacement);
 }
-
-
-
 
 
 function openTab(evt, tabName) {
@@ -106,9 +151,6 @@ function openTab(evt, tabName) {
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
