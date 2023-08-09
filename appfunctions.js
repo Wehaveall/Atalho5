@@ -6,7 +6,7 @@ var appState = {
 var activeCollapsibleButton = null;
 var buttonStates = appState.buttonStates;
 var allDbFiles = {};
-const cache = new Map();
+
 
 
 var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
@@ -14,47 +14,59 @@ var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
 
 
 
-/////cache
+/////////////////////////////////////////////////////////////////////CACHE////////////////////////////////
 
-let dataCache = []; // Esta é uma representação simplificada do seu cache em memória.
 
-function updateMemoryOrCacheWithNewData(updatedData) {
-  // Nesta função, você irá atualizar a memória ou cache com os novos dados.
-  // Por exemplo, se o seu cache é uma lista de itens, você pode procurar o item relevante e atualizá-lo:
 
-  let itemToUpdate = dataCache.find(item => item.shortcut === updatedData.shortcut);
-  if (itemToUpdate) {
-    Object.assign(itemToUpdate, updatedData); // Atualiza o item com os novos dados.
-  } else {
-    dataCache.push(updatedData); // Se o item não existir no cache, adicione-o.
+// Nesta implementação:
+
+// O cache é armazenado em dataCache.
+// Cada entrada de cache tem um timestamp indicando quando foi armazenada.
+// Ao obter uma entrada do cache com getFromCache(), verificamos se o TTL expirou.
+//  Se sim, excluímos a entrada e retornamos null.
+// fetchData() primeiro verifica o cache. Se os dados estiverem no cache e ainda forem válidos,
+//  ele retorna imediatamente. Caso contrário, busca os dados e os armazena no cache.
+// Quando você atualizar os dados em algum lugar no seu aplicativo,
+//  você deve chamar dataCache.delete(cacheKey) para invalidar a entrada de cache relevante.
+
+
+
+const CACHE_TTL = 60000; // 60 segundos de tempo de vida
+const dataCache = new Map();
+
+// Função para obter dados do cache
+function getFromCache(key) {
+  const cacheEntry = dataCache.get(key);
+  if (!cacheEntry) return null;
+  if (Date.now() - cacheEntry.timestamp > CACHE_TTL) {
+    // A entrada do cache expirou
+    dataCache.delete(key);
+    return null;
   }
+  return cacheEntry.data;
 }
 
-
-function setCachedData(directory, databaseFile, tableName, data) {
-  let key = directory + '|' + databaseFile + '|' + tableName;
-  let currentData = cache.get(key) || [];
-
-  // Vamos assumir que os dados são uma lista de itens. Se não, ajuste conforme necessário.
-  data.forEach(updatedItem => {
-    let itemToUpdate = currentData.find(item => item.shortcut === updatedItem.shortcut);
-    if (itemToUpdate) {
-      Object.assign(itemToUpdate, updatedItem); // Atualiza o item com os novos dados.
-    } else {
-      currentData.push(updatedItem); // Se o item não existir no cache, adicione-o.
-    }
+// Função para definir dados no cache
+function setToCache(key, data) {
+  dataCache.set(key, {
+    data: data,
+    timestamp: Date.now()
   });
-
-  cache.set(key, currentData);
 }
 
-
-
-function getCachedData(directory, databaseFile, tableName) {
-  let key = directory + '|' + databaseFile + '|' + tableName;
-  return cache.get(key);
+// Refatorado para usar o cache
+function fetchData(groupName, databaseName, tableName) {
+  const cacheKey = `${groupName}|${databaseName}|${tableName}`;
+  const cachedData = getFromCache(cacheKey);
+  if (cachedData) {
+    return Promise.resolve(cachedData);
+  }
+  return window.pywebview.api.get_data(groupName, databaseName, tableName)
+    .then(data => {
+      setToCache(cacheKey, data);
+      return data;
+    });
 }
-
 
 
 
@@ -289,47 +301,28 @@ function createCollapsible(directory, db_files) {
       var databaseName = databaseFile.replace('.db', '');  // remove the .db extension
 
 
+      //--------------------------------------------------Aqui entra o cache----------------------------------------
+
       window.pywebview.api.get_tables(directory, databaseFile)
         .then(function (tableNames) {
           tableNames.forEach(function (tableName) {
-            let data = getCachedData(directory, databaseFile, tableName);
-            if (data) {
-              if (databaseChildSelected) {
-                document.getElementById('myTable').style.display = 'table';
-                headerElem.style.display = 'table';
-                headerElem.classList.add('showing');
-                populateTable(data);
-              } else {
-                document.getElementById('myTable').innerHTML = "";
-                document.getElementById('myTable').style.display = 'none';
-                headerElem.style.display = 'none';
-                headerElem.classList.remove('showing');
-              }
-            } else {
-
-
-              window.pywebview.api.get_data(groupName, databaseName, tableName)
-                .then(data => {
-                  console.log(data);  // This will print the returned data to the JavaScript console
-                  setCachedData(directory, databaseFile, tableName, data);
-                  if (databaseChildSelected) {
-                    document.getElementById('myTable').style.display = 'table';
-                    headerElem.style.display = 'table';
-                    headerElem.classList.add('showing');
-
-                    //Where I call PopulateTable
-                    populateTable(data, groupName, databaseName, tableName);
-                  }
-
-                  else {
-                    document.getElementById('myTable').innerHTML = "";
-                    document.getElementById('myTable').style.display = 'none';
-                    headerElem.style.display = 'none';
-                    headerElem.classList.remove('showing');
-                  }
-                })
-                .catch(error => console.error('Error:', error));
-            }
+            //aqui entra o cache
+            fetchData(groupName, databaseName, tableName)
+              .then(data => {
+                console.log(data);
+                if (databaseChildSelected) {
+                  document.getElementById('myTable').style.display = 'table';
+                  headerElem.style.display = 'table';
+                  headerElem.classList.add('showing');
+                  populateTable(data, groupName, databaseName, tableName);
+                } else {
+                  document.getElementById('myTable').innerHTML = "";
+                  document.getElementById('myTable').style.display = 'none';
+                  headerElem.style.display = 'none';
+                  headerElem.classList.remove('showing');
+                }
+              })
+              .catch(error => console.error('Error:', error));
           });
         })
         .catch(function (error) {

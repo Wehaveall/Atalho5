@@ -113,7 +113,8 @@ def close_db_in_memory(src, dest):
 # Use a abordagem de "context manager" (with) para garantir que as conexões sejam fechadas após o uso.
 
 
-from sqlalchemy import create_engine, select, MetaData, Table
+from sqlalchemy import create_engine, select, inspect, MetaData, Table
+from sqlalchemy.orm import Session
 
 
 # Crie uma função para obter um engine com base no caminho do banco de dados
@@ -121,37 +122,39 @@ def get_engine(db_path):
     return create_engine(f"sqlite:///{db_path}", echo=True)
 
 
-# Modifique a função lookup_word_in_all_databases
 def lookup_word_in_all_databases(word):
+    # Define the directory for database files
+    db_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
+
     # Get the list of all database files
-    db_files = get_db_files_in_directory(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
-    )
+    db_files = [
+        os.path.join(db_directory, db_file)
+        for db_file in os.listdir(db_directory)
+        if db_file.endswith(".db")
+    ]
     print(f"Database files found: {db_files}")
 
+    # Create MetaData instance once
+    metadata = MetaData()
+
     for db_file in db_files:
-        file_size_in_bytes = os.path.getsize(db_file)
-        file_size_in_megabytes = file_size_in_bytes / (1024 * 1024)
-        print(f"File size of {db_file}: {file_size_in_megabytes} MB")
-
-        mem = psutil.virtual_memory()
-        available_memory_in_megabytes = mem.available / (1024 * 1024)
-        print(f"Available memory: {available_memory_in_megabytes} MB")
-
-        engine = get_engine(db_file)  # Obtenha o engine
-        metadata = MetaData(engine)
-
+        engine = get_engine(db_file)  # Obtain the engine
         table_names = engine.table_names()
-        for table_name in table_names:
-            if "sqlite" not in table_name:
-                table = Table(table_name, metadata, autoload=True)
-                s = select([table]).where(table.c.shortcut == word)
 
-                # Use a abordagem de context manager
-                with engine.connect() as connection:
-                    result = connection.execute(s).first()
-                    if result:
-                        return result.expansion
+        # Select the table that isn't 'sqlite_sequence'
+        target_table_name = next(
+            (name for name in table_names if name != "sqlite_sequence"), None
+        )
+
+        if target_table_name:
+            table = Table(target_table_name, metadata, autoload_with=engine)
+            s = select(table).where(table.c.shortcut == word)
+
+            # Use context manager approach
+            with Session(engine) as session:
+                result = session.execute(s).first()
+                if result:
+                    return result.expansion
 
     # If no result was found in any database, return None
     return None

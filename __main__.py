@@ -112,6 +112,7 @@ from sqlalchemy import inspect
 
 
 # Dicionário global para armazenar engines
+# Removendo a criação duplicada do dicionário engines e função get_engine
 engines = {}
 
 
@@ -122,9 +123,12 @@ def get_engine(database_path):
     return engines[database_path]
 
 
-def handle_database_operations(groupName, databaseName, tableName):
+# --------------------------------------------------------------------------------------------------------------------
+
+
+def handle_database_operations(groupName, databaseName, tableName=None):
     database_path = get_database_path(groupName, databaseName)
-    engine = get_engine(database_path)
+    engine = get_engine(database_path)  # Usando get_engine em vez de create_engine
     metadata = MetaData()
 
     # Se tableName não for fornecido, determinar o nome da tabela que não é "sqlite_sequence"
@@ -355,9 +359,9 @@ class Api:
             f"Converted format value for DB: {format_value_for_db}"
         )  # Just for debugging
 
-        # Establish a connection to the database
+        # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)
-        engine = create_engine(f"sqlite:///{database_path}")
+        engine = get_engine(database_path)  # Usando get_engine em vez de create_engine
         metadata = MetaData()
 
         with Session(engine) as session:
@@ -437,32 +441,38 @@ class Api:
 
     # -------------------------------------------------------------------
 
-    def get_data(
-        self, groupName, databaseName, _
-    ):  # Note que eu substituí tableName por _
-        database_path = get_database_path(groupName, databaseName)
-        engine = create_engine(f"sqlite:///{database_path}")
+    # Configurar o logging
+    logging.basicConfig(filename="app.log", level=logging.INFO)
 
-        # Obtenha o nome da tabela que não é 'sqlite_sequence'
-        tableName = api.get_target_table_name(engine)
-
-        if not tableName:
-            print("No valid table found other than sqlite_sequence.")
-            return None
-
-        print("get_data called with", groupName, databaseName, tableName)
-
+    def get_data(self, groupName, databaseName, tableName):
         try:
+            # Obter o caminho do banco de dados
+            database_path = get_database_path(groupName, databaseName)
+
+            # Usar get_engine para obter uma instância de engine
+            engine = get_engine(database_path)
+
+            # Se tableName é None, obtenha o nome da tabela que não é 'sqlite_sequence'
+            if tableName is None:
+                tableName = api.get_target_table_name(engine)
+                if not tableName:
+                    logging.error("No valid table found other than sqlite_sequence.")
+                    return None
+
+            # Tratar operações no banco de dados
             rows = handle_database_operations(groupName, databaseName, tableName)
             return rows
+
         except Exception as e:
-            print(f"Error in get_data: {e}")
-            print(traceback.format_exc())
+            logging.error(f"Error in get_data: {e}")
+            logging.error(traceback.format_exc())
             return None
+
+    # -------------------------------------------------------------------------------------------
 
     def get_tables(self, groupName, databaseName):
         database_path = get_database_path(groupName, databaseName)
-        engine = create_engine(f"sqlite:///{database_path}")
+        engine = get_engine(database_path)  # Usando get_engine em vez de create_engine
         metadata = MetaData()
 
         with engine.connect() as conn:
