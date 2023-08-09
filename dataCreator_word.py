@@ -30,10 +30,8 @@ def extract_fields(doc, prefix):
         article = articles[i].strip()
         shortcut_match = re.search(r"(\d+)(-\s*[a-zA-Z])?", article)
         if shortcut_match:
-            # Extract and clean up the shortcut, converting letter to lowercase
             shortcut = shortcut_match.group().replace("-", "").replace(" ", "").lower()
 
-            # Replace the delimiters with newlines only for the full articles
             if article.startswith("*Art."):
                 expansion = (
                     article.replace("*", "")
@@ -45,55 +43,45 @@ def extract_fields(doc, prefix):
             else:
                 expansion = article
 
-            # Remove extra whitespace
             expansion = re.sub(r"\s+", " ", expansion).strip()
+            fields.append((prefix, prefix + shortcut, expansion, False, "true"))
 
-            fields.append(
-                (prefix, prefix + shortcut, expansion, False, "true")
-            )  # Add new fields here
             # Split the article into incisos at the '$' delimiter
             incisos = re.split(r"\$", expansion)
 
-            for k, inciso in enumerate(incisos, start=0):
-                if k == 0:  # Skip the first inciso because it's already added
+            for k, inciso in enumerate(incisos, start=1):
+                if k == 1:  # Skip the first inciso because it's already added
                     continue
 
-                # The 'expansion' of the new row should be the text of the inciso
-                new_expansion = inciso.strip()  # Removed "*" here
+                new_expansion = inciso.strip()
+                if "Parágrafo único." in new_expansion:
+                    inciso, _ = new_expansion.split("Parágrafo único.", 1)
 
-                # Extract the Roman numeral after the '$' delimiter and convert it to a decimal number
                 roman_numeral = re.search(r"[IVXLCDM]+", inciso)
                 if roman_numeral:
                     decimal_number = roman_to_decimal(roman_numeral.group())
-
-                    # Create a new shortcut for the inciso with 'i' suffix and the inciso number
                     new_shortcut_inciso = shortcut + "i" + str(decimal_number)
-
                     fields.append(
                         (
                             prefix,
                             prefix + new_shortcut_inciso,
-                            new_expansion,
+                            inciso.strip(),
                             False,
                             "true",
                         )
-                    )  # Changed format to False here
+                    )
 
                 # Split the inciso into alíneas at the '@' delimiter
                 alineas = re.split(r"\@", inciso)
 
-                for j, alinea in enumerate(alineas, start=0):
-                    if j == 0:  # Skip the first alinea because it's already added
+                for j, alinea in enumerate(alineas, start=1):
+                    if j == 1:  # Skip the first alinea because it's already added
                         continue
 
-                    # The 'expansion' of the new row should be the text of the alinea
-                    new_expansion = alinea.strip()  # Removed "*" here
-
-                    # Create a new shortcut for the alinea with 'a' suffix and the alinea letter
+                    new_expansion = alinea.strip()
                     new_shortcut_alinea = (
                         new_shortcut_inciso + "a" + alinea.strip()[0].lower()
                     )
-
                     fields.append(
                         (
                             prefix,
@@ -102,36 +90,27 @@ def extract_fields(doc, prefix):
                             False,
                             "true",
                         )
-                    )  # Changed format to False here
+                    )
 
             # Check if '#' delimiter is present in the 'expansion'
             if "#" in expansion:
                 # Split the 'expansion' into two parts at the '#' delimiter
-                before_delimiter, after_delimiter = expansion.split("#", 1)
-
-                # Create a new shortcut for the article with 'pu' suffix
+                _, after_delimiter = expansion.split("#", 1)
                 new_shortcut = shortcut + "pu"
-
-                # The 'expansion' of the new row should be the text after the '#' delimiter
-                new_expansion = after_delimiter.strip()  # Removed "*" here
-
+                new_expansion = after_delimiter.strip()
                 fields.append(
                     (prefix, prefix + new_shortcut, new_expansion, False, "true")
-                )  # Changed format to False here
+                )
 
             # Split the article into paragraphs at the '%' delimiter
             paragraphs = re.split(r"%", article)
 
-            for j, paragraph in enumerate(paragraphs, start=0):
-                if j == 0:  # Skip the first paragraph because it's already added
+            for j, paragraph in enumerate(paragraphs, start=1):
+                if j == 1:  # Skip the first paragraph because it's already added
                     continue
 
-                # The 'expansion' of the new row should be the text of the paragraph
-                new_expansion = paragraph.strip()  # Removed "*" here
-
-                # Create a new shortcut for the paragraph with 'p' suffix and the paragraph number
+                new_expansion = paragraph.strip()
                 new_shortcut_paragraph = shortcut + "p" + str(j)
-
                 fields.append(
                     (
                         prefix,
@@ -140,16 +119,21 @@ def extract_fields(doc, prefix):
                         False,
                         "true",
                     )
-                )  # And here
+                )
 
     return fields
 
 
+# --------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 # Load the Word file
-doc = Document("E:/ce_v2.docx")
+doc = Document("E:/cf88_v2.docx")
 
 
-def create_db(fields, db_name="E:/ce.db"):
+def create_db(fields, db_name="E:/cf88.db"):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
     c.execute(

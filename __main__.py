@@ -111,33 +111,48 @@ def setsizer(window, perW, perH):
 from sqlalchemy import inspect
 
 
-def handle_database_operations(
-    groupName, databaseName, tableName
-):  # Added tableName as an argument
+# Dicionário global para armazenar engines
+engines = {}
+
+
+def get_engine(database_path):
+    """Retorna uma engine existente ou cria uma nova baseada no caminho do banco de dados."""
+    if database_path not in engines:
+        engines[database_path] = create_engine(f"sqlite:///{database_path}")
+    return engines[database_path]
+
+
+def handle_database_operations(groupName, databaseName, tableName):
     database_path = get_database_path(groupName, databaseName)
-    engine = create_engine(f"sqlite:///{database_path}")
+    engine = get_engine(database_path)
     metadata = MetaData()
+
+    # Se tableName não for fornecido, determinar o nome da tabela que não é "sqlite_sequence"
+    if not tableName:
+        with engine.connect() as conn:
+            table_names = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence';"
+            ).fetchall()
+            if table_names:
+                tableName = table_names[0][0]
+            else:
+                print("No valid table found.")
+                return []
 
     try:
         with Session(engine) as session:
             table = Table(tableName, metadata, autoload_with=engine)
             result = session.execute(select(table)).fetchall()
-            session.commit()
+            # Converta os resultados em uma lista de dicionários
+            return [row2dict(row) for row in result]
 
-            # Convert the results into a list of dictionaries
-            rows = [row2dict(row) for row in result]
-
-            # Print the rows for debugging (if needed)
-            # print(f"Fetched {len(rows)} row(s) from {tableName}:")
-            for row in rows:
-                # print(row)
-
-                return rows
     except Exception as e:
         print(f"Error handling operations for table {tableName}: {e}")
         return []
 
 
+# ---------------------------------------------------------------------------------------------------------
+# #----------------------------------------------------------------------------
 def row2dict(row):
     """Convert a SQLAlchemy RowProxy into a dictionary."""
     return dict(row._mapping)
@@ -446,12 +461,18 @@ class Api:
             return None
 
     def get_tables(self, groupName, databaseName):
-        conn = sqlite3.connect(get_database_path(groupName, databaseName))
-        c = conn.cursor()
-        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = c.fetchall()
-        conn.close()
-        return tables
+        database_path = get_database_path(groupName, databaseName)
+        engine = create_engine(f"sqlite:///{database_path}")
+        metadata = MetaData()
+
+        with engine.connect() as conn:
+            metadata.reflect(
+                bind=engine
+            )  # Reflect the state of the database into the metadata
+            table_names = metadata.tables.keys()
+
+            # Filtrar a tabela "sqlite_sequence"
+            return [name for name in table_names if name != "sqlite_sequence"]
 
     # ----------------------------------------------------------------SETTINGS----------------------------------------------------------------
 

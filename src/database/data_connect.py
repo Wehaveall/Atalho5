@@ -97,6 +97,31 @@ def close_db_in_memory(src, dest):
     src.close()
 
 
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+
+# No SQLAlchemy, o "engine" é a fonte comum para todas as operações de banco de dados.
+# Ao criar um engine, o SQLAlchemy também pode criar um pool de conexões,
+# gerenciando automaticamente a abertura e fechamento de conexões para você.
+# No entanto, criar um novo engine para cada operação pode ser ineficiente e
+# pode levar a problemas se muitas instâncias forem criadas rapidamente.
+# Em vez disso, você pode criar um único engine e reutilizá-lo.
+# Aqui está uma forma de refatorar a função lookup_word_in_all_databases para criar e reutilizar um único engine:
+# Crie o engine uma vez e reutilize-o.
+# Use a abordagem de "context manager" (with) para garantir que as conexões sejam fechadas após o uso.
+
+
+from sqlalchemy import create_engine, select, MetaData, Table
+
+
+# Crie uma função para obter um engine com base no caminho do banco de dados
+def get_engine(db_path):
+    return create_engine(f"sqlite:///{db_path}", echo=True)
+
+
+# Modifique a função lookup_word_in_all_databases
 def lookup_word_in_all_databases(word):
     # Get the list of all database files
     db_files = get_db_files_in_directory(
@@ -113,47 +138,20 @@ def lookup_word_in_all_databases(word):
         available_memory_in_megabytes = mem.available / (1024 * 1024)
         print(f"Available memory: {available_memory_in_megabytes} MB")
 
-        if (
-            file_size_in_megabytes < 100
-            and file_size_in_megabytes < available_memory_in_megabytes
-        ):
-            # Load the database into memory
-            src, conn = load_db_into_memory(db_file)
-        else:
-            # Connect to the file-based database
-            conn = sqlite3.connect(db_file)
+        engine = get_engine(db_file)  # Obtenha o engine
+        metadata = MetaData(engine)
 
-        # Create a cursor
-        c = conn.cursor()
+        table_names = engine.table_names()
+        for table_name in table_names:
+            if "sqlite" not in table_name:
+                table = Table(table_name, metadata, autoload=True)
+                s = select([table]).where(table.c.shortcut == word)
 
-        try:
-            # Execute the query on "aTable"
-            c.execute("SELECT expansion FROM aTable WHERE shortcut=?", (word,))
-        except sqlite3.OperationalError as e:
-            print(f"SQLite error in {db_file} for table aTable: {e}")
-            continue  # Skip to the next database
-        except Exception as e:
-            print(f"General error in {db_file} for table aTable: {e}")
-            continue  # Skip to the next database
-
-        # Fetch the result
-        result = c.fetchone()
-        print(f"Result for {word} in aTable: {result}")
-
-        # If a result was found, return it
-        if result is not None:
-            if (
-                file_size_in_megabytes < 100
-                and file_size_in_megabytes < available_memory_in_megabytes
-            ):
-                close_db_in_memory(src, conn)
-            return result[0]
-
-        if (
-            file_size_in_megabytes < 100
-            and file_size_in_megabytes < available_memory_in_megabytes
-        ):
-            close_db_in_memory(src, conn)
+                # Use a abordagem de context manager
+                with engine.connect() as connection:
+                    result = connection.execute(s).first()
+                    if result:
+                        return result.expansion
 
     # If no result was found in any database, return None
     return None

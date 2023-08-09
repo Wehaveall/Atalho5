@@ -33,7 +33,7 @@ document.getElementById('escolha').addEventListener('change', function () {
             console.error('Error:', error);
             isSaving = false;  // Reset the flag in case of error
         });
-        reinitializeEditor(choice);
+    reinitializeEditor(choice);
 });
 
 
@@ -79,31 +79,39 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
         toolbar: 'undo redo',
         paste_as_text: true,
         setup: function (editor) {
-            editor.on('keyup', function () {
-                if (!isEditorUpdate && window.currentRow) {
-                    // Conteúdo mudou, salvar as alterações
-                    var shortcut = window.currentRow.dataset.shortcut;
-                    var groupName = window.currentRow.dataset.groupName;
-                    var tableName = window.currentRow.dataset.tableName;
-                    var databaseName = window.currentRow.dataset.databaseName;
-                    var formatValue = document.getElementById('escolha').value === "1";
+            var saveTimeout;  // Para armazenar o temporizador
 
-                    isSaving = true;  // Set the flag before saving
-                    window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, editor.getContent(), formatValue)
-                        .then(response => {
-                            // Atualizar o dataset e o conteúdo visual da currentRow
-                            var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
-                            if (expansionCell) {
-                                expansionCell.dataset.expansion = editor.getContent();
-                                expansionCell.textContent = decodeHtml(editor.getContent().replace(/<[^>]*>/g, ''));
-                            }
-                            isSaving = false;  // Reset the flag after saving is done
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                            isSaving = false;  // Reset the flag in case of error
-                        });
+            editor.on('keyup', function () {
+                if (saveTimeout) {
+                    clearTimeout(saveTimeout);  // Limpar o temporizador anterior
                 }
+
+                saveTimeout = setTimeout(function () {
+                    if (!isEditorUpdate && window.currentRow) {
+                        // Conteúdo mudou, salvar as alterações
+                        var shortcut = window.currentRow.dataset.shortcut;
+                        var groupName = window.currentRow.dataset.groupName;
+                        var tableName = window.currentRow.dataset.tableName;
+                        var databaseName = window.currentRow.dataset.databaseName;
+                        var formatValue = document.getElementById('escolha').value === "1";
+
+                        isSaving = true;  // Set the flag before saving
+                        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, editor.getContent(), formatValue)
+                            .then(response => {
+                                // Atualizar o dataset e o conteúdo visual da currentRow
+                                var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
+                                if (expansionCell) {
+                                    expansionCell.dataset.expansion = editor.getContent();
+                                    expansionCell.textContent = decodeHtml(editor.getContent().replace(/<[^>]*>/g, ''));
+                                }
+                                isSaving = false;  // Reset the flag after saving is done
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                                isSaving = false;  // Reset the flag in case of error
+                            });
+                    }
+                }, 1000);  // Aguardar 1 segundo antes de salvar
             });
         }
     };

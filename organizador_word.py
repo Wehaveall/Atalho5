@@ -60,4 +60,4 @@ def modify_word_document(input_file_path, output_file_path):
 
 
 # Test the function with the original file and a new output file
-modify_word_document("E:/ce.docx", "E:/ce_v2.docx")
+modify_word_document("E:/cf88.docx", "E:/cf88_v2.docx")
