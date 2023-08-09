@@ -156,8 +156,20 @@
 
 
 #myTable tr.selected {
-    background-color: orange;
+    background-color: #fbb347;
+    ;
 }
+
+
+
+
+.tr-even {
+    background-color: #ffffff; /* branco */
+  }
+  
+  .tr-odd {
+    background-color: #fafafa; /* cinza claro */
+  }
 
 
 

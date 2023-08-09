@@ -72,12 +72,14 @@ var isSaving = false;  // Flag para verificar se uma operação de salvamento es
 
 function getTinyMCEConfig(isAdvanced, onEditorInit) {
     var basicConfig = {
+        icons: "thin",
         selector: '#editor',
         menubar: false,
         statusbar: false,
         plugins: ['paste'],
         toolbar: 'undo redo',
         paste_as_text: true,
+        
         setup: function (editor) {
             var saveTimeout;  // Para armazenar o temporizador
 

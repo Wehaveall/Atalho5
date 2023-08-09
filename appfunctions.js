@@ -123,6 +123,7 @@ function invalidateCacheEntry(...args) {
 
 
 
+
 //Funções
 
 function decodeHtml(html) {
@@ -131,11 +132,27 @@ function decodeHtml(html) {
   return txt.value;
 }
 
-
-function formatArticle(article) {
-  let replacement = "<br/>".repeat(numberOfEnters); // Repete a tag <br/> de acordo com o valor de numberOfEnters
-  return article.replace(/[\*\#%@\$]/g, replacement);
+//Formata o expansio das tabelas jurídicas
+//-----------------------------------------------------------------
+function formatExpansion(expansion, tableName) {
+  if (tableName === 'aTable') {
+    // Remove os caracteres especiais "#" "%" "&" "*"
+    expansion = expansion.replace(/[#%&*]/g, '');
+  }
+  // Você pode adicionar mais lógica de formatação aqui, se necessário
+  return expansion; // Retorna a expansão formatada
 }
+
+
+function formatArticle(article, tableName) {
+  if (tableName === 'aTable') {
+    let numberOfEnters = 1; // Defina o número desejado de quebras de linha
+    let replacement = "<br/>".repeat(numberOfEnters); // Repete a tag <br/> de acordo com o valor de numberOfEnters
+    return article.replace(/[\*\#%@\$]/g, replacement);
+  }
+  return article; // Se tableName não for 'aTable', retorne o artigo inalterado
+}
+
 
 
 function openTab(evt, tabName) {
@@ -151,6 +168,17 @@ function openTab(evt, tabName) {
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
+
+
+////////////////////////////////////////////////////////////////Esconder tela de caregamento
+function hideLoadingScreen() {
+  document.getElementById("loadingScreen").style.display = "none";
+}
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -388,21 +416,15 @@ function createCollapsible(directory, db_files) {
 
 
 //----------------------------------------------------------------POPULATE TABLE----------------------------------------------------------------
-
-
 // Aqui tive que adicionar a função os parametros groupName, databaseName e tableName
 //pois, a função da API save_changes chama a função get_database_path que requer estes parâmetros:
-
 //I need groupName and databaseName because, inside my save_changes function, im my api,  :
 //def save_changes(self, groupName, databaseName, tableName, shortcut, newContent):
-
 ////Yes, we can simplify the process and find a way to ensure that groupName and databaseName are available when needed. Here's a plan of action:
-
 //Storing groupName and databaseName in populateTable:
 //Instead of extracting the values of groupName and databaseName each time inside the loop, you can pass them as arguments to the populateTable function.
 // This ensures that the function always has access to the required values. 
 //This is especially useful since populateTable is already being called with data specific to a particular database.
-
 //So, modify the function definition to:
 //function populateTable(data, groupName, databaseName){}}
 
@@ -422,14 +444,23 @@ function populateTable(data, groupName, databaseName, tableName) {
   }
 
   // Iterate over data and add new rows
-  data.forEach(item => {
+  data.forEach((item, index) => {
+
+    var rowClass = index % 2 === 0 ? 'tr-even' : 'tr-odd';
     // Extract the values from the item
     const { expansion, label, shortcut, format } = item;
 
     // Create a new row and cells
     var row = table.insertRow(-1);
+    row.className = rowClass; // Apply the class to the row
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
+
+
+    // Determine the row class based on the index (even or odd)
+
+
+
 
     // Convert the HTML expansion to plain text
     var plainExpansion = decodeHtml(expansion.replace(/<[^>]*>/g, ''));
@@ -444,8 +475,13 @@ function populateTable(data, groupName, databaseName, tableName) {
       databaseName
     });
 
+
+    // Formata a expansão das tabelas Jurídicas (tableName "aTable")
+    var formattedExpansion = formatExpansion(plainExpansion, tableName);
+
+
     // Populate the cells with content
-    cell1.appendChild(createCellContent('truncate', expansion === "" ? label : plainExpansion));
+    cell1.appendChild(createCellContent('truncate', expansion === "" ? label : formattedExpansion));
     cell2.appendChild(createCellContent('truncate', shortcut, 'right'));
 
     // Add the row click event
@@ -462,7 +498,7 @@ function createCellContent(className, textContent, textAlign = 'left') {
   return div;
 }
 
-// Row click handler
+
 // Row click handler
 var rowSelected = false;  // Adicione esta variável de flag fora de qualquer função, no escopo global
 var isRowClick = false;  // Adicionado no início do seu script
@@ -496,7 +532,7 @@ function handleRowClick() {
         // Primeiro, decodificar as entidades HTML
         let decodedExpansion = decodeHtml(rowData.expansion);
         // Em seguida, formatar o artigo usando sua função
-        let formattedExpansion = formatArticle(decodedExpansion);
+        let formattedExpansion = formatArticle(decodedExpansion, tableName);
 
         tinyMCE.get('editor').setContent(formattedExpansion);
 
@@ -564,6 +600,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }, false);
   }
 });
+
+
+window.addEventListener("load", function () {
+  hideLoadingScreen();
+});
+
+
 
 window.onbeforeunload = function () {
   if (window.pywebview && window.pywebview.api) {
