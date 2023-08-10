@@ -3,21 +3,36 @@
     background-color: #f1f1f1;
     display: flex;
     flex-direction: column;
-
     /* Definir como 100% para ocupar toda a altura disponível */
     align-items: stretch;
     justify-content: flex-start;
+    padding: 10px;
 
 }
+
+
+
+
+
 
 
 
 #contentType {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    box-sizing: border-box;
     font-family: 'Work Sans', sans-serif;
-    /* Escolha a família da fonte que preferir */
-    font-size: 16px;
-    /* Escolha o tamanho da fonte que preferir */
+    font-size: small;
+    height: 30px;
+    /* Adjust this value as needed */
+
+    /* This will prevent #contentType from growing and occupying unnecessary space */
+    margin-bottom: 14px;
 }
+
+
 
 #contentType select {
     font-family: inherit;
@@ -34,42 +49,8 @@
     /* Arrange atalhoRight and caseRight horizontally */
     justify-content: space-between;
     /* Put maximum space between atalhoRight and caseRight */
-}
-
-
-
-#atalhoRight input {
-
-    font-family: 'Work Sans', sans-serif;
-    border: none;
-    height: 30px;
-    width: 175px;
-
-    box-sizing: border-box;
-    border-radius: 15px;
-    margin-bottom: 10px;
 
 }
-
-
-#caseRight select {
-
-    font-family: 'Work Sans', sans-serif;
-    border: none;
-    height: 30px;
-
-    box-sizing: border-box;
-    border-radius: 15px;
-
-}
-
-
-
-#shortcutName {
-
-    height: 25px;
-}
-
 
 
 
@@ -82,6 +63,7 @@
     flex-shrink: 1;
     flex-basis: 0;
     overflow-y: auto;
+
     /* Adicione esta linha */
 }
 
@@ -92,31 +74,87 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    flex-grow: 0;
-    /* Previne o crescimento */
+
 
 }
+
+
+#labelRight {
+    margin: 0;
+    padding-bottom: 7px;
+    padding-top: 7px;
+    display: flex;
+    width: 100%;
+    /* Make this a flex container */
+    /* Take up all available horizontal space */
+}
+
+#labelRight input {
+    width: 100%;
+    /* Take up all available horizontal space */
+}
+
+
 
 #shortcutName {
-    flex-grow: 0;
-    /* This will prevent #shortcutName from growing and occupying unnecessary space */
-    height: 20px;
+    flex-grow: 1;
+    height: 25px;
     /* Adjust this value as needed */
     display: flex;
     align-items: center;
     padding: 5px;
 }
 
-#contentType {
+
+
+
+
+
+
+
+
+
+
+
+
+#rightInputs {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 5px;
-    box-sizing: border-box;
+    /* Put maximum space between atalhoRight and caseRight */
+}
+
+#atalhoRight {
+    flex-grow: 1;
+    /* Allow this field to grow to the right */
+}
+
+
+
+
+
+#atalhoRight input {
+
     font-family: 'Work Sans', sans-serif;
-    font-size: small;
+    border: none;
     height: 30px;
-    /* Adjust this value as needed */
-    flex-grow: 0;
-    /* This will prevent #contentType from growing and occupying unnecessary space */
+    width: 175px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    margin-bottom: 10px;
+
+}
+
+
+
+#caseRight select {
+
+    font-family: 'Work Sans', sans-serif;
+    border: none;
+    height: 30px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
+    width: 100%;
+
+
 }
