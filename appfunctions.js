@@ -124,8 +124,6 @@ function invalidateCacheEntry(...args) {
 
 
 
-//Funções
-
 function decodeHtml(html) {
   var txt = document.createElement("textarea");
   txt.innerHTML = html;

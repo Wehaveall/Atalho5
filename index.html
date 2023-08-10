@@ -25,11 +25,19 @@
   <link rel="stylesheet" type="text/css" href="src/styles/tabMacros.css">
 
 
+
+
+
+
   <script src="https://cdn.jsdelivr.net/npm/pywebview@latest/dist/webview.js"></script>
   <script src="/tinymce/tinymce.min.js"></script>
   <script src="lang.js"></script>
   <script src="appfunctions.js"></script>
   <script src="database.js"></script>
+
+  <!-- Select2 CSS -->
+
+
 
 
 
@@ -133,7 +141,13 @@
 
             <div id="contentType">
               Tipo de Conteúdo:
-              <select id="escolha">
+              <select 
+              
+              onfocus="this.size = 2"; 
+              onblur="this.size = 0" ; 
+              onchange="this.size = 1; this.blur()"
+              
+              id="escolha">
                 <option value="0" id="noFormat">Texto sem formatação</option>
                 <option value="1" id="format">Texto Formatado/ Imagens/minúsculas</option>
               </select>
@@ -156,10 +170,14 @@
                   <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
                 </div>
                 <div id="caseRight">
-                  <select name="dog-names" id="dog-names">
-                    <option value="rigatoni">Dif. maiúsculas/minúsculas</option>
-                    <option value="dave">Não dif. maiúsculas/minúsculas</option>
-                    <option value="pumpernickel">Adaptar ao atalho</option>
+                  <select 
+                  onfocus="this.size = 3"; 
+                  onblur="this.size = 0" ; 
+                  onchange="this.size = 1; this.blur()"
+                  id="escolha">
+                    <option id="noFormat">Diferenciar Maiúsculas/Minúsculas</option>
+                    <option id="format">Ignorar Maiúsculas/Minúsculas</option>
+                    <option id="format">Adaptar ao atalho</option>
                   </select>
                 </div>
               </div>
