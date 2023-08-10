@@ -5,15 +5,24 @@
     flex-direction: column;
     /* Definir como 100% para ocupar toda a altura disponível */
     align-items: stretch;
-    justify-content: flex-start;
+
     padding: 10px;
+    justify-content: space-between;
+    /* This will push the elements apart */
 
 }
 
 
 
 
+#shortcutName {
+    flex-grow: 1;
+    height: 25px;
+    /* Adjust this value as needed */
+    display: flex;
+    align-items: center;
 
+}
 
 
 
@@ -29,7 +38,7 @@
     /* Adjust this value as needed */
 
     /* This will prevent #contentType from growing and occupying unnecessary space */
-    margin-bottom: 14px;
+
 }
 
 
@@ -41,16 +50,6 @@
     /* Isso garante que o <select> use o mesmo tamanho de fonte do div pai */
 }
 
-
-
-
-#rightInputs {
-    display: flex;
-    /* Arrange atalhoRight and caseRight horizontally */
-    justify-content: space-between;
-    /* Put maximum space between atalhoRight and caseRight */
-
-}
 
 
 
@@ -73,44 +72,44 @@
 #inputContainer {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    /* Stack children vertically */
+    flex-grow: 0;
+    /* Prevent it from growing */
+    flex-shrink: 0;
+    /* Prevent it from shrinking */
 
 
 }
 
 
 #labelRight {
-    margin: 0;
+
     padding-bottom: 7px;
     padding-top: 7px;
     display: flex;
     width: 100%;
+    margin: 0;
+    /* Reset margin */
+
+    /* Reset padding */
     /* Make this a flex container */
     /* Take up all available horizontal space */
 }
 
 #labelRight input {
     width: 100%;
-    /* Take up all available horizontal space */
-}
+    box-sizing: border-box;
+    /* Include padding and border in the width */
 
-
-
-#shortcutName {
-    flex-grow: 1;
-    height: 25px;
-    /* Adjust this value as needed */
-    display: flex;
-    align-items: center;
+    margin: 0;
+    /* Reset margin */
     padding: 5px;
+
+
+
 }
 
-
-
-
-
-
-
+/* Take up all available horizontal space */
 
 
 
@@ -129,9 +128,6 @@
 }
 
 
-
-
-
 #atalhoRight input {
 
     font-family: 'Work Sans', sans-serif;
@@ -140,7 +136,7 @@
     width: 175px;
     box-sizing: border-box;
     border-radius: 15px;
-    margin-bottom: 10px;
+    width: 95%;
 
 }
 
