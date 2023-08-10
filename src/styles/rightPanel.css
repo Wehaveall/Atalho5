@@ -3,20 +3,30 @@
     background-color: #f1f1f1;
     display: flex;
     flex-direction: column;
-    height: auto;
+
+    /* Definir como 100% para ocupar toda a altura disponível */
     align-items: stretch;
     justify-content: flex-start;
 
 }
 
 
-#inputContainer {
 
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
+#contentType {
+    font-family: 'Work Sans', sans-serif;
+    /* Escolha a família da fonte que preferir */
+    font-size: 16px;
+    /* Escolha o tamanho da fonte que preferir */
 }
+
+#contentType select {
+    font-family: inherit;
+    /* Isso garante que o <select> use a mesma fonte do div pai */
+    font-size: inherit;
+    /* Isso garante que o <select> use o mesmo tamanho de fonte do div pai */
+}
+
+
 
 
 #rightInputs {
@@ -65,14 +75,27 @@
 
 #editor {
     -ms-overflow-style: none;
-    scrollbar-width: none;
+
     overflow: auto;
     flex-grow: 1;
-    display: flex;
-    /* this line ensures that #editor behaves as a flex item */
-
+    /* Permitir que o editor cresça para ocupar o espaço disponível */
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow-y: auto;
+    /* Adicione esta linha */
 }
 
+
+
+
+#inputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-grow: 0;
+    /* Previne o crescimento */
+
+}
 
 #shortcutName {
     flex-grow: 0;

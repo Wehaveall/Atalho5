@@ -72,6 +72,9 @@ var isSaving = false;  // Flag para verificar se uma operação de salvamento es
 
 function getTinyMCEConfig(isAdvanced, onEditorInit) {
     var basicConfig = {
+        //Altura 10%% para maximizar
+        height: '100%', // Defina a altura para 100%
+        //Altura 100%
         icons: "thin",
         selector: '#editor',
         menubar: false,
@@ -79,7 +82,10 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
         plugins: ['paste'],
         toolbar: 'undo redo',
         paste_as_text: true,
-        
+
+
+
+
         setup: function (editor) {
             var saveTimeout;  // Para armazenar o temporizador
 

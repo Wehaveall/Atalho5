@@ -1701,7 +1701,8 @@ button::-moz-focus-inner {
 }
 
 .tox .tox-dialog__body-content a {
-    color: #fbb347 cursor: pointer;
+    color: #fbb347;
+    cursor: pointer;
     text-decoration: none
 }
 

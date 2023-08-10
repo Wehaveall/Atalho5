@@ -67,6 +67,8 @@ html {
   width: 100%;
   flex: 1;
   font-family: 'Work Sans', sans-serif;
+  margin-right: 5px;
+  /* add this line */
 
 }
 
