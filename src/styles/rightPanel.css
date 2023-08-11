@@ -28,6 +28,7 @@
 
 
 #contentType {
+    overflow: visible;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -71,6 +72,7 @@
 
 
 #inputContainer {
+    overflow: visible;
     display: flex;
     flex-direction: column;
     /* Stack children vertically */
@@ -145,16 +147,16 @@
 
 
 
-#caseRight select {
+/* #caseRight select {
     font-family: 'Work Sans', sans-serif;
     border: none;
     height: auto;
     box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
     max-height: 300px;
-    /* Adjust as needed */
+ 
     overflow: visible;
     z-index: 1000;
-    /* Higher z-index */
+  
     position: relative;
 
 }
@@ -169,7 +171,7 @@ option:nth-child(2):hover {
 
 option:nth-child(3):hover {
     background: #fbb347;
-}
+} */
 
 #escolha {
     z-index: 1000;

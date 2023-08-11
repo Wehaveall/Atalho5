@@ -4,7 +4,7 @@ html {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
 }
@@ -40,7 +40,20 @@ html {
 }
 
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
 .mainContainer {
+  overflow: visible;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -48,10 +61,10 @@ html {
 
 
 .contentWrapper {
+  overflow: visible;
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow: hidden;
   /* Add this line to enable scrolling if the content overflows */
   margin-bottom: 10px;
   /* Add this line */
@@ -60,6 +73,7 @@ html {
 
 
 .content {
+  overflow: visible;
   background-color: #f1f1f1;
   /* expand to take up remaining space */
   display: flex;
@@ -79,6 +93,7 @@ html {
 
 
 #bottomPanel {
+  overflow: visible;
   height: 50px;
   background-color: #fbb347;
 
@@ -87,7 +102,7 @@ html {
 
 
 .flex-container {
-
+  overflow: visible;
   display: flex;
   align-items: center;
   background-color: cornflowerblue;

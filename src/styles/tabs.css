@@ -1,5 +1,5 @@
 .tab {
-
+    overflow: visible;
     display: inline-block;
     /* Add this line */
     border: 1px solid #ccc;

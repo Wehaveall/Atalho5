@@ -1,4 +1,8 @@
 
+
+
+
+
 var appState = {
   buttonStates: {}
 };
@@ -602,6 +606,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 window.addEventListener("load", function () {
   hideLoadingScreen();
+
 });
 
 

@@ -23,6 +23,8 @@
   <link rel="stylesheet" type="text/css" href="src/styles/rightPanel.css">
   <link rel="stylesheet" type="text/css" href="src/styles/tabs.css">
   <link rel="stylesheet" type="text/css" href="src/styles/tabMacros.css">
+  <link rel="stylesheet" type="text/css" href="src/styles/select.css">
+
 
 
 
@@ -141,13 +143,8 @@
 
             <div id="contentType">
               Tipo de Conteúdo:
-              <select 
-              
-              onfocus="this.size = 2"; 
-              onblur="this.size = 0" ; 
-              onchange="this.size = 1; this.blur()"
-              
-              id="escolha">
+              <select onfocus="this.size = 2" ; onblur="this.size = 0" ; onchange="this.size = 1; this.blur()"
+                id="escolha">
                 <option value="0" id="noFormat">Texto sem formatação</option>
                 <option value="1" id="format">Texto Formatado/ Imagens/minúsculas</option>
               </select>
@@ -170,11 +167,8 @@
                   <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
                 </div>
                 <div id="caseRight">
-                  <select 
-                  onfocus="this.size = 3"; 
-                  onblur="this.size = 0" ; 
-                  onchange="this.size = 1; this.blur()"
-                  id="escolha">
+                  <select data-custom onfocus="this.size = 3" ; onblur="this.size = 0" ;
+                    onchange="this.size = 1; this.blur()" id="escolha">
                     <option id="noFormat">Diferenciar Maiúsculas/Minúsculas</option>
                     <option id="format">Ignorar Maiúsculas/Minúsculas</option>
                     <option id="format">Adaptar ao atalho</option>
@@ -296,9 +290,12 @@
 
 
   </script>
-
   <script src="macros.js"></script>
   <script src="richTextEditor.js"></script>
+  <script src="select.js" type="module"></script>
+  <script src="initSelect.js" type="module"></script>
+
+
 
 
 
