@@ -139,12 +139,12 @@ def create_db(fields, db_name="E:/cf88.db"):
     c.execute(
         """
         CREATE TABLE aTable
-        (id INTEGER PRIMARY KEY AUTOINCREMENT, prefix text, shortcut text, expansion text, format boolean, "case" text)
+        (id INTEGER PRIMARY KEY AUTOINCREMENT, prefix text, shortcut text, expansion text, label text, format boolean, "case" text)
         """
     )
     c.executemany(
         """
-        INSERT INTO aTable (prefix, shortcut, expansion, format, "case")
+        INSERT INTO aTable (prefix, shortcut, expansion, label, format, "case")
         VALUES (?,?,?,?,?)
         """,
         fields,

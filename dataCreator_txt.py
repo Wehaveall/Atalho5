@@ -1,9 +1,8 @@
-###------------------------------------------------BASE
+##------------------------------------------------BASE
 
 
 import re
 import sqlite3
-from bs4 import BeautifulSoup
 
 
 # Function to extract fields from the text
@@ -31,18 +30,14 @@ def roman_to_decimal(roman):
 # Function to extract fields from the text
 # Function to extract fields from the text
 # Function to extract fields from the text
-def extract_fields(html, prefix):
-    soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text("\n")
-    pattern = re.compile(r"\*")
-    articles = pattern.split(text)
-    fields = []
 
 
 # Function to extract fields from the text
-def extract_fields(html, prefix):
-    soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text("\n")
+def extract_fields_from_txt(text_file, prefix):
+    # Read the text file
+    with open(text_file, "r", encoding="utf-8") as file:
+        text = file.read()
+
     pattern = re.compile(r"\*")
     articles = pattern.split(text)
     fields = []
@@ -69,9 +64,9 @@ def extract_fields(html, prefix):
             # Remove extra whitespace
             expansion = re.sub(r"\s+", " ", expansion).strip()
 
-            fields.append(
-                (prefix, prefix + shortcut, expansion, False, "true")
-            )  # Add new fields here
+            # Added an empty string for "label" field
+            fields.append((prefix, prefix + shortcut, expansion, "", False, "true"))
+
             # Split the article into incisos at the '$' delimiter
             incisos = re.split(r"\$", expansion)
 
@@ -95,6 +90,7 @@ def extract_fields(html, prefix):
                             prefix,
                             prefix + new_shortcut_inciso,
                             new_expansion,
+                            "",
                             False,
                             "true",
                         )
@@ -120,6 +116,7 @@ def extract_fields(html, prefix):
                             prefix,
                             prefix + new_shortcut_alinea,
                             new_expansion,
+                            "",
                             False,
                             "true",
                         )
@@ -137,8 +134,8 @@ def extract_fields(html, prefix):
                 new_expansion = after_delimiter.strip()  # Removed "*" here
 
                 fields.append(
-                    (prefix, prefix + new_shortcut, new_expansion, False, "true")
-                )  # Changed format to False here
+                (prefix, prefix + new_shortcut, new_expansion, "", False, "true")
+)
 
             # Split the article into paragraphs at the '%' delimiter
             paragraphs = re.split(r"%", article)
@@ -158,6 +155,7 @@ def extract_fields(html, prefix):
                         prefix,
                         prefix + new_shortcut_paragraph,
                         new_expansion,
+                        "",
                         False,
                         "true",
                     )
@@ -186,72 +184,10 @@ def create_db(fields, db_name="E:/legal.db"):
     conn.close()
 
 
-# Load the HTML file
-with open("E:/cf_v2.html", "r", encoding="utf-8") as file:
-    html = file.read()
-
-# Extract the fields from the HTML
-prefix = "cf"
-fields = extract_fields(html, prefix)
+# Load the text file
+text_file_path = "E:/ce_v2.txt"
+prefix = "ce"
+fields = extract_fields_from_txt(text_file_path, prefix)
 
 # Create the database and insert the data
 create_db(fields)
-##----------------------------------------------------------------
-
-
-# import re
-# import sqlite3
-# from bs4 import BeautifulSoup
-
-
-# # Function to extract fields from the text
-# def extract_fields(html, prefix):
-#     soup = BeautifulSoup(html, "html.parser")
-#     text = soup.get_text("\n")
-#     pattern = re.compile(r"\*")
-#     articles = pattern.split(text)
-#     fields = []
-
-#     for i in range(1, len(articles)):
-#         article = articles[i].strip()
-#         shortcut_match = re.search(r"(\d+)(-\s*[a-zA-Z])?", article)
-#         if shortcut_match:
-#             # Extract and clean up the shortcut, converting letter to lowercase
-#             shortcut = shortcut_match.group().replace("-", "").replace(" ", "").lower()
-#             expansion = "*" + article
-#             fields.append((prefix, shortcut, expansion))
-
-#     return fields
-
-
-# # Function to create the database and insert the data
-# def create_db(fields, db_name="E:/legal.db"):
-#     conn = sqlite3.connect(db_name)
-#     c = conn.cursor()
-#     c.execute(
-#         """
-#         CREATE TABLE Articles
-#         (prefix text, shortcut text, expansion text)
-#     """
-#     )
-#     c.executemany(
-#         """
-#         INSERT INTO Articles VALUES (?,?,?)
-#     """,
-#         fields,
-#     )
-#     conn.commit()
-#     conn.close()
-
-
-# # Load the HTML file
-# with open("E:/ce_v2.html", "r", encoding="utf-8") as file:
-#     html = file.read()
-
-# # Extract the fields from the HTML
-# prefix = "ce"
-# fields = extract_fields(html, prefix)
-
-# # Create the database and insert the data
-# create_db(fields)
-###------------------
