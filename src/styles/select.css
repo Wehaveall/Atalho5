@@ -8,6 +8,7 @@
 .custom-select-container {
   display: inline-block;
   position: relative;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
 }
 
 .custom-select-value {
@@ -21,7 +22,7 @@
   user-select: none;
   padding: 0.15rem 0.5rem;
   /* reduced padding */
-  font-size: 10px;
+  font-size: 12px;
   /* adjusted font size */
 }
 
@@ -34,7 +35,7 @@
   content: '';
   display: inline-block;
   border: 4px solid transparent;
-  border-top-color: black;
+  border-top-color: #ccc;
   margin-left: 12px;
   margin-top: 4px;
 }
@@ -45,7 +46,7 @@
   position: absolute;
   padding: 0;
   margin: 0;
-  border: 2px solid black;
+  border: 2px solid #ccc;
   width: 100%;
   border-top: none;
   max-height: 200px;
@@ -60,16 +61,16 @@
 .custom-select-option {
   padding: 0.15rem 0.5rem;
   /* reduced padding */
-  font-size: 10px;
+  font-size: 12px;
   /* adjusted font size */
 
   cursor: pointer;
 }
 
 .custom-select-option:hover {
-  background-color:  #fce3be;
+  background-color: #fce3be;
 }
 
 .custom-select-option.selected {
-  background-color: #ffd697;
+  background-color: #ccc;
 }

@@ -18,18 +18,76 @@
 
 
 #shortcutName {
+    margin: 3px;
+    font-family: 'Work Sans', sans-serif;
     flex-grow: 1;
     height: 25px;
-    /* Adjust this value as needed */
+    justify-content: space-between;
     display: flex;
     align-items: center;
 
 }
 
+#shortcutName button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+#shortcutName .buttons-container {
+    display: flex;
+}
+
+#duplicate {
+    margin-right: 10px;
+    /* Add this line to create space on the right side of the duplicate button */
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    border: none;
+    background: none;
+    align-content: center;
+}
+
+#delete {
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    border: none;
+    background: none;
+    align-content: center;
+}
+
+#duplicate img,
+#delete img {
+
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    align-content: center;
+
+
+}
+
+
+
+#duplicate:hover,
+#delete:hover {
+
+    background-color: #fbb347
+}
+
+
+
 
 
 #contentType {
     overflow: visible;
+    margin-left: -2px;
+    margin-right: -2px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -38,8 +96,9 @@
     font-family: 'Work Sans', sans-serif;
     font-size: small;
     height: 30px;
-   position: relative;
-   z-index: 10;
+    position: relative;
+    z-index: 10;
+
 
 }
 
@@ -49,6 +108,7 @@
     font-family: inherit;
     /* Isso garante que o <select> use a mesma fonte do div pai */
     font-size: inherit;
+
     /* Isso garante que o <select> use o mesmo tamanho de fonte do div pai */
 }
 
@@ -65,7 +125,7 @@
     flex-basis: 0;
     overflow-y: auto;
 
-   z-index: 5;
+    z-index: 5;
 }
 
 
@@ -123,7 +183,7 @@
     align-items: center;
     /* Center-align vertically */
     overflow: visible;
-    
+
 }
 
 #atalhoRight {
@@ -143,13 +203,4 @@
 
 #atalhoRight input:focus {
     border: 2px solid rgb(232, 159, 15);
-}
-
-
-
-#escolha {
-    z-index: 1000;
-    /* Higher z-index to float over other elements */
-    position: relative;
-    /* Relative positioning */
 }

@@ -139,14 +139,20 @@
 
           <div id="rightPanel" class="content">
 
-            <div id="shortcutName"></div>
+            <div id="shortcutName">
+              Atalho:
+              <div class="buttons-container">
+                <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
+                <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
+              </div>
+            </div>
+
 
             <div id="contentType">
               Tipo de Conteúdo:
-              <select data-custom
-                id="escolha">
+              <select data-custom id="escolha">
                 <option value="0" id="noFormat">Texto sem formatação</option>
-                <option value="1" id="format">Texto Formatado/ Imagens/minúsculas</option>
+                <option value="1" id="format">Texto Formatado/Imagens</option>
               </select>
             </div>
 
