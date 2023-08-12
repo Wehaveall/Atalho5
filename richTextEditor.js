@@ -1,43 +1,49 @@
 
 var dropdownChanged = false;
 
-
-
 window.addEventListener('load', function () {
     initializeEditorBasedOnDropdown();
     // attachTableClickHandler();
 });
 
-document.getElementById('escolha').addEventListener('change', function () {
-    if (isEditorUpdate || !window.currentRow) {
-        // Se a atualização do editor estiver em andamento ou nenhuma linha estiver selecionada, não faça nada
-        return;
-    }
-
-    var choice = document.getElementById('escolha').value;
-    var formatValue = choice === "1";
-
-    var shortcut = window.currentRow.dataset.shortcut;
-    var groupName = window.currentRow.dataset.groupName;
-    var databaseName = window.currentRow.dataset.databaseName;
-    var currentContent = tinyMCE.get('editor').getContent();
-
-    isSaving = true;  // Set the flag before saving
-    window.pywebview.api.save_changes(groupName, databaseName, shortcut, currentContent, formatValue)
-        .then(response => {
-            // Atualize o dataset da linha selecionada
-            window.currentRow.dataset.format = formatValue ? 'true' : 'false';
-            isSaving = false;  // Reset the flag after saving is done
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            isSaving = false;  // Reset the flag in case of error
-        });
-    reinitializeEditor(choice);
-});
 
 
 
+
+
+
+
+// Assuming the custom select is applied to the 'escolha' element
+// const customSelectElement = document.querySelector('.custom-select-container');
+
+// customSelectElement.addEventListener('valueSelected', function (event) {
+
+//     const choice = event.detail.value; // Get the selected value from the event detail
+
+//     if (isEditorUpdate || !window.currentRow) {
+//         // Se a atualização do editor estiver em andamento ou nenhuma linha estiver selecionada, não faça nada
+//         return;
+//     }
+
+//     const formatValue = choice === "1";
+//     const shortcut = window.currentRow.dataset.shortcut;
+//     const groupName = window.currentRow.dataset.groupName;
+//     const databaseName = window.currentRow.dataset.databaseName;
+//     const currentContent = tinyMCE.get('editor').getContent();
+
+//     isSaving = true;  // Set the flag before saving
+//     window.pywebview.api.save_changes(groupName, databaseName, shortcut, currentContent, formatValue)
+//         .then(response => {
+//             // Update the dataset of the selected row directly with the choice
+//             window.currentRow.dataset.format = choice;
+//             isSaving = false;  // Reset the flag after saving is done
+//         })
+//         .catch((error) => {
+//             console.error('Error:', error);
+//             isSaving = false;  // Reset the flag in case of error
+//         });
+//     reinitializeEditor(choice);
+// });
 
 function reinitializeEditor(choice) {
     var currentContent = tinymce.get('editor').getContent();

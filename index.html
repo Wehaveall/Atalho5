@@ -143,7 +143,7 @@
 
             <div id="contentType">
               Tipo de Conteúdo:
-              <select onfocus="this.size = 2" ; onblur="this.size = 0" ; onchange="this.size = 1; this.blur()"
+              <select data-custom
                 id="escolha">
                 <option value="0" id="noFormat">Texto sem formatação</option>
                 <option value="1" id="format">Texto Formatado/ Imagens/minúsculas</option>
@@ -167,8 +167,7 @@
                   <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
                 </div>
                 <div id="caseRight">
-                  <select data-custom onfocus="this.size = 3" ; onblur="this.size = 0" ;
-                    onchange="this.size = 1; this.blur()" id="escolha">
+                  <select data-custom id="escolhaCase">
                     <option id="noFormat">Diferenciar Maiúsculas/Minúsculas</option>
                     <option id="format">Ignorar Maiúsculas/Minúsculas</option>
                     <option id="format">Adaptar ao atalho</option>

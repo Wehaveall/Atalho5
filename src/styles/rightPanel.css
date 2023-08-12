@@ -10,6 +10,7 @@
     justify-content: space-between;
     /* This will push the elements apart */
     overflow: visible;
+    position: relative;
 
 }
 
@@ -37,9 +38,8 @@
     font-family: 'Work Sans', sans-serif;
     font-size: small;
     height: 30px;
-    /* Adjust this value as needed */
-
-    /* This will prevent #contentType from growing and occupying unnecessary space */
+   position: relative;
+   z-index: 10;
 
 }
 
@@ -65,7 +65,7 @@
     flex-basis: 0;
     overflow-y: auto;
 
-    /* Adicione esta linha */
+   z-index: 5;
 }
 
 
@@ -146,32 +146,6 @@
 }
 
 
-
-/* #caseRight select {
-    font-family: 'Work Sans', sans-serif;
-    border: none;
-    height: auto;
-    box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
-    max-height: 300px;
- 
-    overflow: visible;
-    z-index: 1000;
-  
-    position: relative;
-
-}
-
-option:nth-child(1):hover {
-    background: #fbb347;
-}
-
-option:nth-child(2):hover {
-    background: #fbb347;
-}
-
-option:nth-child(3):hover {
-    background: #fbb347;
-} */
 
 #escolha {
     z-index: 1000;

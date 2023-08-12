@@ -539,11 +539,18 @@ function handleRowClick() {
         tinyMCE.get('editor').setContent(formattedExpansion);
 
         // Update dropdown based on the format value
-        var escolhaDropdown = document.getElementById('escolha');
-        escolhaDropdown.value = rowData.format ? '1' : '0';
+        const selectValue = rowData.format ? '1' : '0';
 
+        // Assuming the select element has an ID, and customSelects is accessible here:
+        const selectId = 'escolha'; // Replace with the actual ID
+        const customSelect = window.customSelects[selectId];
+        if (customSelect) {
+          customSelect.selectValue(selectValue);
+        } else {
+          alert('Error: customSelect is not found for ID ' + selectId);
+        }
         // Reinitialize the editor based on the dropdown value
-        reinitializeEditor(escolhaDropdown.value);
+        reinitializeEditor(selectValue);
       } else {
         tinyMCE.get('editor').setContent('');
       }
@@ -586,6 +593,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.pywebview && window.pywebview.api) {
       console.log("pywebview API is ready");
       initializePyWebView();
+
+
+
+
+
+
     } else {
       console.error("Failed to load pywebview API");
     }

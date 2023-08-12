@@ -1,76 +1,122 @@
 export default class Select {
   constructor(element) {
-    this.element = element
-    this.options = getFormattedOptions(element.querySelectorAll("option"))
-    this.customElement = document.createElement("div")
-    this.labelElement = document.createElement("span")
-    this.optionsCustomElement = document.createElement("ul")
-    setupCustomElement(this)
-    element.style.display = "none"
-    element.after(this.customElement)
+
+    this.element = element;
+    this.options = getFormattedOptions(element.querySelectorAll("option"));
+    this.customElement = document.createElement("div");
+    this.labelElement = document.createElement("span");
+    this.optionsCustomElement = document.createElement("ul");
+    this.customElement.classList.add("custom-select-container");
+
+    setupCustomElement(this);
+
+
+    element.style.display = "none"; // Hide the original select element
+
+
+    element.after(this.customElement);
+
   }
 
+
+  // Add this getter method to your class
   get selectedOption() {
-    return this.options.find(option => option.selected)
+    return this.options.find(option => option.selected);
   }
 
+  // Add this method if you need the index of the selected option
   get selectedOptionIndex() {
-    return this.options.indexOf(this.selectedOption)
+    return this.options.indexOf(this.selectedOption);
   }
 
   selectValue(value) {
+
     const newSelectedOption = this.options.find(option => {
-      return option.value === value
-    })
-    const prevSelectedOption = this.selectedOption
-    prevSelectedOption.selected = false
-    prevSelectedOption.element.selected = false
+      return option.value === value;
+    });
+    const prevSelectedOption = this.selectedOption;
+    prevSelectedOption.selected = false;
+    prevSelectedOption.element.selected = false;
 
-    newSelectedOption.selected = true
-    newSelectedOption.element.selected = true
+    newSelectedOption.selected = true;
+    newSelectedOption.element.selected = true;
 
-    this.labelElement.innerText = newSelectedOption.label
+    this.labelElement.innerText = newSelectedOption.label;
     this.optionsCustomElement
       .querySelector(`[data-value="${prevSelectedOption.value}"]`)
-      .classList.remove("selected")
+      .classList.remove("selected");
     const newCustomElement = this.optionsCustomElement.querySelector(
       `[data-value="${newSelectedOption.value}"]`
-    )
-    newCustomElement.classList.add("selected")
-    newCustomElement.scrollIntoView({ block: "nearest" })
+    );
+    newCustomElement.classList.add("selected");
+    newCustomElement.scrollIntoView({ block: "nearest" });
+
+    // Dispatch the custom event with the selected value
+
+    this.customElement.dispatchEvent(new CustomEvent('valueSelected', {
+      detail: { value: newSelectedOption.value }
+    }));
   }
 }
 
 function setupCustomElement(select) {
-  select.customElement.classList.add("custom-select-container")
-  select.customElement.tabIndex = 0
 
-  select.labelElement.classList.add("custom-select-value")
-  select.labelElement.innerText = select.selectedOption.label
-  select.customElement.append(select.labelElement)
 
-  select.optionsCustomElement.classList.add("custom-select-options")
+  select.customElement.classList.add("custom-select-container");
+
+
+  if (!select.customElement) {
+    alert("Error: select.customElement is not defined.");
+    return;
+  }
+
+  select.customElement.tabIndex = 0;
+
+  if (!select.labelElement) {
+    alert("Error: select.labelElement is not defined.");
+    return;
+  }
+
+  select.labelElement.classList.add("custom-select-value");
+
+  if (!select.selectedOption || !select.selectedOption.label) {
+    alert("Error: select.selectedOption.label is not defined.");
+    return;
+  }
+
+  select.labelElement.innerText = select.selectedOption.label;
+  select.customElement.append(select.labelElement);
+
+
+
+  select.optionsCustomElement.classList.add("custom-select-options");
   select.options.forEach(option => {
-    const optionElement = document.createElement("li")
-    optionElement.classList.add("custom-select-option")
-    optionElement.classList.toggle("selected", option.selected)
-    optionElement.innerText = option.label
-    optionElement.dataset.value = option.value
+    const optionElement = document.createElement("li");
+    optionElement.classList.add("custom-select-option");
+    optionElement.classList.toggle("selected", option.selected);
+    optionElement.innerText = option.label;
+    optionElement.dataset.value = option.value;
     optionElement.addEventListener("click", () => {
-      select.selectValue(option.value)
-      select.optionsCustomElement.classList.remove("show")
-    })
-    select.optionsCustomElement.append(optionElement)
-  })
-  select.customElement.append(select.optionsCustomElement)
+
+      select.selectValue(option.value);
+      select.optionsCustomElement.classList.remove("show");
+    });
+    select.optionsCustomElement.append(optionElement);
+  });
+
+  select.customElement.append(select.optionsCustomElement);
+
 
   select.labelElement.addEventListener("click", () => {
-    select.optionsCustomElement.classList.toggle("show")
-  })
+
+    select.optionsCustomElement.classList.toggle("show");
+  });
 
   select.customElement.addEventListener("blur", () => {
-    select.optionsCustomElement.classList.remove("show")
-  })
+
+    select.optionsCustomElement.classList.remove("show");
+  });
+
 
   let debounceTimeout
   let searchTerm = ""
@@ -125,3 +171,5 @@ function getFormattedOptions(optionElements) {
     }
   })
 }
+
+
