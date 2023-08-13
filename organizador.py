@@ -1,15 +1,16 @@
 from bs4 import BeautifulSoup
 import re
 
+
 def process_element(element):
     # Inicializa o texto vazio
     text = ""
-    
+
     # Itera sobre os elementos filhos, incluindo texto e elementos HTML
     for child in element.children:
-        if isinstance(child, str): # Se for um texto, apenas o adiciona
+        if isinstance(child, str):  # Se for um texto, apenas o adiciona
             text += child.strip() + " "
-        else: # Se for um elemento HTML, processa-o recursivamente
+        else:  # Se for um elemento HTML, processa-o recursivamente
             text += process_element(child) + " "
 
     # Substituir ocorrências de "1o", "2 o", etc., por "1º", "2º", etc.
@@ -18,7 +19,8 @@ def process_element(element):
     # Remove qualquer sequência de espaços em branco (incluindo tabulações e novas linhas)
     text = re.sub(r"\s+", " ", text)
 
-    return text.strip() # Remove espaços em branco extras
+    return text.strip()  # Remove espaços em branco extras
+
 
 def modify_legal_document(input_file_path, output_file_path):
     with open(input_file_path, "r", encoding="ISO-8859-1") as file:
@@ -31,19 +33,36 @@ def modify_legal_document(input_file_path, output_file_path):
     subitem_pattern = re.compile(r"^[a-z]\)")
 
     modified_lines = []
+    inside_centered_text = False
+    skip_next_asterisk = False
+    found_first_article = False
 
-    for element in soup.find_all(True, recursive=True):  # Loop through all elements
+    for element in soup.find_all(True, recursive=True):
         if element.name == "p" or (
             element.name == "font" and "Artart" in element.get("class", [])
         ):
             text = process_element(element)
 
-            if text.startswith(article_start):
-                text = "*" + text
+            if text.startswith(article_start) and not found_first_article:
+                found_first_article = True
 
-            if element.attrs.get("align") == "center" or text.isupper():
-                if text.startswith("*"):
-                    text = text[1:]
+            if not found_first_article:
+                continue
+
+            is_centered = element.attrs.get("align") == "center" or text.isupper()
+
+            if is_centered and not inside_centered_text:
+                inside_centered_text = True
+                text = "*" + text
+            elif inside_centered_text and not is_centered:
+                inside_centered_text = False
+                skip_next_asterisk = True
+
+            if text.startswith(article_start):
+                if skip_next_asterisk:
+                    skip_next_asterisk = False
+                else:
+                    text = "*" + text
 
             if text.startswith(article_start):
                 modified_lines.append(text)
@@ -87,5 +106,6 @@ def modify_legal_document(input_file_path, output_file_path):
     with open(output_file_path, "w", encoding="utf-8") as file:
         file.write(modified_text)
 
+
 # Test the function with the original file and a new output file
-modify_legal_document("E:/cc.html", "E:/cc_v2.txt")
+modify_legal_document("E:/cpc.html", "E:/cpc_v2.txt")

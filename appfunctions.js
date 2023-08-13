@@ -538,6 +538,12 @@ function handleRowClick() {
 
         tinyMCE.get('editor').setContent(formattedExpansion);
 
+ // Set the "atalho" value inside the #shortcutName div
+        const shortcutNameDiv = document.getElementById('shortcutName');
+        shortcutNameDiv.innerHTML = `Atalho: ${shortcut}`;
+
+
+
         // Update dropdown based on the format value
         const selectValue = rowData.format ? '1' : '0';
 
