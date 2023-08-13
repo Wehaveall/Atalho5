@@ -108,4 +108,4 @@ def modify_legal_document(input_file_path, output_file_path):
 
 
 # Test the function with the original file and a new output file
-modify_legal_document("E:/cpc.html", "E:/cpc_v2.txt")
+modify_legal_document("E:/cc.html", "E:/cc_v2.txt")
