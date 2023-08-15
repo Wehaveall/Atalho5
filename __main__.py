@@ -348,7 +348,14 @@ class Api:
     # --------------------------------------------------------------------------------------------------------------------------------
 
     def save_changes(
-        self, groupName, databaseName, tableName, shortcut, newContent, formatValue
+        self,
+        groupName,
+        databaseName,
+        tableName,
+        shortcut,
+        newContent,
+        formatValue,
+        label,
     ):
         # Convert formatValue to 0 or 1 for SQLite storage
         format_value_for_db = 1 if formatValue else 0
@@ -379,6 +386,10 @@ class Api:
             # If newContent is provided, update the expansion column
             if newContent:
                 update_values["expansion"] = newContent
+
+            # If labelText is provided, update the label column
+            if label:
+                update_values["label"] = label
 
             stmt = (
                 update(table)

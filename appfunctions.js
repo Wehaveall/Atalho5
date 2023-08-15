@@ -178,7 +178,9 @@ function hideLoadingScreen() {
 }
 
 
-
+function salvar_Label(event) {
+  pywebview.api.update_description(event.target.value);
+}
 
 
 
@@ -472,6 +474,7 @@ function populateTable(data, groupName, databaseName, tableName) {
       expansion,
       shortcut,
       format,
+      label,
       tableName,
       groupName,
       databaseName
@@ -522,7 +525,7 @@ function handleRowClick() {
   window.currentRow = this;
 
   // Extract the relevant data from the clicked row
-  const { groupName, databaseName, tableName, shortcut, format } = this.dataset;
+  const { groupName, databaseName, tableName, shortcut, label, format } = this.dataset;
 
   // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
@@ -538,10 +541,12 @@ function handleRowClick() {
 
         tinyMCE.get('editor').setContent(formattedExpansion);
 
- // Set the "atalho" value inside the #shortcutName div
+        // Set the "atalho" value inside the #shortcutName div
         const shortcutNameDiv = document.getElementById('shortcutName');
         shortcutNameDiv.innerHTML = `Atalho: ${shortcut}`;
 
+        const { label } = this.dataset;
+        document.getElementById('label').value = label;
 
 
         // Update dropdown based on the format value
@@ -564,6 +569,8 @@ function handleRowClick() {
     })
     .catch(error => console.error("Error fetching recent data:", error));
 
+
+
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 }
 
@@ -573,6 +580,37 @@ function handleRowClick() {
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------  
+
+function saveLabelValue(newValue) {
+  var shortcut = window.currentRow.dataset.shortcut;
+  var groupName = window.currentRow.dataset.groupName;
+  var tableName = window.currentRow.dataset.tableName;
+  var databaseName = window.currentRow.dataset.databaseName;
+  var formatValue = document.getElementById('escolha').value === "1";
+
+  window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, null, formatValue, newValue)
+    .then(response => {
+      console.log('Label value saved:', response);
+      // Atualize o valor do data-label na linha selecionada
+      window.currentRow.dataset.label = newValue;
+
+      // Invalidar a entrada de cache após salvar
+      invalidateCacheEntry(groupName, databaseName, tableName);
+    })
+    .catch(error => {
+      console.error('Error saving label value:', error);
+    });
+}
 
 function initializePyWebView() {
   if (!window.pywebview || !window.pywebview.api) {
@@ -601,7 +639,16 @@ document.addEventListener('DOMContentLoaded', function () {
       initializePyWebView();
 
 
+      // Adicione este código em um lugar onde o DOM esteja carregado
 
+      // Pegue o elemento input pelo nome
+      var labelInput = document.getElementById('label');
+
+      // Adicione um event listener para detectar mudanças no valor do input
+      labelInput.addEventListener('input', function () {
+        // Chame a função para salvar os dados
+        saveLabelValue(this.value);
+      });
 
 
 

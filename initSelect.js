@@ -23,17 +23,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const formatValue = choice === "1";
       const shortcut = window.currentRow.dataset.shortcut;
-      const groupName = window.currentRow.dataset.groupName;
+      const groupName = window.currentRow.dataset.groupName; 
       const tableName = window.currentRow.dataset.tableName;
       const databaseName = window.currentRow.dataset.databaseName;
       const currentContent = tinyMCE.get('editor').getContent();
+      const label = window.currentRow.dataset.label
 
       // Set the flag to true because this change was made by the user
       isManualChange = true;
 
       if (isManualChange) { // Only save if changed manually
         isSaving = true;
-        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, currentContent, formatValue)
+        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, currentContent, formatValue, label)
           .then(response => {
             window.currentRow.dataset.format = formatValue ? 'true' : 'false';
             isSaving = false;
