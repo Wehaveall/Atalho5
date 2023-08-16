@@ -1,4 +1,4 @@
-import Select from "./select.js";
+import Select from "./class_Select.js";
 
 window.customSelects = {};
 
