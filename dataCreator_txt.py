@@ -34,6 +34,8 @@ def roman_to_decimal(roman):
 
 # Function to extract fields from the text
 def extract_fields_from_txt(text_file, prefix):
+    # Set default value for the "case" column
+    default_case_value = "Diferenciar Maiúsculas/Minúsculas"
     # Read the text file
     with open(text_file, "r", encoding="utf-8") as file:
         text = file.read()
@@ -65,7 +67,16 @@ def extract_fields_from_txt(text_file, prefix):
             expansion = re.sub(r"\s+", " ", expansion).strip()
 
             # Added an empty string for "label" field
-            fields.append((prefix, prefix + shortcut, expansion, "", False, "true"))
+            fields.append(
+                (
+                    prefix,
+                    prefix + shortcut,
+                    expansion,
+                    "",
+                    False,
+                    default_case_value,
+                )
+            )
 
             # Split the article into incisos at the '$' delimiter
             incisos = re.split(r"\$", expansion)
@@ -92,7 +103,7 @@ def extract_fields_from_txt(text_file, prefix):
                             new_expansion,
                             "",
                             False,
-                            "true",
+                            default_case_value,
                         )
                     )  # Changed format to False here
 
@@ -118,7 +129,7 @@ def extract_fields_from_txt(text_file, prefix):
                             new_expansion,
                             "",
                             False,
-                            "true",
+                            default_case_value,
                         )
                     )  # Changed format to False here
 
@@ -134,8 +145,15 @@ def extract_fields_from_txt(text_file, prefix):
                 new_expansion = after_delimiter.strip()  # Removed "*" here
 
                 fields.append(
-                (prefix, prefix + new_shortcut, new_expansion, "", False, "true")
-)
+                    (
+                        prefix,
+                        prefix + new_shortcut,
+                        new_expansion,
+                        "",
+                        False,
+                        default_case_value,
+                    )
+                )
 
             # Split the article into paragraphs at the '%' delimiter
             paragraphs = re.split(r"%", article)
@@ -157,7 +175,7 @@ def extract_fields_from_txt(text_file, prefix):
                         new_expansion,
                         "",
                         False,
-                        "true",
+                        default_case_value,
                     )
                 )  # And here
 
@@ -170,13 +188,13 @@ def create_db(fields, db_name="E:/legal.db"):
     c = conn.cursor()
     c.execute(
         """
-        CREATE TABLE Articles
-        (prefix text, shortcut text, expansion text, label text, format boolean, "case" text)
+        CREATE TABLE aTable
+        (prefix text, shortcut text, expansion text, label text, format boolean, "case" text DEFAULT 'Diferenciar Maiúsculas/Minúsculas')
     """
     )
     c.executemany(
         """
-        INSERT INTO Articles VALUES (?,?,?,?,?,?)
+        INSERT INTO aTable (prefix, shortcut, expansion, label, format, "case") VALUES (?,?,?,?,?,?)
     """,
         fields,
     )

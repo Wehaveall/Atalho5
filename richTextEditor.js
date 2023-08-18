@@ -46,29 +46,19 @@ window.addEventListener('load', function () {
 // });
 
 function reinitializeEditor(choice) {
-    var currentContent = tinymce.get('editor').getContent();
-
-    // Ocultar o elemento do editor durante a transição
-    document.querySelector('#editor').style.display = 'none';
-
-    tinymce.get('editor').remove();
+    const visibleEditor = (document.getElementById('editor').style.display === 'none') ? '#editor-buffer' : '#editor';
+    const hiddenEditor = (visibleEditor === '#editor') ? '#editor-buffer' : '#editor';
+    const currentContent = tinymce.get(visibleEditor.substring(1)).getContent();
+    tinymce.get(hiddenEditor.substring(1)).remove();
 
     function onEditorInit() {
-        console.log("Editor initialized.");  // Log para verificar a inicialização
-
-        setTimeout(function () {
-            tinymce.get('editor').setContent(currentContent);
-            // Exibir o editor novamente
-            document.querySelector('#editor').style.display = '';
-        }, 100);  // 100ms delay
+        tinymce.get(hiddenEditor.substring(1)).setContent(currentContent);
+        swapEditors(); // Swap the editors
     }
 
-    if (choice === "0") {
-        tinymce.init(getTinyMCEConfig(false, onEditorInit));
-    } else if (choice === "1") {
-        tinymce.init(getTinyMCEConfig(true, onEditorInit));
-    }
+    initializeEditor(hiddenEditor, choice === "1", onEditorInit);
 }
+
 
 
 var saveTimeout = null;
@@ -76,13 +66,13 @@ var rowSelected = false;  // Flag para determinar se uma linha foi selecionada
 
 var isSaving = false;  // Flag para verificar se uma operação de salvamento está em andamento
 
-function getTinyMCEConfig(isAdvanced, onEditorInit) {
+function getTinyMCEConfig(selector, isAdvanced, onEditorInit) {
     var basicConfig = {
         //Altura 10%% para maximizar
         height: '100%', // Defina a altura para 100%
         //Altura 100%
         icons: "thin",
-        selector: '#editor',
+        selector: selector,
         menubar: false,
         statusbar: false,
         plugins: ['paste'],
@@ -109,9 +99,10 @@ function getTinyMCEConfig(isAdvanced, onEditorInit) {
                         var databaseName = window.currentRow.dataset.databaseName;
                         var label = window.currentRow.dataset.label
                         var formatValue = document.getElementById('escolha').value === "1";
+                        var caseChoice = document.getElementById('caseChoice').value;
 
                         isSaving = true;  // Set the flag before saving
-                        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, editor.getContent(), formatValue, label)
+                        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, editor.getContent(), formatValue, label, caseChoice)
                             .then(response => {
                                 // Atualizar o dataset e o conteúdo visual da currentRow
                                 var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
@@ -155,14 +146,30 @@ function getAdvancedTinyMCEConfig() {
     return getTinyMCEConfig(true);
 }
 
+
+
+function initializeEditor(selector, isAdvanced) {
+    tinymce.init(getTinyMCEConfig(selector, isAdvanced));
+}
+
+
 function initializeEditorBasedOnDropdown() {
     var choice = document.getElementById('escolha').value;
-    if (choice === "0") {
-        tinymce.init(getBasicTinyMCEConfig());
-    } else if (choice === "1") {
-        tinymce.init(getAdvancedTinyMCEConfig());
-    }
+    initializeEditor('#editor', choice === "1");
+    initializeEditor('#editor-buffer', choice === "1");
 }
+
+
+
+
+function swapEditors() {
+    const editor1 = document.getElementById('editor');
+    const editor2 = document.getElementById('editor-buffer');
+    editor1.style.display = (editor1.style.display === 'none') ? '' : 'none';
+    editor2.style.display = (editor2.style.display === 'none') ? '' : 'none';
+}
+
+
 
 function decodeHtml(html) {
     var txt = document.createElement("textarea");

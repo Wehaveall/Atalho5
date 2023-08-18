@@ -452,7 +452,7 @@ function populateTable(data, groupName, databaseName, tableName) {
 
     var rowClass = index % 2 === 0 ? 'tr-even' : 'tr-odd';
     // Extract the values from the item
-    const { expansion, label, shortcut, format } = item;
+    const { expansion, label, shortcut, format, case: caseChoice } = item;
 
     // Create a new row and cells
     var row = table.insertRow(-1);
@@ -477,7 +477,8 @@ function populateTable(data, groupName, databaseName, tableName) {
       label,
       tableName,
       groupName,
-      databaseName
+      databaseName,
+      caseChoice
     });
 
 
@@ -525,7 +526,7 @@ function handleRowClick() {
   window.currentRow = this;
 
   // Extract the relevant data from the clicked row
-  const { groupName, databaseName, tableName, shortcut, label, format } = this.dataset;
+  const { groupName, databaseName, tableName, shortcut, label, format, caseChoice } = this.dataset;
 
   // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
@@ -549,8 +550,24 @@ function handleRowClick() {
         document.getElementById('label').value = label;
 
 
+
+
+
         // Update dropdown based on the format value
         const selectValue = rowData.format ? '1' : '0';
+
+
+
+        // Update the custom select for caseChoice
+        // Update the custom select for caseChoice
+        const caseChoiceSelectId = 'caseChoice';
+        const customCaseChoiceSelect = window.customSelects[caseChoiceSelectId];
+        if (customCaseChoiceSelect) {
+          customCaseChoiceSelect.selectValue(caseChoice);
+        } else {
+          alert('Error: customSelect is not found for ID ' + caseChoiceSelectId);
+        }
+
 
         // Assuming the select element has an ID, and customSelects is accessible here:
         const selectId = 'escolha'; // Replace with the actual ID
@@ -597,8 +614,9 @@ function saveLabelValue(newValue) {
   var tableName = window.currentRow.dataset.tableName;
   var databaseName = window.currentRow.dataset.databaseName;
   var formatValue = document.getElementById('escolha').value === "1";
+  var caseChoice = document.getElementById('caseChoice').value;
 
-  window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, null, formatValue, newValue)
+  window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, null, formatValue, newValue, caseChoice)
     .then(response => {
       console.log('Label value saved:', response);
       // Atualize o valor do data-label na linha selecionada

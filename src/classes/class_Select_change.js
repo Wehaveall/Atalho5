@@ -12,48 +12,53 @@ document.addEventListener("DOMContentLoaded", () => {
     const customSelect = new Select(selectElement);
     window.customSelects[selectElement.id] = customSelect;
 
-    const customSelectContainer = customSelect.customElement; // Define customSelectContainer
-
-    customSelectContainer.addEventListener('valueSelected', function (event) {
-      const choice = event.detail.value;
+    customSelect.customElement.addEventListener('valueSelected', function (event) {
+      const selectedValue = event.detail.value;
 
       if (isEditorUpdate || !window.currentRow) {
         return;
       }
 
-      const formatValue = choice === "1";
       const shortcut = window.currentRow.dataset.shortcut;
       const groupName = window.currentRow.dataset.groupName; 
       const tableName = window.currentRow.dataset.tableName;
       const databaseName = window.currentRow.dataset.databaseName;
       const currentContent = tinyMCE.get('editor').getContent();
-      const label = window.currentRow.dataset.label
+      const label = window.currentRow.dataset.label;
+      let formatValue;
+      let caseChoice;
+
+      if (selectElement.id === "escolha") {
+        formatValue = selectedValue === "1";
+        caseChoice = window.currentRow.dataset.caseChoice; // Get the existing value
+        reinitializeEditor(selectedValue);
+      } else if (selectElement.id === "caseChoice") {
+        caseChoice = selectedValue;
+        window.currentRow.dataset.caseChoice = caseChoice; // Store the new value
+      }
 
       // Set the flag to true because this change was made by the user
       isManualChange = true;
 
       if (isManualChange) { // Only save if changed manually
         isSaving = true;
-        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, currentContent, formatValue, label)
+        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, currentContent, formatValue || null, label || null, caseChoice || null)
           .then(response => {
-            window.currentRow.dataset.format = formatValue ? 'true' : 'false';
+            if (formatValue !== undefined) {
+              window.currentRow.dataset.format = formatValue ? 'true' : 'false';
+            }
+            if (caseChoice !== undefined) {
+              window.currentRow.dataset.caseChoice = caseChoice; // Store the updated value
+            }
             isSaving = false;
-
+      
             // Reset the flag after making the changes
             isManualChange = false;
-
-            // Assuming the response contains the database value:
-            const dbValue = response.formatValue; // Replace with the actual value from the response
-            const selectValue = dbValue ? "1" : "0";
-
-            customSelect.selectValue(selectValue); // Update the custom select value
           })
           .catch((error) => {
             isSaving = false;
           });
       }
-
-      reinitializeEditor(choice);
     });
   });
 });

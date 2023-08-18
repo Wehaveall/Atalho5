@@ -12,6 +12,7 @@
     overflow: visible;
     position: relative;
 
+
 }
 
 
@@ -124,8 +125,10 @@
     flex-shrink: 1;
     flex-basis: 0;
     overflow-y: auto;
-
+    min-height: 400px;
     z-index: 5;
+
+    /* Animate all properties over 0.3 seconds with ease timing */
 }
 
 
@@ -183,6 +186,7 @@
     align-items: center;
     /* Center-align vertically */
     overflow: visible;
+    flex-grow: 1;
 
 }
 

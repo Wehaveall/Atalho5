@@ -356,6 +356,7 @@ class Api:
         newContent,
         formatValue,
         label,
+        caseChoice = None,  # New parameter
     ):
         # Convert formatValue to 0 or 1 for SQLite storage
         format_value_for_db = 1 if formatValue else 0
@@ -381,7 +382,10 @@ class Api:
             table = Table(desired_table_name, metadata, autoload_with=engine)
 
             # Prepare the update statement
-            update_values = {"format": format_value_for_db}
+            update_values = {
+                "format": format_value_for_db,
+                "case": caseChoice,
+            }  # Add case field update
 
             # If newContent is provided, update the expansion column
             if newContent:
@@ -403,7 +407,7 @@ class Api:
             session.commit()
             print("Changes saved successfully!")
 
-            # Notifique o JavaScript para invalidar o cache após atualizar o banco de dados
+            # Notify JavaScript to invalidate the cache after updating the database
             self.window.evaluate_js(
                 'invalidateCacheEntry("{groupName}", "{databaseName}", "{tableName}")'.format(
                     groupName=groupName, databaseName=databaseName, tableName=tableName
