@@ -7,9 +7,6 @@ import sqlite3
 
 # Function to extract fields from the text
 # Function to extract fields from the text
-# Function to extract fields from the text
-# Function to extract fields from the text
-# Function to extract fields from the text
 # Function to convert a Roman numeral to a decimal number
 def roman_to_decimal(roman):
     values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
@@ -25,10 +22,6 @@ def roman_to_decimal(roman):
     return total
 
 
-# Function to extract fields from the text
-# Function to extract fields from the text
-# Function to extract fields from the text
-# Function to extract fields from the text
 # Function to extract fields from the text
 
 
@@ -203,7 +196,7 @@ def create_db(fields, db_name="E:/legal.db"):
 
 
 # Load the text file
-text_file_path = "E:/cc_v2.txt"
+text_file_path = "E:/cc_v3.txt"
 prefix = "cc"
 fields = extract_fields_from_txt(text_file_path, prefix)
 

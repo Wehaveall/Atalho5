@@ -1,5 +1,24 @@
 from bs4 import BeautifulSoup
 import re
+import html
+
+
+def is_element_centered(element):
+    # Check the 'align' attribute for centering (case-insensitive)
+    if element.attrs.get("align", "").lower() == "center":
+        return True
+
+    # Check for 'style' attribute with 'text-align: center' (case-insensitive)
+    style = element.attrs.get("style", "").lower()
+    if "text-align: center" in style:
+        return True
+
+    # Check for specific CSS classes that might indicate centering
+    # (replace 'center-class' with actual class names if known)
+    if "center-class" in element.get("class", []):
+        return True
+
+    return False
 
 
 def process_element(element):
@@ -49,7 +68,11 @@ def modify_legal_document(input_file_path, output_file_path):
             if not found_first_article:
                 continue
 
-            is_centered = element.attrs.get("align") == "center" or text.isupper()
+            is_centered = is_element_centered(element) or (
+                text.isupper() and text.split()[0].isupper()
+            )
+
+            #  is_centered = element.attrs.get("align") == "center" or text.isupper()
 
             if is_centered and not inside_centered_text:
                 inside_centered_text = True
@@ -109,3 +132,68 @@ def modify_legal_document(input_file_path, output_file_path):
 
 # Test the function with the original file and a new output file
 modify_legal_document("E:/cc.html", "E:/cc_v2.txt")
+
+
+import re
+from bs4 import BeautifulSoup
+import html
+
+
+import re
+from bs4 import BeautifulSoup
+import html
+
+
+def add_delimiters(input_file_path, output_file_path):
+    target_strings = [
+        "Livro",
+        "Título",
+        "Capítulo",
+        "Disposições",
+        "Seção",
+        "Das",
+        "Da",
+        "Do",
+        "Dos",
+    ]
+    target_strings += [s.upper() for s in target_strings]  # Add uppercase versions
+
+    # Open the input file for reading
+    with open(input_file_path, "r", encoding="utf-8") as file:
+        content = file.read()
+
+    # Convert HTML to plain text
+    content = html.unescape(content)
+    content = BeautifulSoup(content, "html.parser").get_text()
+
+    # Dictionary to track occurrences of each delimiter
+    occurrences = {target: 0 for target in target_strings}
+
+    # Replace occurrences of target strings
+    for target in target_strings:
+        # Create a regex pattern to find the target word with the first letter capitalized or all uppercase
+        pattern = (
+            r"(?<!\+)\b(" + re.escape(target) + "|" + re.escape(target.upper()) + r")\b"
+        )
+
+        def replace_match(match):
+            key = match.group(1)
+            occurrences[key] += 1
+            prefix = "\n" if occurrences[key] > 1 else ""
+            return prefix + "++" + key
+
+        # Replace with the delimiter, possibly with a line break, but only if not already preceded by "++"
+        content = re.sub(pattern, replace_match, content)
+
+    # Save the modified text to the output file
+    with open(output_file_path, "w", encoding="utf-8") as file:
+        file.write(content)
+
+
+# Path of the input file
+input_file_path = "E:/cc_v2.txt"
+# Path of the output file
+output_file_path = "E:/cc_v3.txt"
+
+# Call the function to modify the file
+add_delimiters(input_file_path, output_file_path)

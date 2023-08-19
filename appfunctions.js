@@ -146,14 +146,62 @@ function formatExpansion(expansion, tableName) {
 }
 
 
+
+
+function convertHtmlToPlainText(html) {
+  var tempDiv = document.createElement("div");
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || "";
+}
+
+
+
+//----------------------------------------------------------------
+//Formata  o texto dentro do tinyMCE editor
+//----------------------------------------------------------------
+
 function formatArticle(article, tableName) {
   if (tableName === 'aTable') {
-    let numberOfEnters = 1; // Defina o número desejado de quebras de linha
-    let replacement = "<br/>".repeat(numberOfEnters); // Repete a tag <br/> de acordo com o valor de numberOfEnters
-    return article.replace(/[\*\#%@\$]/g, replacement);
+    // Convert HTML to plain text
+    article = convertHtmlToPlainText(article);
+
+    var numberOfEnters = 2; // Adjust this value as needed
+    var lineBreaks = '<br/>'.repeat(numberOfEnters); // Repeat the line break the desired number of times
+
+    // Trim whitespace from the start and end of the article
+    article = article.trim();
+
+    // Initialize a counter for occurrences of "++"
+    let plusCounter = 0;
+
+    // Replace "++" not preceded by "*" with line breaks, except for the first occurrence
+    article = article.replace(/\+\+/g, (match, offset, fullString) => {
+      if (offset > 0 && fullString[offset - 1] === '*') return match;
+      plusCounter++;
+      return plusCounter > 1 ? lineBreaks : '';
+    });
+
+    // Replace "Art. " with "<br/>Art. " if "Art." is not the first string in the article
+    article = article.replace(/(^|\s)(Art\. )/g, (match, p1, p2) => {
+      return p1 ? lineBreaks + p2 : p2;
+    });
+
+    // Replace "@", "#", and "$" with the desired number of line breaks
+    article = article.replace(/[@#$%]/g, lineBreaks);
+
+    // If the article now starts with a line break, remove it
+    if (article.startsWith('<br/>')) {
+      article = article.substring(5);
+    }
+
+    return article;
   }
-  return article; // Se tableName não for 'aTable', retorne o artigo inalterado
+  return article; // If tableName is not 'aTable', return the unchanged article
 }
+
+
+//----------------------------------------------------------------
+//----------------------------------------------------------------
 
 
 
