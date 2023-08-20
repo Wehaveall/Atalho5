@@ -140,6 +140,9 @@ function formatExpansion(expansion, tableName) {
   if (tableName === 'aTable') {
     // Remove os caracteres especiais "#" "%" "&" "*"
     expansion = expansion.replace(/[#%&*]/g, '');
+
+    // Nova linha: Remove os delimitadores "++"
+    expansion = expansion.replace(/\+\+/g, '');
   }
   // Você pode adicionar mais lógica de formatação aqui, se necessário
   return expansion; // Retorna a expansão formatada
@@ -576,6 +579,9 @@ function handleRowClick() {
   // Extract the relevant data from the clicked row
   const { groupName, databaseName, tableName, shortcut, label, format, caseChoice } = this.dataset;
 
+
+
+
   // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
     .then(data => {
@@ -598,15 +604,9 @@ function handleRowClick() {
         document.getElementById('label').value = label;
 
 
-
-
-
         // Update dropdown based on the format value
         const selectValue = rowData.format ? '1' : '0';
 
-
-
-        // Update the custom select for caseChoice
         // Update the custom select for caseChoice
         const caseChoiceSelectId = 'caseChoice';
         const customCaseChoiceSelect = window.customSelects[caseChoiceSelectId];
