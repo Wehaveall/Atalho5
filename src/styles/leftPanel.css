@@ -1,13 +1,23 @@
 #leftPanel {
     max-height: calc(100vh - 50px);
     background-color: #f1f1f1;
-    flex: 0.6;
+    flex: 0.2;
+    /* Adjust the flex value as needed */
     min-width: 215px;
-
-
+    /* Keep the width as needed */
+    flex-direction: column;
+    /* Exibir em coluna */
     overflow-y: auto;
-    justify-content: space-between;
+
     /* Add this if you want to push the button to the right */
+    display: flex;
+    align-items: flex-start;
+    /* Alinhar os itens à esquerda */
+    justify-content: flex-start;
+    /* Alinhar os itens ao topo */
+
+    flex-shrink: 0; /* Prevents shrinking */
+
 }
 
 .collapsible {

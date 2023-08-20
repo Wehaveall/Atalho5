@@ -11,6 +11,7 @@
     /* This will push the elements apart */
     overflow: visible;
     position: relative;
+    max-height: calc(100% - 33px); /* Ajuste conforme necessário */
 
 
 }

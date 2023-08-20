@@ -7,6 +7,8 @@ html {
   overflow: visible;
   display: flex;
   flex-direction: column;
+  background-color: green;
+
 }
 
 
@@ -53,10 +55,18 @@ html {
 
 
 .mainContainer {
+  margin: 0; /* Ensure no margin */
+  padding: 0; /* Ensure no padding */
   overflow: visible;
+
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* Organize vertically */
+  height: 100vh;
+  /* Occupy the entire viewport height */
+  width: 100vw;
+  /* Occupy the entire viewport width */
+  background-color:  deeppink;
 }
 
 
@@ -64,10 +74,14 @@ html {
   overflow: visible;
   display: flex;
   flex-direction: column;
-  flex: 1;
+
   /* Add this line to enable scrolling if the content overflows */
-  margin-bottom: 10px;
+
   /* Add this line */
+  background-color: blue;
+  height: 100%;
+  /* Defina a altura como 100% */
+
 }
 
 
@@ -78,11 +92,14 @@ html {
   /* expand to take up remaining space */
   display: flex;
   /* align child elements in a row */
+  height: 100%;
   width: 100%;
   flex: 1;
   font-family: 'Work Sans', sans-serif;
   margin-right: 5px;
   /* add this line */
+  
+
 
 }
 
@@ -90,9 +107,9 @@ html {
 
 
 
-
-
 #bottomPanel {
+  margin: 0;
+  padding: 0;
   overflow: visible;
   height: 50px;
   background-color: #fbb347;

@@ -67,7 +67,7 @@
 
   <div class="mainContainer">
 
-    <div class="contentWrapper">
+ 
 
 
       <div class="tab">
@@ -87,9 +87,11 @@
         <!-- --------------------Content------------------------------ -->
         <div id="content" class="content">
 
+          <!-- Aqui onde vão ficar as configurações do Grupo/ Banco de Dados -->      
+          
+          
 
-
-          <div id="leftPanel">
+          <div id="leftPanel" class="content">
             <div id="topLeftContent">
               <input type="text" placeholder="Pesquisar...">
               <button id="folderAdd" onclick=""><img src="/src/images/addFolder.png"></button>
@@ -97,96 +99,109 @@
           </div>
 
 
-          <div id="middlePanel" class="content">
 
-            <div id="groupManage">
-              <p id="selectedDbName"></p>
-              <div id="iconContainer">
-                <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
-                <button id="dataSettings" onclick=""><img src="/src/images/data_Settings.png"></button>
-              </div>
+          <div id="middleAndRightContainer" class="content">
+
+            <div id="dataSettingsPanel" class="data-settings-panel" style="display: none;">
+              <h2>Data Settings</h2>
+              
             </div>
-
-
-            <table id="header" class="content">
-              <tr>
-                <td>Descrição/Expansão</td>
-                <td>Atalho</td>
-              </tr>
-            </table>
-
-
-
-            <div id="tableContainer" class="content">
-
-              <table id="myTable">
-
-                <thead>
-                  <tr id="nomeDatabase"></tr>
-                </thead>
-
-
-                <tbody>
-                </tbody>
-
-                <!-- Table content goes here -->
-              </table>
-            </div>
-
-
-          </div>
-
-
-          <div id="rightPanel" class="content">
-
-            <div id="shortcutName">
-              Atalho:
-              <div class="buttons-container">
-                <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
-                <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
-              </div>
-            </div>
-
-
-            <div id="contentType">
-              Tipo de Conteúdo:
-              <select data-custom id="escolha">
-                <option value="0" id="noFormat">Texto sem formatação</option>
-                <option value="1" id="format">Texto Formatado/Imagens</option>
-              </select>
-            </div>
-
-
-
-            <div id="editor" class="editor-container"></div>
-            <div id="editor-buffer" class="editor-container" style="display: none;"></div>
+  
 
 
 
 
+                      <div id="middlePanel" class="content">
 
-            <div id="inputContainer">
-              <div id="labelRight">
-                <input id="label" type="text" placeholder="Descrição:" size="60">
-              </div>
-              <div id="rightInputs">
-                <div id="atalhoRight">
-                  <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
-                </div>
-                <div id="caseRight">
-                  <select data-custom id="caseChoice">
-                    <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
-                    <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
-                    <option id="adapt">Adaptar ao atalho</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+                        <div id="groupManage">
+                          <p id="selectedDbName"></p>
+                          <div id="iconContainer">
+                            <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
+                            <button id="dataSettings" onclick="showDataSettingsPanel()"><img src="/src/images/data_Settings.png"></button>
+
+                          </div>
+                        </div>
 
 
-          </div>
+                        <table id="header" class="content">
+                          <tr>
+                            <td>Descrição/Expansão</td>
+                            <td>Atalho</td>
+                          </tr>
+                        </table>
+
+
+
+                        <div id="tableContainer" class="content">
+
+                          <table id="myTable">
+
+                            <thead>
+                              <tr id="nomeDatabase"></tr>
+                            </thead>
+
+
+                            <tbody>
+                            </tbody>
+
+                            <!-- Table content goes here -->
+                          </table>
+                        </div>
+
+
+                      </div>
+
+
+                      <div id="rightPanel" class="content">
+
+                        <div id="shortcutName">
+                          Atalho:
+                          <div class="buttons-container">
+                            <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
+                            <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
+                          </div>
+                        </div>
+
+
+                        <div id="contentType">
+                          Tipo de Conteúdo:
+                          <select data-custom id="escolha">
+                            <option value="0" id="noFormat">Texto sem formatação</option>
+                            <option value="1" id="format">Texto Formatado/Imagens</option>
+                          </select>
+                        </div>
+
+
+
+                        <div id="editor" class="editor-container"></div>
+                        <div id="editor-buffer" class="editor-container" style="display: none;"></div>
+
+
+
+
+
+                        <div id="inputContainer">
+                          <div id="labelRight">
+                            <input id="label" type="text" placeholder="Descrição:" size="60">
+                          </div>
+                          <div id="rightInputs">
+                            <div id="atalhoRight">
+                              <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+                            </div>
+                            <div id="caseRight">
+                              <select data-custom id="caseChoice">
+                                <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
+                                <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
+                                <option id="adapt">Adaptar ao atalho</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+           </div>
 
         </div>
+
+       </div>
 
 
       </div>
@@ -271,7 +286,7 @@
       </div>
 
 
-    </div>
+    
     <!-- end of content-wrapper -->
 
     <div id=bottomPanel class="mainContainer"></div>

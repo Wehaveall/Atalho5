@@ -126,20 +126,51 @@ function invalidateCacheEntry(...args) {
 }
 
 
-
-
 function decodeHtml(html) {
   var txt = document.createElement("textarea");
   txt.innerHTML = html;
   return txt.value;
 }
 
-//Formata o expansio das tabelas jurídicas
+//----------------------------------------------------------------
+//Clique do botão de configuração dos Grupos
+
+
+function showDataSettingsPanel() {
+  var dataSettingsPanel = document.getElementById('dataSettingsPanel');
+  var middlePanel = document.getElementById('middlePanel');
+  var rightPanel = document.getElementById('rightPanel');
+
+  if (dataSettingsPanel.style.display === 'none') {
+    // Mostrar o painel de configurações de dados e ocultar os painéis do meio e da direita
+    dataSettingsPanel.style.display = 'block';
+    middlePanel.style.display = 'none';
+    rightPanel.style.display = 'none';
+  } else {
+    // Ocultar o painel de configurações de dados e mostrar os painéis do meio e da direita
+    dataSettingsPanel.style.display = 'none';
+    middlePanel.style.display = 'block';
+    rightPanel.style.display = 'block';
+  }
+}
+
+
+
+//--------------------------------------------------------------
+// Restaura a visão padrão quando se clica em qualquer child do leftPanel
+
+
+
+//------------------------------------------------------------------
+
+
+
+//Formata o expansion das tabelas jurídicas
 //-----------------------------------------------------------------
 function formatExpansion(expansion, tableName) {
   if (tableName === 'aTable') {
     // Remove os caracteres especiais "#" "%" "&" "*"
-    expansion = expansion.replace(/[#%&*]/g, '');
+    expansion = expansion.replace(/[#%&@*]/g, '');
 
     // Nova linha: Remove os delimitadores "++"
     expansion = expansion.replace(/\+\+/g, '');
@@ -391,6 +422,15 @@ function createCollapsible(directory, db_files) {
     db_file_elem.style.marginTop = "10px";
 
     db_file_elem.addEventListener('click', function () {
+
+
+
+      document.getElementById("dataSettingsPanel").style.display = "none";
+      document.getElementById("middleAndRightContainer").style.display = "flex";
+
+
+
+
       console.log("Database clicked!");
       // Remove 'focused' class from all children across all sections
       let allChildElements = document.getElementsByClassName('child-elem');

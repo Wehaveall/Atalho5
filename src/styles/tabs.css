@@ -5,6 +5,8 @@
     /* Add this line */
     border: 1px solid #ccc;
     background-color: #f1f1f1;
+   
+    
 }
 
 
@@ -43,9 +45,14 @@
 .tabcontent {
     display: flex;
     border-top: none;
-    display: none;
+    height: calc(100% - 30px); /* Add this line to take up the remaining height minus the tab bar height */
 
     /* adjust 50px if the bottomPanel height changes */
+}
+
+
+#Tab1 {
+    height: 100%; /* Add this line */
 }
 
 
