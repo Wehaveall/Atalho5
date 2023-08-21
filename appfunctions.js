@@ -134,30 +134,29 @@ function decodeHtml(html) {
 
 //----------------------------------------------------------------
 //Clique do botão de configuração dos Grupos
-
-
 function showDataSettingsPanel() {
   var dataSettingsPanel = document.getElementById('dataSettingsPanel');
   var middlePanel = document.getElementById('middlePanel');
   var rightPanel = document.getElementById('rightPanel');
 
-  if (dataSettingsPanel.style.display === 'none') {
-    // Mostrar o painel de configurações de dados e ocultar os painéis do meio e da direita
-    dataSettingsPanel.style.display = 'block';
-    middlePanel.style.display = 'none';
-    rightPanel.style.display = 'none';
-  } else {
-    // Ocultar o painel de configurações de dados e mostrar os painéis do meio e da direita
-    dataSettingsPanel.style.display = 'none';
-    middlePanel.style.display = 'block';
-    rightPanel.style.display = 'block';
-  }
+  // Mostrar o painel de configurações de dados e ocultar os painéis do meio e da direita
+  dataSettingsPanel.style.display = 'flex';
+  middlePanel.style.display = 'none';
+  rightPanel.style.display = 'none';
 }
 
+function hideDataSettingsPanel() {
+  var dataSettingsPanel = document.getElementById('dataSettingsPanel');
+  var middlePanel = document.getElementById('middlePanel');
+  var rightPanel = document.getElementById('rightPanel');
 
+  // Ocultar o painel de configurações de dados e mostrar os painéis do meio e da direita
+  dataSettingsPanel.style.display = 'none';
+  middlePanel.style.display = 'flex';
+  rightPanel.style.display = 'flex';
+}
 
-//--------------------------------------------------------------
-// Restaura a visão padrão quando se clica em qualquer child do leftPanel
+// Adicionar um ouvinte de evento para clicar em qualquer child (por exemplo, em um elemento da tabela)
 
 
 
@@ -421,14 +420,15 @@ function createCollapsible(directory, db_files) {
     db_file_elem.style.fontSize = "14px";
     db_file_elem.style.marginTop = "10px";
 
+
+    //----------------------------------------------------------------CLIQUE
+    //----------------------------------------------------------------
+
     db_file_elem.addEventListener('click', function () {
 
+      hideDataSettingsPanel();
 
-
-      document.getElementById("dataSettingsPanel").style.display = "none";
-      document.getElementById("middleAndRightContainer").style.display = "flex";
-
-
+      //------------------------------------------------------------------CLIQUE
 
 
       console.log("Database clicked!");

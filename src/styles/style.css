@@ -67,6 +67,7 @@ html {
   width: 100vw;
   /* Occupy the entire viewport width */
   background-color:  deeppink;
+  align-self: flex-start;
 }
 
 
@@ -98,6 +99,7 @@ html {
   font-family: 'Work Sans', sans-serif;
   margin-right: 5px;
   /* add this line */
+  align-self: flex-start;
   
 
 

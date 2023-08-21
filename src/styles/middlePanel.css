@@ -8,6 +8,7 @@
     flex-direction: column;
     min-width: 250px;
     max-height: calc(100% - 15px); /* Ajuste conforme necessário */
+    align-self: flex-start; /* Alinha os painéis no topo */
 
     
 }
@@ -191,17 +192,9 @@
 
 /* Painel de Configurações do Grupo */
 .data-settings-panel {
-    flex-grow: 1;
-    display: none;
-    /* Initially hidden */
-    /* To occupy the same space as middleAndRightContainer */
-    background-color: #c52727;
-    /* Background color, you can adjust this */
-    color: #000;
-    /* Text color, adjust as needed */
-    height: 100%; /* Make it occupy the full height */
-    flex-shrink: 0; /* Prevents shrinking */
-
+  display: none; /* Inicialmente oculto */
+  flex-grow: 1; /* Permitir que ele ocupe todo o espaço disponível */
+  background-color: #c52727; /* Cor vermelha */
 
 }
 
@@ -210,5 +203,7 @@
 #middleAndRightContainer {
     display: flex;
     flex: 1;
-
+    align-self: flex-start;
+   
+   
 }
