@@ -67,181 +67,170 @@
 
   <div class="mainContainer">
 
- 
-
-
-      <div class="tab">
-        <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
-        <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
-        <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
-        <button id="macros" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
-        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab5')">""</button>
-      </div>
-
-
-      <div id="Tab1" class="tabcontent">
-        <!-- Your existing div "content" goes here -->
 
 
 
-        <!-- --------------------Content------------------------------ -->
-        <div id="content" class="content">
+    <div class="tab">
+      <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
+      <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
+      <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
+      <button id="macros" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
+      <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab5')">""</button>
+    </div>
 
-          <!-- Aqui onde vão ficar as configurações do Grupo/ Banco de Dados -->      
-          
-          
 
-          <div id="leftPanel" class="content">
-            <div id="topLeftContent">
-              <input type="text" placeholder="Pesquisar...">
-              <button id="folderAdd" onclick=""><img src="/src/images/addFolder.png"></button>
+    <div id="Tab1" class="tabcontent">
+      <!-- Your existing div "content" goes here -->
+
+
+
+      <!-- --------------------Content------------------------------ -->
+      <div id="content" class="content">
+
+        <!-- Aqui onde vão ficar as configurações do Grupo/ Banco de Dados -->
+
+
+
+        <div id="leftPanel" class="content">
+          <div id="topLeftContent">
+            <input type="text" placeholder="Pesquisar...">
+            <button id="folderAdd" onclick=""><img src="/src/images/addFolder.png"></button>
+          </div>
+        </div>
+
+
+
+        <div id="middleAndRightContainer" class="content">
+
+          <div id="dataSettingsPanel" class="data-settings-panel" style="display: none;">
+
+            <div class="settings-item" id="configTitle">Configurações do Grupo:</div>
+
+            <div class="settings-item" id="nomeGrupo">Nome:
+              <input type="text" id="nomeGrupoInput" maxlength="30" />
             </div>
+
+            <div class="settings-item" id="notasGrupo">Notas:
+              <textarea id="notasGrupoInput" rows="5"></textarea>
+            </div>
+
+            <div class="settings-item" id="em_Grupo">Expandir em:
+
+              <select data-custom id="expandir_Em">
+                <option id="padrao">Padrão - Configurações</option>
+                <option id="em_Todos">Em todos os aplicativos</option>
+                <option id="apenas">Apenas nestes aplicativos</option>
+                <option id="desativar">Desativar</option>
+              </select>
+
+            </div>
+
+            <div class="quando" id="quando_Grupo">Expandir quando:
+              <select data-custom id="expandir_Quando">
+                <option id="em_Branco">Espaço em branco precede abreviação</option>
+                <option id="qualquer_exceto">Qualquer caractere (exceto letra/número) precede abreviação</option>
+                <option id="qualquer">Qualquer caractere precede abreviação</option>
+
+              </select>
+
+
+            </div>
+
+            <div class="settings-item" id="prefixo">Prefixo:</div>
+
           </div>
 
 
 
-          <div id="middleAndRightContainer" class="content">
 
-            <div id="dataSettingsPanel" class="data-settings-panel" style="display: none;">
-              <h2>Data Settings</h2>
-              
+
+          <div id="middlePanel" class="content">
+
+            <div id="groupManage">
+              <p id="selectedDbName"></p>
+              <div id="iconContainer">
+                <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
+                <button id="dataSettings" onclick="showDataSettingsPanel()"><img
+                    src="/src/images/data_Settings.png"></button>
+
+              </div>
             </div>
-  
+
+
+            <table id="header" class="content">
+              <tr>
+                <td>Descrição/Expansão</td>
+                <td>Atalho</td>
+              </tr>
+            </table>
 
 
 
+            <div id="tableContainer" class="content">
 
-                      <div id="middlePanel" class="content">
+              <table id="myTable">
 
-                        <div id="groupManage">
-                          <p id="selectedDbName"></p>
-                          <div id="iconContainer">
-                            <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
-                            <button id="dataSettings" onclick="showDataSettingsPanel()"><img src="/src/images/data_Settings.png"></button>
-
-                          </div>
-                        </div>
+                <thead>
+                  <tr id="nomeDatabase"></tr>
+                </thead>
 
 
-                        <table id="header" class="content">
-                          <tr>
-                            <td>Descrição/Expansão</td>
-                            <td>Atalho</td>
-                          </tr>
-                        </table>
+                <tbody>
+                </tbody>
+
+                <!-- Table content goes here -->
+              </table>
+            </div>
 
 
-
-                        <div id="tableContainer" class="content">
-
-                          <table id="myTable">
-
-                            <thead>
-                              <tr id="nomeDatabase"></tr>
-                            </thead>
+          </div>
 
 
-                            <tbody>
-                            </tbody>
+          <div id="rightPanel" class="content">
 
-                            <!-- Table content goes here -->
-                          </table>
-                        </div>
-
-
-                      </div>
-
-
-                      <div id="rightPanel" class="content">
-
-                        <div id="shortcutName">
-                          Atalho:
-                          <div class="buttons-container">
-                            <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
-                            <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
-                          </div>
-                        </div>
+            <div id="shortcutName">
+              Atalho:
+              <div class="buttons-container">
+                <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
+                <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
+              </div>
+            </div>
 
 
-                        <div id="contentType">
-                          Tipo de Conteúdo:
-                          <select data-custom id="escolha">
-                            <option value="0" id="noFormat">Texto sem formatação</option>
-                            <option value="1" id="format">Texto Formatado/Imagens</option>
-                          </select>
-                        </div>
-
-
-
-                        <div id="editor" class="editor-container"></div>
-                        <div id="editor-buffer" class="editor-container" style="display: none;"></div>
-
-
-
-
-
-                        <div id="inputContainer">
-                          <div id="labelRight">
-                            <input id="label" type="text" placeholder="Descrição:" size="60">
-                          </div>
-                          <div id="rightInputs">
-                            <div id="atalhoRight">
-                              <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
-                            </div>
-                            <div id="caseRight">
-                              <select data-custom id="caseChoice">
-                                <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
-                                <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
-                                <option id="adapt">Adaptar ao atalho</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-           </div>
-
-        </div>
-
-       </div>
-
-
-      </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-      <div id="Tab2" class="tabcontent">
-
-        <div id="content2" class="content">
-
-          <div class="flex-container">
-            <div id="language_choice">Escolha seu idioma:</div>
-
-            <div>
-              <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
-                title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
-              <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
-                onclick="changeLanguage('en')">
-              <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
-                onclick="changeLanguage('es')">
-              <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
-                onclick="changeLanguage('it')">
-              <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
-                onclick="changeLanguage('de')">
-              <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
-                onclick="changeLanguage('fr')">
+            <div id="contentType">
+              Tipo de Conteúdo:
+              <select data-custom id="escolha">
+                <option value="0" id="noFormat">Texto sem formatação</option>
+                <option value="1" id="format">Texto Formatado/Imagens</option>
+              </select>
             </div>
 
 
 
+            <div id="editor" class="editor-container"></div>
+            <div id="editor-buffer" class="editor-container" style="display: none;"></div>
+
+
+
+
+
+            <div id="inputContainer">
+              <div id="labelRight">
+                <input id="label" type="text" placeholder="Descrição:" size="60">
+              </div>
+              <div id="rightInputs">
+                <div id="atalhoRight">
+                  <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+                </div>
+                <div id="caseRight">
+                  <select data-custom id="caseChoice">
+                    <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
+                    <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
+                    <option id="adapt">Adaptar ao atalho</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -249,44 +238,89 @@
       </div>
 
 
+    </div>
 
 
-      <div id="Tab3" class="tabcontent">
-        <!-- Tab3 content goes here -->
+
+
+
+
+
+
+
+
+
+
+
+    <div id="Tab2" class="tabcontent">
+
+      <div id="content2" class="content">
+
+        <div class="flex-container">
+          <div id="language_choice">Escolha seu idioma:</div>
+
+          <div>
+            <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
+              title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
+            <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
+              onclick="changeLanguage('en')">
+            <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
+              onclick="changeLanguage('es')">
+            <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
+              onclick="changeLanguage('it')">
+            <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
+              onclick="changeLanguage('de')">
+            <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
+              onclick="changeLanguage('fr')">
+          </div>
+
+
+
+        </div>
+
       </div>
 
-      <div id="Tab4" class="tabcontent">
-        <h2>Macros</h2>
-        <button id="startRecording">Iniciar gravação</button>
-        <button id="pauseRecording">Pausar gravação</button>
-        <button id="resumeRecording">Retomar gravação</button>
-        <button id="stopRecording">Parar gravação</button>
-        <form id="saveMacroForm" onsubmit="event.preventDefault(); saveMacro();">
-          <label for="filename">Nome do arquivo:</label>
-          <input type="text" id="filename" name="filename">
-          <input id="saveMacroButton" type="submit" value="Salvar Macro">
-        </form>
-        <button id="executeMacroButton">Executar Macro</button>
-        <form id="executeMacroForm" onsubmit="event.preventDefault(); executeMacro();">
-          <label for="executeFilename">Arquivo para Executar:</label>
-          <input type="text" id="executeFilename" name="executeFilename">
-          <button id="pauseExecutionButton">Pausar Execução</button>
-          <button id="resumeExecutionButton">Retomar Execução</button>
-          <button id="stopExecutionButton">Parar Execução</button>
-        </form>
-        <div id="status"></div>
-        <div id="eventos"></div>
-      </div>
+    </div>
 
 
 
 
-      <div id="Tab5" class="tabcontent">
-        <!-- Tab3 content goes here -->
-      </div>
+    <div id="Tab3" class="tabcontent">
+      <!-- Tab3 content goes here -->
+    </div>
+
+    <div id="Tab4" class="tabcontent">
+      <h2>Macros</h2>
+      <button id="startRecording">Iniciar gravação</button>
+      <button id="pauseRecording">Pausar gravação</button>
+      <button id="resumeRecording">Retomar gravação</button>
+      <button id="stopRecording">Parar gravação</button>
+      <form id="saveMacroForm" onsubmit="event.preventDefault(); saveMacro();">
+        <label for="filename">Nome do arquivo:</label>
+        <input type="text" id="filename" name="filename">
+        <input id="saveMacroButton" type="submit" value="Salvar Macro">
+      </form>
+      <button id="executeMacroButton">Executar Macro</button>
+      <form id="executeMacroForm" onsubmit="event.preventDefault(); executeMacro();">
+        <label for="executeFilename">Arquivo para Executar:</label>
+        <input type="text" id="executeFilename" name="executeFilename">
+        <button id="pauseExecutionButton">Pausar Execução</button>
+        <button id="resumeExecutionButton">Retomar Execução</button>
+        <button id="stopExecutionButton">Parar Execução</button>
+      </form>
+      <div id="status"></div>
+      <div id="eventos"></div>
+    </div>
 
 
-    
+
+
+    <div id="Tab5" class="tabcontent">
+      <!-- Tab3 content goes here -->
+    </div>
+
+
+
     <!-- end of content-wrapper -->
 
     <div id=bottomPanel class="mainContainer"></div>

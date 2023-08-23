@@ -7,10 +7,12 @@
     display: flex;
     flex-direction: column;
     min-width: 250px;
-    max-height: calc(100% - 15px); /* Ajuste conforme necessário */
-    align-self: flex-start; /* Alinha os painéis no topo */
+    max-height: calc(100% - 15px);
+    /* Ajuste conforme necessário */
+    align-self: flex-start;
+    /* Alinha os painéis no topo */
 
-    
+
 }
 
 
@@ -188,15 +190,156 @@
     text-overflow: ellipsis;
 }
 
-
+/*-------------------------------------------------------------------      
 
 /* Painel de Configurações do Grupo */
 .data-settings-panel {
-  display: none; /* Inicialmente oculto */
-  flex-grow: 1; /* Permitir que ele ocupe todo o espaço disponível */
-  background-color: #c52727; /* Cor vermelha */
+    display: none;
+    /* Inicialmente oculto */
+    flex-grow: 1;
+    /* Permitir que ele ocupe todo o espaço disponível */
+    background-color: #f1f1f1;
+    /* Cor vermelha */
+    flex-direction: column;
+    /* Organizar os itens verticalmente */
 
 }
+
+
+.settings-item {
+    display: block;
+    /* Cada item é um bloco separado */
+
+}
+
+
+
+
+#configTitle {
+    height: 45px;
+    /* Define a altura como 60 pixels */
+    border: 2px solid #000;
+    /* Define uma borda sólida com 2 pixels de espessura e cor preta */
+    display: flex;
+    /* Utiliza o flex para centralizar o conteúdo */
+    align-items: center;
+    /* Centraliza o texto verticalmente */
+    justify-content: left;
+    /* Centraliza o texto horizontalmente */
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+/*-------------------------------------------------------------------      
+/* NOMEGRUPO*/
+
+
+#nomeGrupo {
+    height: 40px;
+    /* Define a altura como 60 pixels */
+    margin-left: 50px;
+    display: flex;
+    /* Utiliza o flex para centralizar o conteúdo */
+    align-items: flex-start;
+    /* Centraliza o texto verticalmente */
+    justify-content: left;
+    /* Centraliza o texto horizontalmente */
+    padding-top: 25px;
+    padding-bottom: 5px;
+}
+
+
+#nomeGrupoInput {
+    margin-left: 10px;
+    /* Adiciona uma margem à esquerda para separar o input do texto */
+}
+
+/*-------------------------------------------------------------------      
+/* NOTASGRUPO*/
+
+#notasGrupo {
+    height: 40px;
+    /* Define a altura como 60 pixels */
+    margin-left: 50px;
+    display: flex;
+    /* Utiliza o flex para centralizar o conteúdo */
+    align-items: flex-start;
+    /* Centraliza o texto verticalmente */
+    justify-content: left;
+    /* Centraliza o texto horizontalmente */
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+#notasGrupoInput {
+    margin-left: 10px;
+    margin-right: 10px;
+    /* Adiciona uma margem à esquerda para separar o input do texto */
+    flex-grow: 1;
+    border-radius: 10px;
+}
+
+
+
+
+#em_Grupo {
+    height: 40px;
+    margin-left: 50px;
+    margin-right: 10px;
+    display: flex;
+    padding-top: 100px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+
+#quando_Grupo {
+    height: 40px;
+    margin-left: 50px;
+    margin-right: 10px;
+    display: flex;
+    padding-top: 100px;
+    padding-bottom: 5px;
+    display: flex;
+    /* Habilita o layout flex */
+    justify-content: space-between;
+    /* Distribui o espaço igualmente entre os itens */
+    align-items: center;
+    /* Alinha verticalmente */
+
+
+}
+
+.quando .custom-select-container .custom-select-value {
+    width: 450px; /* Adjust to your desired width */
+  }
+
+
+
+
+
+#prefixo {
+    height: 40px;
+    /* Define a altura como 60 pixels */
+    margin-left: 50px;
+    display: flex;
+    /* Utiliza o flex para centralizar o conteúdo */
+    align-items: flex-start;
+    /* Centraliza o texto verticalmente */
+    justify-content: left;
+    /* Centraliza o texto horizontalmente */
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+
+
+
 
 
 
@@ -204,6 +347,4 @@
     display: flex;
     flex: 1;
     align-self: flex-start;
-   
-   
 }
