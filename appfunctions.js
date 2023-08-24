@@ -282,7 +282,7 @@ function createCollapsible(directory, db_files) {
   // Create a parent div for the collapsible and its content
   var collapsibleParent = document.createElement('div');
 
-  // Check if the button and the content div already exist
+  collapsibleParent.style.width = '90%'; // Garantir que ocupe a largura total
 
   // Check if the button and the content div already exist
   var collapsibleButton = document.getElementById(directory);
@@ -295,17 +295,19 @@ function createCollapsible(directory, db_files) {
     collapsibleButton.className = 'collapsible';
 
     // Create span for the arrow
-    var arrowSpan = document.createElement('span');
+    var arrowSpan = document.createElement('div');
     arrowSpan.className = 'arrow-right';
     arrowSpan.innerHTML = "▶ ";
 
     // Create span for the directory name
-    var directorySpan = document.createElement('span');
+    var directorySpan = document.createElement('div');
     directorySpan.textContent = directory;
 
     // Append the spans to the button
     collapsibleButton.appendChild(arrowSpan);
     collapsibleButton.appendChild(directorySpan);
+
+    collapsibleButton.style.width = "100%";
 
     collapsibleButton.style.fontFamily = "'Work Sans', sans-serif";
 
@@ -407,19 +409,21 @@ function createCollapsible(directory, db_files) {
 
 
   db_files.forEach(function (databaseFile) {
-    var db_file_elem = document.createElement('p');
+    var db_file_elem = document.createElement('div'); // Alterando para 'div'
     var filenameWithoutExtension = databaseFile.replace('.db', '');
     db_file_elem.textContent = filenameWithoutExtension;
-
+  
     // Add a class to child elements
     db_file_elem.className = 'child-elem';
-
+  
     // Add left padding to align with the title
     db_file_elem.style.paddingLeft = "30px";
     db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
     db_file_elem.style.fontSize = "14px";
     db_file_elem.style.marginTop = "10px";
-
+    db_file_elem.style.width = '90%'; // Garantindo que ocupe a largura total
+    db_file_elem.style.height = '1.5em'; // Definindo a altura da linha
+    db_file_elem.style.display = 'block'; // Definindo como bloco
 
     //----------------------------------------------------------------CLIQUE
     //----------------------------------------------------------------
