@@ -417,7 +417,8 @@ function createCollapsible(directory, db_files) {
     db_file_elem.className = 'child-elem';
   
     // Add left padding to align with the title
-    db_file_elem.style.paddingLeft = "30px";
+    db_file_elem.style.paddingLeft = "5px";
+    db_file_elem.style.marginLeft = "25px"; // Adicionar margem esquerda negativa
     db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
     db_file_elem.style.fontSize = "14px";
     db_file_elem.style.marginTop = "10px";
