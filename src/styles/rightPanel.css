@@ -214,3 +214,21 @@
 #atalhoRight input:focus {
     border: 2px solid rgb(232, 159, 15);
 }
+
+
+
+
+/* Mudança nos select customizados - Tamanho e fonte*/
+
+.escolha .custom-select-container .custom-select-value {
+    width: 250px;
+    /* Adjust to your desired width */
+    font-size: 14px;
+}
+
+
+.case .custom-select-container .custom-select-value {
+    width: 290px;
+    /* Adjust to your desired width */
+    font-size: 14px;
+}

@@ -316,8 +316,19 @@
 }
 
 .quando .custom-select-container .custom-select-value {
-    width: 450px; /* Adjust to your desired width */
-  }
+    width: 470px;
+    /* Adjust to your desired width */
+    font-size: 14px;
+}
+
+
+
+
+.quem .custom-select-container .custom-select-value {
+    width: 470px;
+    /* Adjust to your desired width */
+    font-size: 14px;
+}
 
 
 
