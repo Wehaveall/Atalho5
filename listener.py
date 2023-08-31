@@ -9,10 +9,15 @@ import time
 import logging
 
 
+
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+
+
 
 
 def format_article(article):
@@ -115,6 +120,7 @@ class KeyListener:
                 keyboard.Key.caps_lock,
                 keyboard.Key.tab,
                 keyboard.Key.enter,
+                keyboard.Key.num_lock,
             ]
         )
         self.resetting_keys = set([keyboard.Key.space])
@@ -187,18 +193,31 @@ class KeyListener:
                     else:
                         expansion = lookup_word_in_all_databases(self.typed_keys)
                         if expansion is not None:
-                            original_clipboard_content = pyperclip.paste()
+                            self.pynput_listener.stop()
 
-                            self.pynput_listener.stop()  # Stop the listener
-                            pyautogui.hotkey("ctrl", "shift", "left")
+                            # Determine the hotkey based on OS and NumLock status
+                            # if platform.system() == "Windows":
+                            #     COND_HOTKEY = (
+                            #         "ctrlleft, shiftleft, left"
+                            #         if is_numlock_on()
+                            #         else "ctrl, shiftleft, shiftright, left"
+                            #     )
+                            # else:
+                            #     COND_HOTKEY = "ctrl, shift, left"
+
+                            # pyautogui.hotkey(*COND_HOTKEY.split(", "))
+
+                            pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
+                            #Aqui funciona com NUMlock ligado ou desligado
+                            
                             pyautogui.press("backspace")
+
                             pyperclip.copy(format_article(expansion))
                             pyautogui.hotkey("ctrl", "v")
-                            self.start_listener()  # Start a new listener
-
-                            pyperclip.copy(original_clipboard_content)
 
                             self.typed_keys = ""
+                            self.start_listener()
+
                         else:
                             # If no expansion was found, clear the typed keys
                             self.typed_keys = ""

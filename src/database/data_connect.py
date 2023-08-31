@@ -1,10 +1,17 @@
 import sqlite3
-import json
+
 
 # for the collapsible
 import os
-import glob
-import psutil
+
+
+
+from sqlalchemy import create_engine, select, MetaData, Table
+from sqlalchemy import inspect  # Importe o Inspector
+from sqlalchemy.orm import Session
+
+
+
 
 
 def process_all_databases():
@@ -123,38 +130,41 @@ def get_engine(db_path):
 
 
 def lookup_word_in_all_databases(word):
-    # Define the directory for database files
     db_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
+    
+    # Lista para armazenar os arquivos de banco de dados
+    db_files = []
+    
+    # Use os.walk para percorrer todos os subdiretórios de db_directory
+    for root, dirs, files in os.walk(db_directory):
+        for file in files:
+            if file.endswith('.db'):
+                db_files.append(os.path.join(root, file))
 
-    # Get the list of all database files
-    db_files = [
-        os.path.join(db_directory, db_file)
-        for db_file in os.listdir(db_directory)
-        if db_file.endswith(".db")
-    ]
-    print(f"Database files found: {db_files}")
+  
 
-    # Create MetaData instance once
+    # Crie uma instância de MetaData uma vez
     metadata = MetaData()
 
     for db_file in db_files:
-        engine = get_engine(db_file)  # Obtain the engine
-        table_names = engine.table_names()
+        engine = get_engine(db_file)  # Obtenha o engine
+        
+        # Use o Inspector para obter os nomes das tabelas
+        inspector = inspect(engine)
+        table_names = inspector.get_table_names()
 
-        # Select the table that isn't 'sqlite_sequence'
-        target_table_name = next(
-            (name for name in table_names if name != "sqlite_sequence"), None
-        )
+        # Selecione a tabela que não é 'sqlite_sequence'
+        target_table_name = next((name for name in table_names if name != "sqlite_sequence"), None)
 
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)
 
-            # Use context manager approach
+            # Use a abordagem de "context manager"
             with Session(engine) as session:
                 result = session.execute(s).first()
                 if result:
                     return result.expansion
 
-    # If no result was found in any database, return None
+    # Se nenhum resultado foi encontrado em nenhum banco de dados, retorne None
     return None

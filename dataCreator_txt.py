@@ -182,7 +182,13 @@ def create_db(fields, db_name="E:/legal.db"):
     c.execute(
         """
         CREATE TABLE aTable
-        (prefix text, shortcut text, expansion text, label text, format boolean, "case" text DEFAULT 'Diferenciar Maiúsculas/Minúsculas')
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+         prefix text, 
+         shortcut text, 
+         expansion text, 
+         label text, 
+         format boolean, 
+         "case" text DEFAULT 'Diferenciar Maiúsculas/Minúsculas')
     """
     )
     c.executemany(
