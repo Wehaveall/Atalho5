@@ -418,13 +418,41 @@ function createCollapsible(directory, db_files) {
   
     // Add left padding to align with the title
     db_file_elem.style.paddingLeft = "5px";
-    db_file_elem.style.marginLeft = "25px"; // Adicionar margem esquerda negativa
+    db_file_elem.style.marginLeft = "10px"; // Adicionar margem esquerda negativa
     db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
     db_file_elem.style.fontSize = "14px";
     db_file_elem.style.marginTop = "10px";
     db_file_elem.style.width = '90%'; // Garantindo que ocupe a largura total
     db_file_elem.style.height = '1.5em'; // Definindo a altura da linha
     db_file_elem.style.display = 'block'; // Definindo como bloco
+   
+    db_file_elem.style.marginTop = "0px";  // <-- Set to 0 to remove any top margin
+    db_file_elem.style.marginLeft = "2px"; // <-- Reduce margin to bring closer to the checkbox
+    db_file_elem.style.alignSelf = 'center'; // <-- Changed from alignItems to alignSelf
+
+  
+     // Adicionando um checkbox
+     var checkbox = document.createElement('input');
+     checkbox.type = 'checkbox';
+     checkbox.className = 'db-file-checkbox';
+     checkbox.style.margin = '0';  // <-- Add this line to remove default margins
+     checkbox.style.alignSelf = 'center';  // <-- Add this line for vertical alignment
+   
+     // Wrapper to contain the checkbox and the text
+     var wrapper = document.createElement('div');
+     wrapper.style.display = 'flex';
+     wrapper.style.marginLeft = '25px';
+     wrapper.style.alignItems = 'center'; 
+     wrapper.style.gap = '2px';  // <-- Reduced gap to 2p
+  
+  // Adicionando o checkbox e o texto ao wrapper
+  wrapper.appendChild(checkbox);
+  wrapper.appendChild(db_file_elem);
+    
+
+
+
+
 
     //----------------------------------------------------------------CLIQUE
     //----------------------------------------------------------------
@@ -503,7 +531,7 @@ function createCollapsible(directory, db_files) {
 
     // Append the p element to the content div
     //contentDiv.appendChild(db_file_elem);
-    contentDiv.appendChild(db_file_elem);
+    contentDiv.appendChild(wrapper);
   });
 
 
