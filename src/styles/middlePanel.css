@@ -1,5 +1,6 @@
 #middlePanel {
-    flex: 1;
+    flex-basis: calc(100% - 500px);  /* Adjust as needed */
+    flex-grow: 0;
     margin: 0;
     padding: 0;
     height: calc(100vh - 78px);
@@ -14,6 +15,9 @@
 
 
 }
+
+
+
 
 
 

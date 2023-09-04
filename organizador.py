@@ -131,7 +131,7 @@ def modify_legal_document(input_file_path, output_file_path):
 
 
 # Test the function with the original file and a new output file
-modify_legal_document("E:/cc.html", "E:/cc_v2.txt")
+modify_legal_document("E:/ce.html", "E:/ce_v2.txt")
 
 
 import re
@@ -191,9 +191,9 @@ def add_delimiters(input_file_path, output_file_path):
 
 
 # Path of the input file
-input_file_path = "E:/cc_v2.txt"
+input_file_path = "E:/ce_v2.txt"
 # Path of the output file
-output_file_path = "E:/cc_v3.txt"
+output_file_path = "E:/ce_v3.txt"
 
 # Call the function to modify the file
 add_delimiters(input_file_path, output_file_path)

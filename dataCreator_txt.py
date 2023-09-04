@@ -202,8 +202,8 @@ def create_db(fields, db_name="E:/legal.db"):
 
 
 # Load the text file
-text_file_path = "E:/cc_v3.txt"
-prefix = "cc"
+text_file_path = "E:/ce_v3.txt"
+prefix = "ce"
 fields = extract_fields_from_txt(text_file_path, prefix)
 
 # Create the database and insert the data

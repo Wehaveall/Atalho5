@@ -14,37 +14,43 @@ window.addEventListener('load', function () {
 
 
 // Assuming the custom select is applied to the 'escolha' element
-// const customSelectElement = document.querySelector('.custom-select-container');
+ const customSelectElement = document.querySelector('.custom-select-container');
 
-// customSelectElement.addEventListener('valueSelected', function (event) {
+ customSelectElement.addEventListener('valueSelected', function (event) {
 
-//     const choice = event.detail.value; // Get the selected value from the event detail
+    const choice = event.detail.value; // Get the selected value from the event detail
 
-//     if (isEditorUpdate || !window.currentRow) {
+    if (isEditorUpdate || !window.currentRow) {
 //         // Se a atualização do editor estiver em andamento ou nenhuma linha estiver selecionada, não faça nada
-//         return;
-//     }
+         return;
+    }
 
-//     const formatValue = choice === "1";
-//     const shortcut = window.currentRow.dataset.shortcut;
-//     const groupName = window.currentRow.dataset.groupName;
-//     const databaseName = window.currentRow.dataset.databaseName;
-//     const currentContent = tinyMCE.get('editor').getContent();
+    const formatValue = choice === "1";
+    const shortcut = window.currentRow.dataset.shortcut;
+    const groupName = window.currentRow.dataset.groupName;
+    const databaseName = window.currentRow.dataset.databaseName;
+    const currentContent = tinyMCE.get('editor').getContent();
 
-//     isSaving = true;  // Set the flag before saving
-//     window.pywebview.api.save_changes(groupName, databaseName, shortcut, currentContent, formatValue)
-//         .then(response => {
-//             // Update the dataset of the selected row directly with the choice
-//             window.currentRow.dataset.format = choice;
-//             isSaving = false;  // Reset the flag after saving is done
-//         })
-//         .catch((error) => {
-//             console.error('Error:', error);
-//             isSaving = false;  // Reset the flag in case of error
-//         });
-//     reinitializeEditor(choice);
-// });
+     isSaving = true;  // Set the flag before saving
+     window.pywebview.api.save_changes(groupName, databaseName, shortcut, currentContent, formatValue)
+         .then(response => {
+             // Update the dataset of the selected row directly with the choice
+           window.currentRow.dataset.format = choice;
+             isSaving = false;  // Reset the flag after saving is done
+         })
+         .catch((error) => {
+             console.error('Error:', error);
+             isSaving = false;  // Reset the flag in case of error
+         });
+     reinitializeEditor(choice);
+ });
 
+
+
+
+
+
+ 
 function reinitializeEditor(choice) {
     const visibleEditor = (document.getElementById('editor').style.display === 'none') ? '#editor-buffer' : '#editor';
     const hiddenEditor = (visibleEditor === '#editor') ? '#editor-buffer' : '#editor';

@@ -1,7 +1,7 @@
 
 
 
-
+var checkBoxStates = {};  // Object to hold checkbox states
 
 var appState = {
   buttonStates: {}
@@ -161,6 +161,14 @@ function hideDataSettingsPanel() {
 
 
 //------------------------------------------------------------------
+
+function saveCheckBoxStates() {
+  // Call Python function to save checkBoxStates to JSON file
+  window.pywebview.api.save_checkBox_states(checkBoxStates);
+}
+
+
+
 
 
 
@@ -450,6 +458,23 @@ function createCollapsible(directory, db_files) {
   wrapper.appendChild(db_file_elem);
     
 
+//CHECKBOX INITIALIZATION 
+  // Inside your createCollapsible function
+  var key = `${directory}|${filenameWithoutExtension}`;
+  checkbox.checked = checkBoxStates[key] || false;
+
+
+  checkbox.addEventListener('change', function() {
+    // Update the state of this checkbox in checkBoxStates
+    let key = `${directory}|${filenameWithoutExtension}`;
+    checkBoxStates[key] = this.checked;
+    // Save it
+    saveCheckBoxStates();
+  });
+  
+
+
+
 
 
 
@@ -460,6 +485,13 @@ function createCollapsible(directory, db_files) {
     db_file_elem.addEventListener('click', function () {
 
       hideDataSettingsPanel();
+ 
+    // Hide the #rightPanel
+    document.getElementById('rightPanel').style.display = 'none';
+      
+    // Show the #middlePanel without modifying its width
+    document.getElementById('middlePanel').style.display = 'flex';
+    // No need to modify flex-grow here
 
       //------------------------------------------------------------------CLIQUE
 
@@ -640,6 +672,11 @@ function handleRowClick() {
   // Se uma operação de salvamento estiver em andamento, retorne imediatamente
   if (isSaving) return;
 
+// Show the #rightPanel without modifying the width of #middlePanel
+document.getElementById('rightPanel').style.display = 'flex';
+
+
+
   // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
     window.currentRow.className = '';  // Deselect the previous row
@@ -756,6 +793,18 @@ function initializePyWebView() {
     console.error('pywebview API is not available');
     return;
   }
+
+
+
+  window.pywebview.api.load_checkBox_states()
+  .then(states => {
+    checkBoxStates = states;
+    // Initialize checkboxes based on these states
+  });
+
+
+
+
 
   window.pywebview.api.load_all_states()
     .then(states => {

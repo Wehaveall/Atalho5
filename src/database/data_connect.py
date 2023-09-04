@@ -3,6 +3,7 @@ import sqlite3
 
 # for the collapsible
 import os
+import json
 
 
 
@@ -129,42 +130,70 @@ def get_engine(db_path):
     return create_engine(f"sqlite:///{db_path}", echo=True)
 
 
+
+import importlib
+
+
 def lookup_word_in_all_databases(word):
-    db_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
-    
-    # Lista para armazenar os arquivos de banco de dados
+    # Import Api class from the '__main__' module
+    Api = importlib.import_module('__main__').Api
+
+    # Load checkbox states using the Api class
+    checkBoxStates = Api().load_checkBox_states()
+
+    # Define the base directory
+    base_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups"))
+
+    # List to store database files
     db_files = []
-    
-    # Use os.walk para percorrer todos os subdiretórios de db_directory
-    for root, dirs, files in os.walk(db_directory):
+
+    # Use os.walk to traverse all subdirectories of db_directory
+    for root, dirs, files in os.walk(base_directory):
         for file in files:
             if file.endswith('.db'):
                 db_files.append(os.path.join(root, file))
 
-  
+    print(f"Loaded checkbox states: {checkBoxStates}")  # Debugging line
 
-    # Crie uma instância de MetaData uma vez
+    # Create a MetaData instance once
     metadata = MetaData()
 
     for db_file in db_files:
-        engine = get_engine(db_file)  # Obtenha o engine
-        
-        # Use o Inspector para obter os nomes das tabelas
+        # Extract group and database name from the full path
+        relative_path = os.path.relpath(db_file, base_directory)
+        group_name, db_filename = os.path.split(relative_path)
+        db_name, _ = os.path.splitext(db_filename)
+
+        # Construct the key
+        key = f"{group_name}|{db_name}"
+
+        print(f"Checking key: {key}")  # Debugging line
+
+        # Skip this database if its checkbox is not checked
+        if not checkBoxStates.get(key, False):
+            print(f"Skipping database: {db_file}")  # Debugging line
+            continue
+
+        print(f"Searching in database: {db_file}")  # Debugging line
+
+        engine = get_engine(db_file)  # Get the engine
+
+        # Use Inspector to get table names
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
 
-        # Selecione a tabela que não é 'sqlite_sequence'
+        # Select the table that is not 'sqlite_sequence'
         target_table_name = next((name for name in table_names if name != "sqlite_sequence"), None)
 
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)
 
-            # Use a abordagem de "context manager"
+            # Use "context manager" approach
             with Session(engine) as session:
                 result = session.execute(s).first()
                 if result:
                     return result.expansion
 
-    # Se nenhum resultado foi encontrado em nenhum banco de dados, retorne None
+    # If no result was found in any database, return None
     return None
