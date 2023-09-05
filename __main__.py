@@ -373,9 +373,9 @@ class Api:
             # Get the table names from the database using inspect
             table_names = inspect(engine).get_table_names()
 
-            # Filter out 'sqlite_sequence' and get the desired table name
+             # Filter out 'sqlite_sequence' and 'config' and get the desired table name
             desired_table_name = next(
-                (name for name in table_names if name != "sqlite_sequence"), tableName
+            (name for name in table_names if name not in ["sqlite_sequence", "config"]), tableName
             )
 
             # Target the desired table
@@ -449,14 +449,15 @@ class Api:
 
         return all_db_files
 
-    # ----------------------------------------------------------------EXCLUIR - SQLITE_SEQUENCY TABLE
+    # ----------------------------------------------------------------EXCLUIR - SQLITE_SEQUENCY AND CONFIG TABLE
     def get_target_table_name(self, engine):
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
         for name in table_names:
-            if name != "sqlite_sequence":
+            if name not in ["sqlite_sequence", "config"]:
                 return name
-        return None  # Se não encontrar nenhuma tabela que não seja 'sqlite_sequence'
+        return None  # If no table is found other than 'sqlite_sequence' and 'config'
+
 
     # -------------------------------------------------------------------
 
@@ -495,13 +496,11 @@ class Api:
         metadata = MetaData()
 
         with engine.connect() as conn:
-            metadata.reflect(
-                bind=engine
-            )  # Reflect the state of the database into the metadata
+            metadata.reflect(bind=engine)  # Reflect the state of the database into the metadata
             table_names = metadata.tables.keys()
 
-            # Filtrar a tabela "sqlite_sequence"
-            return [name for name in table_names if name != "sqlite_sequence"]
+            # Filter out the tables "sqlite_sequence" and "config"
+            return [name for name in table_names if name not in ["sqlite_sequence", "config"]]
 
     # ----------------------------------------------------------------SETTINGS----------------------------------------------------------------
 

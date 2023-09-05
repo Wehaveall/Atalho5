@@ -182,9 +182,10 @@ def lookup_word_in_all_databases(word):
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
 
-        # Select the table that is not 'sqlite_sequence'
-        target_table_name = next((name for name in table_names if name != "sqlite_sequence"), None)
-
+       # Select the table that is not 'sqlite_sequence' and 'config'
+        target_table_name = next((name for name in table_names if name not in ["sqlite_sequence", "config"]), None)
+       
+       
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)

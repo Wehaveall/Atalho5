@@ -191,6 +191,27 @@ def create_db(fields, db_name="E:/legal.db"):
          "case" text DEFAULT 'Diferenciar Maiúsculas/Minúsculas')
     """
     )
+
+    # Create the config table with default values
+    c.execute(
+        """
+        CREATE TABLE config
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+         requires_delimiter TEXT DEFAULT 'yes', 
+         delimiters TEXT DEFAULT 'space,enter')
+    """
+    )
+
+    # Insert default values into config table
+    c.execute(
+        """
+        INSERT INTO config (requires_delimiter, delimiters) 
+        VALUES ('yes', 'space,enter')
+    """
+    )
+
+    # Insert data into the main table
+
     c.executemany(
         """
         INSERT INTO aTable (prefix, shortcut, expansion, label, format, "case") VALUES (?,?,?,?,?,?)
