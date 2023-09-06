@@ -9,15 +9,10 @@ import time
 import logging
 
 
-
-
 # Setup logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
-
-
 
 
 def format_article(article):
@@ -29,6 +24,15 @@ def format_article(article):
 
 class KeyListener:
     def __init__(self, api):
+        self.key_to_str_map = {
+            "Key.space": "space",
+            "Key.enter": "enter",
+            # Add more if needed
+        }
+
+        self.requires_delimiter = None
+        self.delimiters = None
+
         self.accent = False
         self.last_key = None
         self.typed_keys = ""
@@ -137,7 +141,37 @@ class KeyListener:
         self.isRecordingMacro = False
         self.typed_keys = ""  # Add this line
 
+
+
+
+#----------------------------------------------------------------
+
+
+
+    def paste_expansion(self, expansion):
+        self.pynput_listener.stop()
+        
+        # Insert a backspace press if the last key was "Enter"
+        if self.just_expanded_with == 'enter':
+            pyautogui.press("backspace")
+        
+        pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
+        pyautogui.press("backspace")
+        
+        if expansion is not None:
+            pyperclip.copy(format_article(expansion))
+            pyautogui.hotkey("ctrl", "v")
+        
+        self.typed_keys = ""
+        self.just_expanded_with = None  # Reset the flag
+        self.start_listener()
+#----------------------------------------------------------------
+
+
     def on_key_release(self, key):
+        # Initialize just_expanded to False at the beginning of the function
+        just_expanded = False
+
         start_time = time.time()
 
         try:
@@ -154,88 +188,85 @@ class KeyListener:
 
                 if key == keyboard.Key.backspace:
                     self.typed_keys = self.typed_keys[:-1]
+                    print(
+                        f"Current typed_keys (After backspace): {self.typed_keys}"
+                    )  # Debug
                     return
 
-                if key == keyboard.Key.space:
-                    typed_keys_for_conversion = self.typed_keys.replace(",", ".")
+                (
+                    expansion,
+                    self.requires_delimiter,
+                    self.delimiters,
+                ) = lookup_word_in_all_databases(self.typed_keys)
 
-                    number_type = number_utils.is_number(typed_keys_for_conversion[:-1])
-                    if self.typed_keys.endswith("e") and number_type:
-                        number_in_words = number_utils.number_to_words(
-                            typed_keys_for_conversion
-                        )
+                print(
+                    f"Requires delimiter: {self.requires_delimiter}"
+                )  # Debug moved here
+                print(f"Delimiters: {self.delimiters}")  # Debug moved here
 
-                        self.pynput_listener.stop()  # Stop the listener
-                        pyautogui.hotkey("ctrl", "shift", "left")
-                        pyautogui.press("backspace")
-                        pyperclip.copy(number_in_words)
-                        pyautogui.hotkey("ctrl", "v")
-                        self.start_listener()  # Start a new listener
+                # Convert the delimiters string to a list
+                delimiter_list = [item.strip() for item in self.delimiters.split(",")]
 
-                        self.typed_keys = ""
+                print(f"Delimiter list: {delimiter_list}")  # Debug
 
-                    elif self.typed_keys.endswith("m") and number_utils.is_number(
-                        typed_keys_for_conversion[:-1]
-                    ):
-                        number_as_currency = number_utils.number_to_currency(
-                            typed_keys_for_conversion
-                        )
+                # Add a debug line here to print the value of str(key)
+                print(f"String representation of key: {str(key)}")
 
-                        self.pynput_listener.stop()  # Stop the listener
-                        pyautogui.hotkey("ctrl", "shift", "left")
-                        pyautogui.press("backspace")
-                        pyperclip.copy(number_as_currency)
-                        pyautogui.hotkey("ctrl", "v")
-                        self.start_listener()  # Start a new listener
+                key_str = self.key_to_str_map.get(str(key), str(key))
+                print(f"Human-readable key: {key_str}")  # Debug
 
-                        self.typed_keys = ""
+                if self.requires_delimiter == "yes":
+                    if key_str in delimiter_list:  # Use the mapped string
+                        print(
+                            f"Attempting to paste expansion: {expansion}"
+                        )  # Debug line
+                        print("Delimiter matched")  # Debug
 
-                    else:
-                        expansion = lookup_word_in_all_databases(self.typed_keys)
                         if expansion is not None:
-                            self.pynput_listener.stop()
-
-                            # Determine the hotkey based on OS and NumLock status
-                            # if platform.system() == "Windows":
-                            #     COND_HOTKEY = (
-                            #         "ctrlleft, shiftleft, left"
-                            #         if is_numlock_on()
-                            #         else "ctrl, shiftleft, shiftright, left"
-                            #     )
-                            # else:
-                            #     COND_HOTKEY = "ctrl, shift, left"
-
-                            # pyautogui.hotkey(*COND_HOTKEY.split(", "))
-
-                            pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
-                            #Aqui funciona com NUMlock ligado ou desligado
-                            
-                            pyautogui.press("backspace")
-
-                            pyperclip.copy(format_article(expansion))
-                            pyautogui.hotkey("ctrl", "v")
-
-                            self.typed_keys = ""
-                            self.start_listener()
+                            self.just_expanded_with = key_str  # Set the flag here
+                            self.paste_expansion(expansion)
+                            self.typed_keys = ""  # Reset typed keys
+                            just_expanded = (
+                                True  # Set this to True when an expansion happens
+                            )
+                            print(
+                                f"self.typed_keys cleared: {self.typed_keys}"
+                            )  # Debug
 
                         else:
-                            # If no expansion was found, clear the typed keys
-                            self.typed_keys = ""
+                            return
 
-                return
+                elif self.requires_delimiter == "no":
+                    if expansion is not None:
+                        self.paste_expansion(expansion)
+                        self.typed_keys = ""  # Reset typed keys
+                        just_expanded = (
+                            True  # Set this to True when an expansion happens
+                        )
+                    else:
+                        self.typed_keys = (
+                            ""  # Reset typed keys if no expansion is found
+                        )
 
             if self.stop_event.is_set():
                 return False
 
             key_char = key.char if hasattr(key, "char") else str(key)
 
-            if self.accent:
-                self.handle_accent_key(key_char)
-            elif key_char in self.accents:
-                self.accent = True
-                self.last_key = key_char
-            else:
-                self.typed_keys += key_char
+            # ----------------------------------------------------------------
+            if not just_expanded:
+                if self.accent:
+                    self.handle_accent_key(key_char)
+                elif key_char in self.accents:
+                    self.accent = True
+                    self.last_key = key_char
+                else:
+                    self.typed_keys += key_char
+                    print(self.typed_keys)
+
+            just_expanded = False
+
+        # --------------------------------------------------------
 
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")

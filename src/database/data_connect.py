@@ -6,13 +6,9 @@ import os
 import json
 
 
-
 from sqlalchemy import create_engine, select, MetaData, Table
 from sqlalchemy import inspect  # Importe o Inspector
 from sqlalchemy.orm import Session
-
-
-
 
 
 def process_all_databases():
@@ -130,19 +126,25 @@ def get_engine(db_path):
     return create_engine(f"sqlite:///{db_path}", echo=True)
 
 
+import os
+from sqlalchemy import create_engine, MetaData, Table, select, inspect
+from sqlalchemy.orm import Session
+
 
 import importlib
 
 
 def lookup_word_in_all_databases(word):
     # Import Api class from the '__main__' module
-    Api = importlib.import_module('__main__').Api
+    Api = importlib.import_module("__main__").Api
 
     # Load checkbox states using the Api class
     checkBoxStates = Api().load_checkBox_states()
 
     # Define the base directory
-    base_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups"))
+    base_directory = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
+    )
 
     # List to store database files
     db_files = []
@@ -150,7 +152,7 @@ def lookup_word_in_all_databases(word):
     # Use os.walk to traverse all subdirectories of db_directory
     for root, dirs, files in os.walk(base_directory):
         for file in files:
-            if file.endswith('.db'):
+            if file.endswith(".db"):
                 db_files.append(os.path.join(root, file))
 
     print(f"Loaded checkbox states: {checkBoxStates}")  # Debugging line
@@ -176,25 +178,37 @@ def lookup_word_in_all_databases(word):
 
         print(f"Searching in database: {db_file}")  # Debugging line
 
-        engine = get_engine(db_file)  # Get the engine
+        engine = create_engine(f"sqlite:///{db_file}")  # Get the engine
 
         # Use Inspector to get table names
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
 
-       # Select the table that is not 'sqlite_sequence' and 'config'
-        target_table_name = next((name for name in table_names if name not in ["sqlite_sequence", "config"]), None)
-       
-       
+        # Select the table that is not 'sqlite_sequence' and 'config'
+        target_table_name = next(
+            (name for name in table_names if name not in ["sqlite_sequence", "config"]),
+            None,
+        )
+
+        # Fetch required_delimiters and delimiters from the config table
+        if "config" in table_names:
+            config_table = Table("config", metadata, autoload_with=engine)
+            s_config = select(config_table)
+            with Session(engine) as session:
+                config_result = session.execute(s_config).first()
+                if config_result:
+                   
+                    requires_delimiter = config_result.requires_delimiter
+                    delimiters = config_result.delimiters
+        # Continue with the existing logic for looking up words
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)
 
-            # Use "context manager" approach
             with Session(engine) as session:
                 result = session.execute(s).first()
                 if result:
-                    return result.expansion
+                    return result.expansion, requires_delimiter, delimiters
 
     # If no result was found in any database, return None
-    return None
+    return None, requires_delimiter, delimiters
