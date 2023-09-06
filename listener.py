@@ -150,25 +150,48 @@ class KeyListener:
 
     def paste_expansion(self, expansion):
         self.pynput_listener.stop()
-        
-        # Insert a backspace press if the last key was "Enter"
+
+        # Salvar conteúdo original do clipboard
+        original_clipboard_content = pyperclip.paste()
+
+        # Inserir um backspace press se a última tecla foi "Enter"
         if self.just_expanded_with == 'enter':
             pyautogui.press("backspace")
-        
+
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
         pyautogui.press("backspace")
-        
+
         if expansion is not None:
+            logging.info("About to copy to clipboard.")
             pyperclip.copy(format_article(expansion))
+            logging.info("Copied to clipboard.")
+
+            # Verificar se o clipboard foi atualizado
+            for _ in range(10):
+                if pyperclip.paste() == format_article(expansion):
+                    break
+                time.sleep(0.1)
+
+            logging.info("About to paste.")
             pyautogui.hotkey("ctrl", "v")
-        
+            logging.info("Pasted.")
+
+            # Restaurar conteúdo original do clipboard
+            pyperclip.copy(original_clipboard_content)
+
         self.typed_keys = ""
-        self.just_expanded_with = None  # Reset the flag
+        self.just_expanded_with = None  # Resetar a flag
         self.start_listener()
+
 #----------------------------------------------------------------
 
 
     def on_key_release(self, key):
+
+        # Ignora enter quando não há  nada em self_typed_keys
+        if key == keyboard.Key.enter and not self.typed_keys:
+            return
+       
         # Initialize just_expanded to False at the beginning of the function
         just_expanded = False
 
@@ -261,8 +284,10 @@ class KeyListener:
                     self.accent = True
                     self.last_key = key_char
                 else:
-                    self.typed_keys += key_char
-                    print(self.typed_keys)
+                     if key not in self.omitted_keys:
+                        self.typed_keys += key_char
+                        print(self.typed_keys)
+                                
 
             just_expanded = False
 
