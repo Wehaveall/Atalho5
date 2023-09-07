@@ -16,30 +16,40 @@ logging.basicConfig(
 )
 
 
-
-def format_article(article, num_newlines=2):
-
-    delimiters = ["*", "#", "%", "@", "$", "++"]
+def format_article(article, newlines=1):
+    # Replacing other delimiters
+    delimiters = ["*", "#", "%", "@", "$"]
+    for delimiter in delimiters:
+        article = article.replace(delimiter, "\n")
     
-    # Cria uma string contendo o número desejado de quebras de linha
-    newlines = "\n" * num_newlines
+    # Handling "++" delimiter
+    plus_sections = article.split("++")
+    new_article = plus_sections[0]  # Keep the first section as it is
     
-    for delimiter in delimiters[:-1]:  # Exclui "++", que será tratado separadamente
-        article = article.replace(delimiter, newlines)
+    if len(plus_sections) > 1:  # Only proceed if "++" exists in the article
+        counter = 0  # Counter to keep track of "++" occurrences after the first one
+        for section in plus_sections[1:]:
+            # If counter is zero, simply remove the "++"
+            if counter == 0:
+                new_article += section
+            # If counter is more than zero, add newline before "Art."
+            else:
+                art_split = section.split("Art.", 1)  # Split by the first occurrence of "Art."
+                if len(art_split) > 1:
+                    new_article += "\n" * newlines + "Art.".join(art_split)
+                    counter = 0  # Reset the counter
+                else:
+                    new_article += "\n" * newlines + section
+            
+            # Increment the counter after the first "++"
+            counter += 1
+
+        # Add a newline before the first occurrence of "Art." if "++" exists
+        first_art_index = new_article.find("Art.")
+        if first_art_index != -1:
+            new_article = new_article[:first_art_index] + "\n" + new_article[first_art_index:]
     
-    # Trata o delimitador "++" de forma especial
-    indices = [m.start() for m in re.finditer(r'\+\+', article)]
-    for index in reversed(indices):
-        next_art = article.find("Art.", index)
-        if next_art != -1:
-            article = article[:next_art] + newlines + article[next_art:]
-    article = article.replace('++', '')
-    
-    return article
-
-
-
-
+    return new_article
 
 
 class KeyListener:
@@ -161,12 +171,7 @@ class KeyListener:
         self.isRecordingMacro = False
         self.typed_keys = ""  # Add this line
 
-
-
-
-#----------------------------------------------------------------
-
-
+    # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion):
         self.pynput_listener.stop()
@@ -175,7 +180,7 @@ class KeyListener:
         original_clipboard_content = pyperclip.paste()
 
         # Inserir um backspace press se a última tecla foi "Enter"
-        if self.just_expanded_with == 'enter':
+        if self.just_expanded_with == "enter":
             pyautogui.press("backspace")
 
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
@@ -203,15 +208,13 @@ class KeyListener:
         self.just_expanded_with = None  # Resetar a flag
         self.start_listener()
 
-#----------------------------------------------------------------
-
+    # ----------------------------------------------------------------
 
     def on_key_release(self, key):
-
         # Ignora enter quando não há  nada em self_typed_keys
         if key == keyboard.Key.enter and not self.typed_keys:
             return
-       
+
         # Initialize just_expanded to False at the beginning of the function
         just_expanded = False
 
@@ -304,10 +307,9 @@ class KeyListener:
                     self.accent = True
                     self.last_key = key_char
                 else:
-                     if key not in self.omitted_keys:
+                    if key not in self.omitted_keys:
                         self.typed_keys += key_char
                         print(self.typed_keys)
-                                
 
             just_expanded = False
 

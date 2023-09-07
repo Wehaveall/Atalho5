@@ -134,16 +134,6 @@ def modify_legal_document(input_file_path, output_file_path):
 modify_legal_document("E:/ce.html", "E:/ce_v2.txt")
 
 
-import re
-from bs4 import BeautifulSoup
-import html
-
-
-import re
-from bs4 import BeautifulSoup
-import html
-
-
 def add_delimiters(input_file_path, output_file_path):
     target_strings = [
         "Livro",
