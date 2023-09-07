@@ -7,6 +7,7 @@ import pyperclip  # We add this import for clipboard manipulation
 from src.utils import number_utils
 import time
 import logging
+import re
 
 
 # Setup logging
@@ -15,11 +16,30 @@ logging.basicConfig(
 )
 
 
-def format_article(article):
-    delimiters = ["*", "#", "%", "@", "$"]
-    for delimiter in delimiters:
-        article = article.replace(delimiter, "\n")
+
+def format_article(article, num_newlines=2):
+
+    delimiters = ["*", "#", "%", "@", "$", "++"]
+    
+    # Cria uma string contendo o número desejado de quebras de linha
+    newlines = "\n" * num_newlines
+    
+    for delimiter in delimiters[:-1]:  # Exclui "++", que será tratado separadamente
+        article = article.replace(delimiter, newlines)
+    
+    # Trata o delimitador "++" de forma especial
+    indices = [m.start() for m in re.finditer(r'\+\+', article)]
+    for index in reversed(indices):
+        next_art = article.find("Art.", index)
+        if next_art != -1:
+            article = article[:next_art] + newlines + article[next_art:]
+    article = article.replace('++', '')
+    
     return article
+
+
+
+
 
 
 class KeyListener:
@@ -167,10 +187,10 @@ class KeyListener:
             logging.info("Copied to clipboard.")
 
             # Verificar se o clipboard foi atualizado
-            for _ in range(10):
+            for _ in range(5):
                 if pyperclip.paste() == format_article(expansion):
                     break
-                time.sleep(0.1)
+                time.sleep(0.01)
 
             logging.info("About to paste.")
             pyautogui.hotkey("ctrl", "v")

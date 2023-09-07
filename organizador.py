@@ -151,6 +151,11 @@ def add_delimiters(input_file_path, output_file_path):
         "Capítulo",
         "Disposições",
         "Seção",
+        "Parte",
+        "Das",
+        "Da",
+        "Do",
+        "Dos",
     ]
     target_strings += [s.upper() for s in target_strings]  # Add uppercase versions
 
