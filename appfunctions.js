@@ -701,8 +701,9 @@ document.getElementById('rightPanel').style.display = 'flex';
       if (rowData) {
         // Primeiro, decodificar as entidades HTML
         let decodedExpansion = decodeHtml(rowData.expansion);
-        // Em seguida, formatar o artigo usando sua função
-        let formattedExpansion = formatArticle(decodedExpansion, tableName);
+        
+        // If format is "0", then format the article using your function
+        let formattedExpansion = (format === "0") ? formatArticle(decodedExpansion, tableName) : decodedExpansion;
 
         tinyMCE.get('editor').setContent(formattedExpansion);
 

@@ -21,11 +21,11 @@ def format_article(article, newlines=1):
     delimiters = ["*", "#", "%", "@", "$"]
     for delimiter in delimiters:
         article = article.replace(delimiter, "\n")
-    
+
     # Handling "++" delimiter
     plus_sections = article.split("++")
     new_article = plus_sections[0]  # Keep the first section as it is
-    
+
     if len(plus_sections) > 1:  # Only proceed if "++" exists in the article
         counter = 0  # Counter to keep track of "++" occurrences after the first one
         for section in plus_sections[1:]:
@@ -34,21 +34,25 @@ def format_article(article, newlines=1):
                 new_article += section
             # If counter is more than zero, add newline before "Art."
             else:
-                art_split = section.split("Art.", 1)  # Split by the first occurrence of "Art."
+                art_split = section.split(
+                    "Art.", 1
+                )  # Split by the first occurrence of "Art."
                 if len(art_split) > 1:
                     new_article += "\n" * newlines + "Art.".join(art_split)
                     counter = 0  # Reset the counter
                 else:
                     new_article += "\n" * newlines + section
-            
+
             # Increment the counter after the first "++"
             counter += 1
 
         # Add a newline before the first occurrence of "Art." if "++" exists
         first_art_index = new_article.find("Art.")
         if first_art_index != -1:
-            new_article = new_article[:first_art_index] + "\n" + new_article[first_art_index:]
-    
+            new_article = (
+                new_article[:first_art_index] + "\n" + new_article[first_art_index:]
+            )
+
     return new_article
 
 
@@ -173,13 +177,13 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    def paste_expansion(self, expansion):
+    def paste_expansion(self, expansion, expansion_format):
         self.pynput_listener.stop()
 
-        # Salvar conteúdo original do clipboard
+        # Save original clipboard content
         original_clipboard_content = pyperclip.paste()
 
-        # Inserir um backspace press se a última tecla foi "Enter"
+        # Insert a backspace press if the last key was "Enter"
         if self.just_expanded_with == "enter":
             pyautogui.press("backspace")
 
@@ -188,12 +192,20 @@ class KeyListener:
 
         if expansion is not None:
             logging.info("About to copy to clipboard.")
-            pyperclip.copy(format_article(expansion))
+
+            # Check the format and then copy accordingly
+            if expansion_format == "1":
+                pyperclip.copy(format_article(expansion))  # Formatted Text
+            else:
+                pyperclip.copy(expansion)  # Plain Text
+
             logging.info("Copied to clipboard.")
 
-            # Verificar se o clipboard foi atualizado
+            # Verify if the clipboard was updated
             for _ in range(5):
-                if pyperclip.paste() == format_article(expansion):
+                if pyperclip.paste() == (
+                    format_article(expansion) if expansion_format == "1" else expansion
+                ):
                     break
                 time.sleep(0.01)
 
@@ -201,11 +213,11 @@ class KeyListener:
             pyautogui.hotkey("ctrl", "v")
             logging.info("Pasted.")
 
-            # Restaurar conteúdo original do clipboard
+            # Restore original clipboard content
             pyperclip.copy(original_clipboard_content)
 
         self.typed_keys = ""
-        self.just_expanded_with = None  # Resetar a flag
+        self.just_expanded_with = None  # Reset the flag
         self.start_listener()
 
     # ----------------------------------------------------------------
@@ -243,6 +255,7 @@ class KeyListener:
                     expansion,
                     self.requires_delimiter,
                     self.delimiters,
+                    expansion_format,
                 ) = lookup_word_in_all_databases(self.typed_keys)
 
                 print(
@@ -270,7 +283,7 @@ class KeyListener:
 
                         if expansion is not None:
                             self.just_expanded_with = key_str  # Set the flag here
-                            self.paste_expansion(expansion)
+                            self.paste_expansion(expansion, expansion_format)
                             self.typed_keys = ""  # Reset typed keys
                             just_expanded = (
                                 True  # Set this to True when an expansion happens
