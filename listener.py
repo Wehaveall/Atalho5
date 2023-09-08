@@ -8,7 +8,8 @@ from src.utils import number_utils
 import time
 import logging
 import re
-
+from bs4 import BeautifulSoup
+import ctypes
 
 # Setup logging
 logging.basicConfig(
@@ -54,6 +55,10 @@ def format_article(article, newlines=1):
             )
 
     return new_article
+
+
+
+
 
 
 class KeyListener:
@@ -177,13 +182,15 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    def paste_expansion(self, expansion, expansion_format):
+    
+    
+    def paste_expansion(self, expansion, format_value):
         self.pynput_listener.stop()
 
-        # Save original clipboard content
+        # Salvar conteúdo original do clipboard
         original_clipboard_content = pyperclip.paste()
 
-        # Insert a backspace press if the last key was "Enter"
+        # Inserir um backspace press se a última tecla foi "Enter"
         if self.just_expanded_with == "enter":
             pyautogui.press("backspace")
 
@@ -191,33 +198,61 @@ class KeyListener:
         pyautogui.press("backspace")
 
         if expansion is not None:
-            logging.info("About to copy to clipboard.")
 
-            # Check the format and then copy accordingly
-            if expansion_format == "1":
-                pyperclip.copy(format_article(expansion))  # Formatted Text
+            # Debugging steps
+            print("Actual value of format_value before casting: ", format_value)
+            format_value = int(format_value)
+            print("Actual value of format_value after casting: ", format_value)
+
+            if format_value == 0:
+                # Copiar como texto simples
+                pyperclip.copy(format_article(expansion))
+           
+           
+           
+           
+           
             else:
-                pyperclip.copy(expansion)  # Plain Text
+                # Abre o clipboard
+                ctypes.windll.user32.OpenClipboard(0)
 
-            logging.info("Copied to clipboard.")
+                try:
+                    # Esvazia o conteúdo atual
+                    ctypes.windll.user32.EmptyClipboard()
 
-            # Verify if the clipboard was updated
-            for _ in range(5):
-                if pyperclip.paste() == (
-                    format_article(expansion) if expansion_format == "1" else expansion
-                ):
-                    break
-                time.sleep(0.01)
+                    # Define o formato HTML
+                    cf_html = 49161  # Formato HTML
+
+                    # Define o texto HTML formatado
+                    html_data = expansion
+
+                    # Define os dados no clipboard
+                    data = ctypes.create_unicode_buffer(html_data)
+                    ctypes.windll.user32.SetClipboardData(cf_html, data)
+                finally:
+                    # Fecha o clipboard
+                    ctypes.windll.user32.CloseClipboard()
+
+
+               
+
+
+
+
+            # Verificar se o clipboard foi atualizado
+            #for _ in range(5):
+              ##     break
+               # time.sleep(0.01)
 
             logging.info("About to paste.")
             pyautogui.hotkey("ctrl", "v")
             logging.info("Pasted.")
 
-            # Restore original clipboard content
+            # Restaurar conteúdo original do clipboard
             pyperclip.copy(original_clipboard_content)
 
         self.typed_keys = ""
-        self.just_expanded_with = None  # Reset the flag
+        self.just_expanded_with = None  # Resetar a flag
         self.start_listener()
 
     # ----------------------------------------------------------------
@@ -251,20 +286,29 @@ class KeyListener:
                     )  # Debug
                     return
 
-                (
-                    expansion,
-                    self.requires_delimiter,
-                    self.delimiters,
-                    expansion_format,
-                ) = lookup_word_in_all_databases(self.typed_keys)
+                try:
+                    print("Before lookup")
+                    (
+                        expansion,
+                        format_value,
+                        self.requires_delimiter,
+                        self.delimiters,
+                    ) = lookup_word_in_all_databases(self.typed_keys)
+                    print("After lookup")
+                    print(f"Format Value: {format_value}")
+
+                except Exception as e:
+                    print(f"An exception occurred: {e}")
 
                 print(
                     f"Requires delimiter: {self.requires_delimiter}"
                 )  # Debug moved here
                 print(f"Delimiters: {self.delimiters}")  # Debug moved here
 
-                # Convert the delimiters string to a list
-                delimiter_list = [item.strip() for item in self.delimiters.split(",")]
+                if self.delimiters is not None:
+                    delimiter_list = [item.strip() for item in self.delimiters.split(",")]
+                else:
+                    delimiter_list = []
 
                 print(f"Delimiter list: {delimiter_list}")  # Debug
 
@@ -283,7 +327,7 @@ class KeyListener:
 
                         if expansion is not None:
                             self.just_expanded_with = key_str  # Set the flag here
-                            self.paste_expansion(expansion, expansion_format)
+                            self.paste_expansion(expansion, format_value=format_value)  # Use the variable format_value
                             self.typed_keys = ""  # Reset typed keys
                             just_expanded = (
                                 True  # Set this to True when an expansion happens

@@ -197,11 +197,9 @@ def lookup_word_in_all_databases(word):
             with Session(engine) as session:
                 config_result = session.execute(s_config).first()
                 if config_result:
+                   
                     requires_delimiter = config_result.requires_delimiter
                     delimiters = config_result.delimiters
-
-                    # Assume you have a 'format' field in the config table
-
         # Continue with the existing logic for looking up words
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
@@ -210,13 +208,9 @@ def lookup_word_in_all_databases(word):
             with Session(engine) as session:
                 result = session.execute(s).first()
                 if result:
-                    expansion_format = result.format  # Extracting the format field
-                    return (
-                        result.expansion,
-                        requires_delimiter,
-                        delimiters,
-                        expansion_format,
-                    )  # Return the format
+                    format_value = int(result.format)
+                    print(f"Format value: {result.format}, Type: {type(result.format)}")  # Debugging line
+                    return result.expansion, format_value, requires_delimiter, delimiters
 
     # If no result was found in any database, return None
     return None, requires_delimiter, delimiters

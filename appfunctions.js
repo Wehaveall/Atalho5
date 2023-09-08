@@ -188,6 +188,7 @@ function formatExpansion(expansion, tableName) {
 
 
 
+// Apenas no caso de aTable!!!!!
 
 function convertHtmlToPlainText(html) {
   var tempDiv = document.createElement("div");
@@ -201,7 +202,10 @@ function convertHtmlToPlainText(html) {
 //Formata  o texto dentro do tinyMCE editor
 //----------------------------------------------------------------
 
+
+
 function formatArticle(article, tableName) {
+  // Apenas no caso de aTable!!!!!
   if (tableName === 'aTable') {
     // Convert HTML to plain text
     article = convertHtmlToPlainText(article);
@@ -701,9 +705,8 @@ document.getElementById('rightPanel').style.display = 'flex';
       if (rowData) {
         // Primeiro, decodificar as entidades HTML
         let decodedExpansion = decodeHtml(rowData.expansion);
-        
-        // If format is "0", then format the article using your function
-        let formattedExpansion = (format === "0") ? formatArticle(decodedExpansion, tableName) : decodedExpansion;
+        // Em seguida, formatar o artigo usando sua função
+        let formattedExpansion = formatArticle(decodedExpansion, tableName);
 
         tinyMCE.get('editor').setContent(formattedExpansion);
 
