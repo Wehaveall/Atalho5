@@ -9,11 +9,8 @@ import time
 import logging
 
 
-
-
 from bs4 import BeautifulSoup
 import html_clipboard
-
 
 
 # Setup logging
@@ -64,19 +61,13 @@ def format_article(article, newlines=1):
 
 class KeyListener:
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-        
-        
         self.ctrl_pressed = False
         self.shift_pressed = False
         self.alt_pressed = False
         self.winkey_pressed = False
 
-
         self.api = api
-       
 
-       
-        
         self.key_to_str_map = {
             "Key.space": "space",
             "Key.enter": "enter",
@@ -198,11 +189,8 @@ class KeyListener:
     def paste_expansion(self, expansion, format_value):
         self.pynput_listener.stop()  # Stop listening for keys
 
-        #original_clipboard_content = pyperclip.paste()  # Save the original clipboard content
-
-        # Log for debugging
+        # Debug statements
         print(f"Debug: Expansion before copy: {expansion}")
-
 
         # Clear previously typed keys
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
@@ -215,40 +203,38 @@ class KeyListener:
 
             if format_value == 0:
                 pyperclip.copy(expansion)
+                print("Debug: Using REGULAR clipboard.")
             else:
-                                
-            
+                dirty_HTML = expansion  # Your variable
+                html_clipboard.PutHtml(dirty_HTML)  # Your logic
+                print("Debug: Using HTML clipboard.")
 
-                if html_clipboard.HasHtml():
-                    # print('there is HTML!!')
-                    dirty_HTML = expansion
-                     #put data to clipboard:
-                    html_clipboard.PutHtml(dirty_HTML)
-                   
-                else:
-                    print("Debug: About to paste.")
-                  
-                   
-           
             # Now paste
             print("Debug: About to paste.")
-            pyautogui.hotkey("ctrl", "v")  # Paste the clipboard content
+            pyautogui.hotkey("ctrl", "v")
             print("Debug: Pasted.")
 
-            #pyperclip.copy(original_clipboard_content)  # Restore the original clipboard content
-
         self.typed_keys = ""
-        self.just_expanded_with = None  # Initialize this variable if you plan to use it
+        self.just_expanded_with = None
         self.start_listener()  # Start listening for keys again
 
     # ----------------------------------------------------------------
 
     def on_key_release(self, key):
 
+         # Initialize variables to None at the start of the function
+        expansion = None
+        format_value = None
+        self.requires_delimiter = None
+        self.delimiters = None
 
-        if self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed:
+        if (
+            self.ctrl_pressed
+            or self.shift_pressed
+            or self.alt_pressed
+            or self.winkey_pressed
+        ):
             return
-
 
         if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
             self.ctrl_pressed = False
@@ -258,16 +244,6 @@ class KeyListener:
             self.alt_pressed = False
         elif key == keyboard.Key.cmd:
             self.winkey_pressed = False
-
-
-
-
-
-
-
-
-
-
 
         # Ignora enter quando não há  nada em self_typed_keys
         if key == keyboard.Key.enter and not self.typed_keys:
@@ -299,12 +275,21 @@ class KeyListener:
 
                 try:
                     print("Before lookup")
-                    (
-                        expansion,
-                        format_value,
-                        self.requires_delimiter,
-                        self.delimiters,
-                    ) = lookup_word_in_all_databases(self.typed_keys)
+                   
+                   
+                    try:
+                        (
+                            expansion,
+                            format_value,
+                            self.requires_delimiter,
+                            self.delimiters,
+                        ) = lookup_word_in_all_databases(self.typed_keys)
+                    except ValueError:  # Handle the case where not enough values are returned
+                        print("Not enough values returned from lookup")
+                        expansion = format_value = self.requires_delimiter = self.delimiters = None
+                   
+                   
+                   
                     print("After lookup")
                     print(f"Format Value: {format_value}")
 
@@ -388,12 +373,20 @@ class KeyListener:
         # --------------------------------------------------------
 
         except Exception as e:
-            logging.error(f"Error in on_key_release: {e}")
-            self.restart_listener()  # Restart the listener in case of an error
+            logging.error(f"Error in on_key_release: {e}")  # Log the error
+            try:
+                self.restart_listener()  # Moved inside the except block
+            except RuntimeError:
+                logging.error("Could not restart the listener.")
 
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            logging.info(f"on_key_release processing took {elapsed_time:.2f} seconds")
+        # Reset self.typed_keys if Enter or Space is pressed
+        resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
+        if key in resetting_keys_conditionally:
+            self.typed_keys = ""
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        logging.info(f"on_key_release processing took {elapsed_time:.2f} seconds")
 
     # ----------------------------------------------------------------
     # ----------------------------------------------------------------
