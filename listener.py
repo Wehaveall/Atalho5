@@ -7,9 +7,14 @@ import pyperclip  # We add this import for clipboard manipulation
 from src.utils import number_utils
 import time
 import logging
-import re
+
+
+
+
 from bs4 import BeautifulSoup
-import ctypes
+import html_clipboard
+
+
 
 # Setup logging
 logging.basicConfig(
@@ -57,12 +62,21 @@ def format_article(article, newlines=1):
     return new_article
 
 
-
-
-
-
 class KeyListener:
-    def __init__(self, api):
+    def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
+        
+        
+        self.ctrl_pressed = False
+        self.shift_pressed = False
+        self.alt_pressed = False
+        self.winkey_pressed = False
+
+
+        self.api = api
+       
+
+       
+        
         self.key_to_str_map = {
             "Key.space": "space",
             "Key.enter": "enter",
@@ -77,7 +91,6 @@ class KeyListener:
         self.typed_keys = ""
         # Added this line to store the pynput listener
         self.pynput_listener = None
-        self.api = api  # Armazene api para uso posterior
         self.silent_mode = False
         self.isRecordingMacro = False
         self.accent_mapping = defaultdict(
@@ -182,82 +195,80 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    
-    
     def paste_expansion(self, expansion, format_value):
-        self.pynput_listener.stop()
+        self.pynput_listener.stop()  # Stop listening for keys
 
-        # Salvar conteúdo original do clipboard
-        original_clipboard_content = pyperclip.paste()
+        #original_clipboard_content = pyperclip.paste()  # Save the original clipboard content
 
-        # Inserir um backspace press se a última tecla foi "Enter"
-        if self.just_expanded_with == "enter":
-            pyautogui.press("backspace")
+        # Log for debugging
+        print(f"Debug: Expansion before copy: {expansion}")
 
+
+        # Clear previously typed keys
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
         pyautogui.press("backspace")
 
         if expansion is not None:
-
-            # Debugging steps
             print("Actual value of format_value before casting: ", format_value)
             format_value = int(format_value)
             print("Actual value of format_value after casting: ", format_value)
 
             if format_value == 0:
-                # Copiar como texto simples
-                pyperclip.copy(format_article(expansion))
-           
-           
-           
-           
-           
+                pyperclip.copy(expansion)
             else:
-                # Abre o clipboard
-                ctypes.windll.user32.OpenClipboard(0)
+                                
+            
 
-                try:
-                    # Esvazia o conteúdo atual
-                    ctypes.windll.user32.EmptyClipboard()
+                if html_clipboard.HasHtml():
+                    # print('there is HTML!!')
+                    dirty_HTML = expansion
+                     #put data to clipboard:
+                    html_clipboard.PutHtml(dirty_HTML)
+                   
+                else:
+                    print("Debug: About to paste.")
+                  
+                   
+           
+            # Now paste
+            print("Debug: About to paste.")
+            pyautogui.hotkey("ctrl", "v")  # Paste the clipboard content
+            print("Debug: Pasted.")
 
-                    # Define o formato HTML
-                    cf_html = 49161  # Formato HTML
-
-                    # Define o texto HTML formatado
-                    html_data = expansion
-
-                    # Define os dados no clipboard
-                    data = ctypes.create_unicode_buffer(html_data)
-                    ctypes.windll.user32.SetClipboardData(cf_html, data)
-                finally:
-                    # Fecha o clipboard
-                    ctypes.windll.user32.CloseClipboard()
-
-
-               
-
-
-
-
-            # Verificar se o clipboard foi atualizado
-            #for _ in range(5):
-              ##     break
-               # time.sleep(0.01)
-
-            logging.info("About to paste.")
-            pyautogui.hotkey("ctrl", "v")
-            logging.info("Pasted.")
-
-            # Restaurar conteúdo original do clipboard
-            pyperclip.copy(original_clipboard_content)
+            #pyperclip.copy(original_clipboard_content)  # Restore the original clipboard content
 
         self.typed_keys = ""
-        self.just_expanded_with = None  # Resetar a flag
-        self.start_listener()
+        self.just_expanded_with = None  # Initialize this variable if you plan to use it
+        self.start_listener()  # Start listening for keys again
 
     # ----------------------------------------------------------------
 
     def on_key_release(self, key):
+
+
+        if self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed:
+            return
+
+
+        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+            self.ctrl_pressed = False
+        elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
+            self.shift_pressed = False
+        elif key == keyboard.Key.alt_l or key == keyboard.Key.alt_r:
+            self.alt_pressed = False
+        elif key == keyboard.Key.cmd:
+            self.winkey_pressed = False
+
+
+
+
+
+
+
+
+
+
+
         # Ignora enter quando não há  nada em self_typed_keys
         if key == keyboard.Key.enter and not self.typed_keys:
             return
@@ -306,7 +317,9 @@ class KeyListener:
                 print(f"Delimiters: {self.delimiters}")  # Debug moved here
 
                 if self.delimiters is not None:
-                    delimiter_list = [item.strip() for item in self.delimiters.split(",")]
+                    delimiter_list = [
+                        item.strip() for item in self.delimiters.split(",")
+                    ]
                 else:
                     delimiter_list = []
 
@@ -327,7 +340,9 @@ class KeyListener:
 
                         if expansion is not None:
                             self.just_expanded_with = key_str  # Set the flag here
-                            self.paste_expansion(expansion, format_value=format_value)  # Use the variable format_value
+                            self.paste_expansion(
+                                expansion, format_value=format_value
+                            )  # Use the variable format_value
                             self.typed_keys = ""  # Reset typed keys
                             just_expanded = (
                                 True  # Set this to True when an expansion happens

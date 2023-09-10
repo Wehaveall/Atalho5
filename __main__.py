@@ -38,7 +38,7 @@ from ctypes import windll, Structure, c_long, byref
 import json
 import os
 import logging
-import sqlite3
+
 
 from sqlalchemy.orm import Session
 
@@ -55,6 +55,11 @@ from macroPlayer import Executor
 # --------------------------------Imagem bandeja do sistema
 import pystray
 from PIL import Image
+
+
+import pyautogui
+import pyperclip
+
 
 state_lock = Lock()
 
@@ -342,6 +347,20 @@ class Api:
 
     def start_macro(self, filename):
         self.executor.start_macro(filename)
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
 
     # ---------------------------------------------------------------- DATABASE  -------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------

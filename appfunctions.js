@@ -672,6 +672,31 @@ var preventSave = false;
 var isEditorUpdate = false;
 var isSaving = false;
 
+
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+var jsOperationCompleted = false; // Global variable
+
+async function copyHtmlToClipboard(html) {
+  alert("copyHtmlToClipboard is called with:", html); 
+  const item = new ClipboardItem({
+    "text/html": new Blob([html], {type: "text/html"})
+  });
+  await navigator.clipboard.write([item]);
+  jsOperationCompleted = true;  // Set the global variable to true
+}
+
+
+//-----------------------------------------------------------------
+//-------------------------------------------------------------------
+//------------------------------------------------------------------
+
+
+
+
+
+
 function handleRowClick() {
   // Se uma operação de salvamento estiver em andamento, retorne imediatamente
   if (isSaving) return;
@@ -709,6 +734,25 @@ document.getElementById('rightPanel').style.display = 'flex';
         let formattedExpansion = formatArticle(decodedExpansion, tableName);
 
         tinyMCE.get('editor').setContent(formattedExpansion);
+
+
+
+        // Obter o conteúdo renderizado do editor
+        let renderedContent = tinyMCE.get('editor').getContent();
+
+        // Obter o conteúdo renderizado do editor
+
+
+        // Copiar o conteúdo HTML para a área de transferência
+        copyHtmlToClipboard(renderedContent);
+
+
+
+
+
+
+
+
 
         // Set the "atalho" value inside the #shortcutName div
         const shortcutNameDiv = document.getElementById('shortcutName');

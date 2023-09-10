@@ -13,6 +13,29 @@ window.addEventListener('load', function () {
 
 
 
+
+
+
+
+
+
+
+
+
+
+//Editor oculto para as formatações
+tinymce.init({
+    selector: '#hiddenEditor',
+    height: '100%',
+    plugins:
+    "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
+    toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough',
+    toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    paste_as_text: false,
+    // suas outras configurações aqui, idênticas à instância visível
+});
+
+
 // Assuming the custom select is applied to the 'escolha' element
  const customSelectElement = document.querySelector('.custom-select-container');
 
