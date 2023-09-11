@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 import html_clipboard
 
 
+from collections import deque
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -61,6 +63,12 @@ def format_article(article, newlines=1):
 
 class KeyListener:
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
+        self.word_buffer = deque(
+            maxlen=5
+        )  # Set the maximum length to the longest shortcut you have
+        self.char_buffer = ""
+        self.buffer_size = 5 # Set the buffer size
+
         self.ctrl_pressed = False
         self.shift_pressed = False
         self.alt_pressed = False
@@ -186,6 +194,9 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
+    def get_last_n_words(self, n):
+        return " ".join(list(self.word_buffer)[-n:])
+
     def paste_expansion(self, expansion, format_value):
         self.pynput_listener.stop()  # Stop listening for keys
 
@@ -221,12 +232,15 @@ class KeyListener:
     # ----------------------------------------------------------------
 
     def on_key_release(self, key):
-
-         # Initialize variables to None at the start of the function
+        # Initialize variables to None at the start of the function
         expansion = None
         format_value = None
         self.requires_delimiter = None
         self.delimiters = None
+        key_char = None  # Initialize key_char
+
+        print(f"Word buffer: {self.word_buffer}")  # Debug
+
 
         if (
             self.ctrl_pressed
@@ -262,6 +276,8 @@ class KeyListener:
             if self.silent_mode:
                 return
 
+           
+
             if key in self.omitted_keys:
                 if self.api.is_recording:
                     return
@@ -275,8 +291,7 @@ class KeyListener:
 
                 try:
                     print("Before lookup")
-                   
-                   
+
                     try:
                         (
                             expansion,
@@ -284,12 +299,15 @@ class KeyListener:
                             self.requires_delimiter,
                             self.delimiters,
                         ) = lookup_word_in_all_databases(self.typed_keys)
-                    except ValueError:  # Handle the case where not enough values are returned
+
+                    except (
+                        ValueError
+                    ):  # Handle the case where not enough values are returned
                         print("Not enough values returned from lookup")
-                        expansion = format_value = self.requires_delimiter = self.delimiters = None
-                   
-                   
-                   
+                        expansion = (
+                            format_value
+                        ) = self.requires_delimiter = self.delimiters = None
+
                     print("After lookup")
                     print(f"Format Value: {format_value}")
 
@@ -354,7 +372,18 @@ class KeyListener:
             if self.stop_event.is_set():
                 return False
 
-            key_char = key.char if hasattr(key, "char") else str(key)
+            key_char = ' ' if key == keyboard.Key.space else (key.char if hasattr(key, "char") else str(key))
+            print(f"key: {key}, key_char: {key_char}")  # Debug
+
+            if key_char == ' ':  # Space separates words
+                self.word_buffer.append(self.char_buffer)
+                self.char_buffer = ""
+                if len(self.word_buffer) > self.buffer_size:
+                    self.word_buffer.pop(0)  # Remove the oldest word
+                print(f"Word buffer: {self.word_buffer}")  # Debug
+            else:
+                self.char_buffer += key_char
+                print(f"Char buffer: {self.char_buffer}")  # Debug
 
             # ----------------------------------------------------------------
             if not just_expanded:
@@ -383,6 +412,7 @@ class KeyListener:
         resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
         if key in resetting_keys_conditionally:
             self.typed_keys = ""
+            self.char_buffer = ""  # Clear the char buffer
 
         end_time = time.time()
         elapsed_time = end_time - start_time
