@@ -239,8 +239,7 @@ class KeyListener:
         self.delimiters = None
         key_char = None  # Initialize key_char
 
-        print(f"Word buffer: {self.word_buffer}")  # Debug
-
+      
 
         if (
             self.ctrl_pressed
@@ -373,40 +372,38 @@ class KeyListener:
                 return False
 
             key_char = ' ' if key == keyboard.Key.space else (key.char if hasattr(key, "char") else str(key))
-            print(f"key: {key}, key_char: {key_char}")  # Debug
 
-            if key_char == ' ':  # Space separates words
+        # Handle word and char buffering
+            if key_char == ' ':
+                if self.accent:  # If the last character had an accent
+                    self.handle_accent_key(' ')  # Apply the accent to the space (or modify as needed)
+                    
                 self.word_buffer.append(self.char_buffer)
                 self.char_buffer = ""
+                
                 if len(self.word_buffer) > self.buffer_size:
-                    self.word_buffer.pop(0)  # Remove the oldest word
+                    self.word_buffer.popleft()  # Remove the oldest word
+                
                 print(f"Word buffer: {self.word_buffer}")  # Debug
             else:
-                self.char_buffer += key_char
-                print(f"Char buffer: {self.char_buffer}")  # Debug
-
-            # ----------------------------------------------------------------
-            if not just_expanded:
+                # Handle accents
                 if self.accent:
                     self.handle_accent_key(key_char)
                 elif key_char in self.accents:
                     self.accent = True
                     self.last_key = key_char
                 else:
-                    if key not in self.omitted_keys:
-                        self.typed_keys += key_char
-                        print(self.typed_keys)
+                    self.char_buffer += key_char
 
-            just_expanded = False
+                print(f"Char buffer: {self.char_buffer}")  # Debug
 
-        # --------------------------------------------------------
+            if not just_expanded:
+                if key not in self.omitted_keys:
+                    self.typed_keys += key_char
 
         except Exception as e:
-            logging.error(f"Error in on_key_release: {e}")  # Log the error
-            try:
-                self.restart_listener()  # Moved inside the except block
-            except RuntimeError:
-                logging.error("Could not restart the listener.")
+            logging.error(f"Error in on_key_release: {e}")
+            self.restart_listener()
 
         # Reset self.typed_keys if Enter or Space is pressed
         resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
@@ -449,7 +446,11 @@ class KeyListener:
     def handle_accent_key(self, key_char):
         self.accent = False
         combination = self.last_key + key_char
-        self.typed_keys += self.accent_mapping[combination]
+        accented_char = self.accent_mapping[combination]
+        
+        # Add the accented character to the char_buffer
+        self.char_buffer += accented_char  # Add this line
+
 
     def start(self):
         self.start_listener()  # Change self.listener.start() to self.start_listener()
