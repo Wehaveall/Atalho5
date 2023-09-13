@@ -14,6 +14,54 @@ import html_clipboard
 
 
 from collections import deque
+import platform
+
+
+
+import time
+from pynput import keyboard
+
+
+
+
+
+
+
+# Import the TextExtractor class
+from src.classes.text_Extractor import TextExtractor
+
+# Create an instance of the class
+text_extractor = TextExtractor()
+
+
+
+
+
+
+
+
+
+
+def get_last_word_in_MS_Word():
+    if platform.system() == "Windows":
+        import win32com.client
+
+        word = win32com.client.Dispatch("Word.Application")
+        doc = word.ActiveDocument
+        content = doc.Content.Text
+        words = content.split()
+        if words:
+            return words[-1]
+        else:
+            return None
+    elif platform.system() == "Darwin":  # macOS
+        # Code for Mac
+        print("This function is not supported on macOS")
+        return None
+    else:
+        print("Unsupported OS")
+        return None
+
 
 # Setup logging
 logging.basicConfig(
@@ -62,12 +110,17 @@ def format_article(article, newlines=1):
 
 
 class KeyListener:
+    
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-        self.word_buffer = deque(
-            maxlen=5
-        )  # Set the maximum length to the longest shortcut you have
+        
+
+        self.last_key_pressed = None  # Add this line to initialize the last_key_pressed variable
+
+        self.word_buffer = deque([], maxlen=5)  # Initialize with an empty deque
+
+       
         self.char_buffer = ""
-        self.buffer_size = 5 # Set the buffer size
+    
 
         self.ctrl_pressed = False
         self.shift_pressed = False
@@ -194,8 +247,9 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    def get_last_n_words(self, n):
-        return " ".join(list(self.word_buffer)[-n:])
+ 
+
+    # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
         self.pynput_listener.stop()  # Stop listening for keys
@@ -239,7 +293,36 @@ class KeyListener:
         self.delimiters = None
         key_char = None  # Initialize key_char
 
-      
+         # Initialize a new instance variable in __init__ to None
+       
+
+        # -----------------------------------------if platform.system() == 'Windows':
+        import win32gui
+
+        # MS WORD SPECIFIC
+        # --------------------------------------- Get the title of the current window
+        hwnd = win32gui.GetForegroundWindow()
+        window_title = win32gui.GetWindowText(hwnd)
+        # ----------------------------------------------------------------
+
+        # Verificar se estamos no MS-WORD
+        # Check if we're in MS Word
+
+       # Check platform first
+        if platform.system() == "Windows":
+            # Check if we're in MS Word
+            if "Word" in window_title:
+                last_word = get_last_word_in_MS_Word()
+                print(f"Last word in the document: {last_word}")
+            # You can put other conditions here for different software if needed
+        elif platform.system() == "Darwin":  # macOS
+            print("This function is not supported on macOS")
+        else:
+            print("Unsupported OS")
+
+            
+        # -------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
 
         if (
             self.ctrl_pressed
@@ -267,6 +350,12 @@ class KeyListener:
 
         start_time = time.time()
 
+        if hasattr(key, 'char') and key.char:  # Only update when key.char exists and is not None
+            #self.char_buffer += key.char
+            self.typed_keys += key.char
+            #self.word_buffer[-1] += key.char  # This should be safe now
+
+
         try:
             # Check silent mode is enabled
             if self.isRecordingMacro:
@@ -275,20 +364,26 @@ class KeyListener:
             if self.silent_mode:
                 return
 
-           
-
             if key in self.omitted_keys:
                 if self.api.is_recording:
                     return
+                
 
-                if key == keyboard.Key.backspace:
-                    self.typed_keys = self.typed_keys[:-1]
-                    print(
-                        f"Current typed_keys (After backspace): {self.typed_keys}"
-                    )  # Debug
-                    return
+                if key == keyboard.Key.space:
+                    # Use the methods from the class
+                    text_from_window = text_extractor.get_text_from_foreground_window()
+                   
+                    if text_from_window:
+                        cursor_position, _ = text_extractor.get_cursor_position(text_extractor.edit_hwnd)
+                        last_word = text_extractor.get_word_behind_cursor(cursor_position, text_from_window)
+                        print(f"The last word behind the cursor is: {last_word}")
 
+                
+    
+                
                 try:
+                
+                    
                     print("Before lookup")
 
                     try:
@@ -371,31 +466,25 @@ class KeyListener:
             if self.stop_event.is_set():
                 return False
 
-            key_char = ' ' if key == keyboard.Key.space else (key.char if hasattr(key, "char") else str(key))
+            key_char = (
+                " "
+                if key == keyboard.Key.space
+                else (key.char if hasattr(key, "char") else str(key))
+            )
 
-        # Handle word and char buffering
-            if key_char == ' ':
-                if self.accent:  # If the last character had an accent
-                    self.handle_accent_key(' ')  # Apply the accent to the space (or modify as needed)
-                    
-                self.word_buffer.append(self.char_buffer)
-                self.char_buffer = ""
-                
-                if len(self.word_buffer) > self.buffer_size:
-                    self.word_buffer.popleft()  # Remove the oldest word
-                
-                print(f"Word buffer: {self.word_buffer}")  # Debug
-            else:
+            # Handle word and char buffering
+            
                 # Handle accents
-                if self.accent:
+            if self.accent:
                     self.handle_accent_key(key_char)
-                elif key_char in self.accents:
+            elif key_char in self.accents:
                     self.accent = True
                     self.last_key = key_char
-                else:
+            else:
                     self.char_buffer += key_char
 
-                print(f"Char buffer: {self.char_buffer}")  # Debug
+            print(f"Char buffer: {self.char_buffer}")  # Debug
+            print(f"Word buffer after space: {self.word_buffer}")
 
             if not just_expanded:
                 if key not in self.omitted_keys:
@@ -406,10 +495,10 @@ class KeyListener:
             self.restart_listener()
 
         # Reset self.typed_keys if Enter or Space is pressed
-        resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
-        if key in resetting_keys_conditionally:
-            self.typed_keys = ""
-            self.char_buffer = ""  # Clear the char buffer
+        #resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
+        #if key in resetting_keys_conditionally:
+         #   self.typed_keys = ""
+          #  self.char_buffer = ""  # Clear the char buffer
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -447,10 +536,9 @@ class KeyListener:
         self.accent = False
         combination = self.last_key + key_char
         accented_char = self.accent_mapping[combination]
-        
+
         # Add the accented character to the char_buffer
         self.char_buffer += accented_char  # Add this line
-
 
     def start(self):
         self.start_listener()  # Change self.listener.start() to self.start_listener()
