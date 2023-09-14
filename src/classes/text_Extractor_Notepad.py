@@ -20,11 +20,13 @@ class TextExtractor:
             'TEdit', 'TMemo', 'wxWindowClassNR', 'Scintilla', 'ConsoleWindowClass', 
             'NetUIHWND', 'RICHEDIT', 'RichEditD2DPT', 'TextBox', 'View32', 
             'AfxWnd', '_WwG', 'EXCEL7'
+          
         ]
         
         if class_name in known_classes:
             self.edit_hwnd = hwnd
             return False
+
    
 
     def get_text_from_foreground_window(self):
