@@ -129,12 +129,21 @@ def get_engine(db_path):
 import os
 from sqlalchemy import create_engine, MetaData, Table, select, inspect
 from sqlalchemy.orm import Session
-
-
 import importlib
 
 
-def lookup_word_in_all_databases(word):
+
+
+
+
+# Initialize the preloaded_data dictionary
+preloaded_data = {}
+cache = {}
+
+def preload_data():
+    print("Preloading data...")  # Debug
+    global preloaded_data  # Declare as global to modify it
+
     # Import Api class from the '__main__' module
     Api = importlib.import_module("__main__").Api
 
@@ -155,8 +164,6 @@ def lookup_word_in_all_databases(word):
             if file.endswith(".db"):
                 db_files.append(os.path.join(root, file))
 
-    print(f"Loaded checkbox states: {checkBoxStates}")  # Debugging line
-
     # Create a MetaData instance once
     metadata = MetaData()
 
@@ -169,14 +176,9 @@ def lookup_word_in_all_databases(word):
         # Construct the key
         key = f"{group_name}|{db_name}"
 
-        print(f"Checking key: {key}")  # Debugging line
-
         # Skip this database if its checkbox is not checked
         if not checkBoxStates.get(key, False):
-            print(f"Skipping database: {db_file}")  # Debugging line
             continue
-
-        print(f"Searching in database: {db_file}")  # Debugging line
 
         engine = create_engine(f"sqlite:///{db_file}")  # Get the engine
 
@@ -190,27 +192,54 @@ def lookup_word_in_all_databases(word):
             None,
         )
 
-        # Fetch required_delimiters and delimiters from the config table
-        if "config" in table_names:
-            config_table = Table("config", metadata, autoload_with=engine)
-            s_config = select(config_table)
-            with Session(engine) as session:
-                config_result = session.execute(s_config).first()
-                if config_result:
-                   
-                    requires_delimiter = config_result.requires_delimiter
-                    delimiters = config_result.delimiters
-        # Continue with the existing logic for looking up words
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
-            s = select(table).where(table.c.shortcut == word)
+            s = select(table)
 
             with Session(engine) as session:
-                result = session.execute(s).first()
-                if result:
-                    format_value = int(result.format)
-                    print(f"Format value: {result.format}, Type: {type(result.format)}")  # Debugging line
-                    return result.expansion, format_value, requires_delimiter, delimiters
+                results = session.execute(s).all()
+                for row in results:
+                    preloaded_data[row.shortcut] = (row.expansion, int(row.format))
 
-    # If no result was found in any database, return None
-    return None, requires_delimiter, delimiters
+ # Debug print the keys loaded
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def lookup_word_in_all_databases(word):
+    global preloaded_data, cache  # Declare both as global to modify them
+    
+
+    # Check cache first
+    if word in cache:
+        
+        return cache[word]
+
+    # Check preloaded data
+    if word in preloaded_data:
+
+        
+        expansion, format_value = preloaded_data[word]
+        
+        # Assuming that requires_delimiter and delimiters are the same across all databases
+        requires_delimiter = "yes"  # Or whatever default value you have
+        delimiters = "space,enter"  # Or whatever default value you have
+        cache[word] = (expansion, format_value, requires_delimiter, delimiters)
+        return cache[word]
+
+    # If no result was found, cache that information as well
+    cache[word] = (None, "yes", "space,enter")  # Or whatever default values you have
+    return None, "yes", "space,enter"  # Or whatever default values you have

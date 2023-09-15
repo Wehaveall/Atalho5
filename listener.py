@@ -17,23 +17,13 @@ from collections import deque
 import platform
 
 
-
 import time
 from pynput import keyboard
 
 
-
-
-
-
-
-
 def move_cursor_to_last_word(self):
-        # Move cursor to the start of the last word without going to the end of the line
-        pyautogui.hotkey('ctrl', 'left')
-
-
-
+    # Move cursor to the start of the last word without going to the end of the line
+    pyautogui.hotkey("ctrl", "left")
 
 
 def get_last_word_in_MS_Word():
@@ -104,17 +94,8 @@ def format_article(article, newlines=1):
 
 
 class KeyListener:
-    
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-        
-
-
-
         self.word_buffer = deque([], maxlen=5)  # Initialize with an empty deque
-
-       
-
-    
 
         self.ctrl_pressed = False
         self.shift_pressed = False
@@ -241,25 +222,19 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    
-       
-
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
         self.pynput_listener.stop()  # Stop listening for keys
 
         # Debug statements
-        print(f"Debug: Expansion before copy: {expansion}")
 
         # Clear previously typed keys
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
         pyautogui.press("backspace")
 
         if expansion is not None:
-            print("Actual value of format_value before casting: ", format_value)
             format_value = int(format_value)
-            print("Actual value of format_value after casting: ", format_value)
 
             if format_value == 0:
                 pyperclip.copy(expansion)
@@ -270,13 +245,28 @@ class KeyListener:
                 print("Debug: Using HTML clipboard.")
 
             # Now paste
-            print("Debug: About to paste.")
+
             pyautogui.hotkey("ctrl", "v")
-            print("Debug: Pasted.")
 
         self.typed_keys = ""
         self.just_expanded_with = None
         self.start_listener()  # Start listening for keys again
+
+    # -------------------------------------Verificar se a string the acentos
+    def handle_accent_keys(self, key_char):
+        if key_char in self.accents:
+            self.accent = key_char
+        elif self.accent:
+            combination = self.accent + key_char
+            accented_char = self.accent_mapping.get(combination, "")
+            if accented_char:
+                self.typed_keys += accented_char
+            self.accent = None
+        else:
+            self.typed_keys += key_char
+        print(f"Self Typed Keys:----------- {self.typed_keys}")
+
+    # -----------------------------------
 
     # ----------------------------------------------------------------
 
@@ -286,44 +276,9 @@ class KeyListener:
         format_value = None
         self.requires_delimiter = None
         self.delimiters = None
-        key_char = None  # Initialize key_char
-
-         # Initialize a new instance variable in __init__ to None
-       
-
-    #     # -----------------------------------------if platform.system() == 'Windows':
-    #     import win32gui
-
-    #     # MS WORD SPECIFIC
-    #     # --------------------------------------- Get the title of the current window
-    #     hwnd = win32gui.GetForegroundWindow()
-    #     window_title = win32gui.GetWindowText(hwnd)
-    #     # ----------------------------------------------------------------
-
-    #     # Verificar se estamos no MS-WORD
-    #     # Check if we're in MS Word
-
-    #    # Check platform first
-    #     if platform.system() == "Windows":
-    #         # Check if we're in MS Word
-    #         if "Word" in window_title:
-    #             last_word = get_last_word_in_MS_Word()
-    #             print(f"Last word in the document: {last_word}")
-    #         # You can put other conditions here for different software if needed
-    #     elif platform.system() == "Darwin":  # macOS
-    #         print("This function is not supported on macOS")
-    #     else:
-    #         print("Unsupported OS")
-
-            
-        # -------------------------------------------------------------------------------
-        # ---------------------------------------------------------------------------
-
-
- # Initialize key_char to None at the start of the function
-
-    
-
+        key_char = (
+            key.char if hasattr(key, "char") and key.char else ""
+        )  # Do it once here
 
         if (
             self.ctrl_pressed
@@ -333,6 +288,7 @@ class KeyListener:
         ):
             return
 
+        # Handle special key states
         if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
             self.ctrl_pressed = False
         elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
@@ -342,51 +298,19 @@ class KeyListener:
         elif key == keyboard.Key.cmd:
             self.winkey_pressed = False
 
-        # Ignora enter quando não há  nada em self_typed_keys
-        if key == keyboard.Key.enter and not self.typed_keys:
+        if (
+            key == keyboard.Key.enter
+            or key == keyboard.Key.space
+            and not self.typed_keys
+        ):
             return
 
-       
-       
-        if hasattr(key, 'char') and key.char:
-            key_char = key.char
-            
+        if key_char:
             # Check if it's an accent key
-            if key_char in self.accents:
-                self.accent = key_char  # Remember the last accent key
-                # Don't update self.typed_keys yet, wait for next key
-            
-            # If the last key was an accent key, handle it
-            elif self.accent:
-                 combination = self.accent + key_char
-                 accented_char = self.accent_mapping.get(combination, "")
-                 if accented_char:  
-                        self.typed_keys += accented_char  
-                        print(f"Debug: Added accented character {accented_char} to typed_keys")
-                 self.accent = None  # Reset the last accent key
-
-            # If it's neither, simply append to self.typed_keys
-            else:
-                self.typed_keys += key_char
-        
-        
-        
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-        # Initialize just_expanded to False at the beginning of the function
-        just_expanded = False
+            self.handle_accent_keys(key_char)
 
         start_time = time.time()
-        print(f"Self Typed Keys:----------- {self.typed_keys}")  
-    
+        print(f"Self Typed Keys:----------- {self.typed_keys}")
 
         try:
             # Check silent mode is enabled
@@ -399,53 +323,34 @@ class KeyListener:
             if key in self.omitted_keys:
                 if self.api.is_recording:
                     return
-                
-
-
-                #Inicia KeyChar
-                key_char = key.char if hasattr(key, 'char') and key.char else ""
-
-
-
 
                 # Handle backspace
                 if key == keyboard.Key.backspace:
                     self.typed_keys = self.typed_keys[:-1]  # Remove the last character
-                
+
                 # Handle space key
                 elif key == keyboard.Key.space:
                     self.typed_keys += " "
+
                     # Extract the last word
-                    last_word = self.typed_keys.split()[-1] if self.typed_keys.split() else ''
+                    last_word = (
+                        self.typed_keys.split()[-1] if self.typed_keys.split() else ""
+                    )
                     print(f"Last Word:----------- {last_word}")
-              
-                
+
                 # After any other char key is pressed, update self.typed_keys
-                elif hasattr(key, 'char') and key.char:
+                elif hasattr(key, "char") and key.char:
                     self.typed_keys += key.char
-                
-                
-                            
-               
-               
-               
-             
 
-
-
-
-                
                 try:
-              
-                    print("Before lookup")
-
                     try:
-                        (
-                            expansion,
-                            format_value,
-                            self.requires_delimiter,
-                            self.delimiters,
-                        ) = lookup_word_in_all_databases(self.typed_keys)
+                        if last_word:
+                            (
+                                expansion,
+                                format_value,
+                                self.requires_delimiter,
+                                self.delimiters,
+                            ) = lookup_word_in_all_databases(last_word)
 
                     except (
                         ValueError
@@ -455,7 +360,6 @@ class KeyListener:
                             format_value
                         ) = self.requires_delimiter = self.delimiters = None
 
-                    print("After lookup")
                     print(f"Format Value: {format_value}")
 
                 except Exception as e:
@@ -519,23 +423,9 @@ class KeyListener:
             if self.stop_event.is_set():
                 return False
 
-            
-
-            # Handle word and char buffering
-            
-         
-        
-        
-            
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
             self.restart_listener()
-
-        # Reset self.typed_keys if Enter or Space is pressed
-        #resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
-        #if key in resetting_keys_conditionally:
-         #   self.typed_keys = ""
-          #  self.char_buffer = ""  # Clear the char buffer
 
         end_time = time.time()
         elapsed_time = end_time - start_time
