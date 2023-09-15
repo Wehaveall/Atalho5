@@ -17,23 +17,20 @@ from collections import deque
 import platform
 
 
-
 import time
 from pynput import keyboard
+import re
 
-
-
-
-
-
+suffix_to_regex = {
+        'cao': '.cao',  # should only expand when following another character
+        'other_suffix': 'other_pattern'
+        # ... add more here
+    }
 
 
 def move_cursor_to_last_word(self):
-        # Move cursor to the start of the last word without going to the end of the line
-        pyautogui.hotkey('ctrl', 'left')
-
-
-
+    # Move cursor to the start of the last word without going to the end of the line
+    pyautogui.hotkey("ctrl", "left")
 
 
 def get_last_word_in_MS_Word():
@@ -106,15 +103,8 @@ def format_article(article, newlines=1):
 class KeyListener:
     
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-        
-
-
-
+        self.last_word = ""  # Initialize last_word
         self.word_buffer = deque([], maxlen=5)  # Initialize with an empty deque
-
-       
-
-    
 
         self.ctrl_pressed = False
         self.shift_pressed = False
@@ -240,10 +230,10 @@ class KeyListener:
         self.typed_keys = ""  # Add this line
 
     # ----------------------------------------------------------------
-
-    
-       
-
+   
+    @staticmethod
+    def get_suffix_pattern_from_database(suffix):
+        return suffix_to_regex.get(suffix)
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
@@ -275,6 +265,7 @@ class KeyListener:
             print("Debug: Pasted.")
 
         self.typed_keys = ""
+        self.last_sequence = ""  # Clear last_sequence after expansion
         self.just_expanded_with = None
         self.start_listener()  # Start listening for keys again
 
@@ -292,11 +283,30 @@ class KeyListener:
         else:
             self.typed_keys += key_char
 
-    #--------------------------------------------------------------------------
-    #--------------------------------------------------------------------------
-    #-------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def lookup_and_expand(self, sequence):
+       
+        hardcoded_suffixes = {
+        'çao': ('ção', r'.çao'),  # The regex ensures there is at least one character before 'cao'
+        'mn': ('mento', r'.mn'),
+        'ao': ('ão', r'.ao'),
+        # Add more here
+        }
+
+        for i in range(len(sequence) - 1, -1, -1):
+            suffix = sequence[i:]
+            
+            if suffix in hardcoded_suffixes:
+                expansion, regex_pattern = hardcoded_suffixes[suffix]
+                if re.search(regex_pattern, sequence):
+                    prefix = sequence[:i]
+                    expansion = prefix + expansion  # <-- This line is corrected
+                    self.paste_expansion(expansion, format_value=0)
+                    return
+
         try:
             (
                 expansion,
@@ -308,22 +318,20 @@ class KeyListener:
             print("Not enough values returned from lookup")
             expansion = format_value = self.requires_delimiter = self.delimiters = None
 
-        # Check whether to actually paste the expansion
         if self.requires_delimiter == "yes":
             delimiter_list = [item.strip() for item in self.delimiters.split(",")]
-            key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))  # Use the last key pressed
+            key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))
             if key_str in delimiter_list:
                 if expansion is not None:
                     self.paste_expansion(expansion, format_value=format_value)
                     self.typed_keys = ""
+
         elif self.requires_delimiter == "no":
             if expansion is not None:
                 self.paste_expansion(expansion, format_value=format_value)
                 self.typed_keys = ""
 
-
-
-    #----------------------------------------------------------------   
+    # ----------------------------------------------------------------
 
     def on_key_release(self, key):
         # Initialize variables to None at the start of the function
@@ -331,17 +339,14 @@ class KeyListener:
         format_value = None
         self.requires_delimiter = None
         self.delimiters = None
-        #Inicia KeyChar
-        #key_char = key.char if hasattr(key, 'char') and key.char else ""
-
+        # Inicia KeyChar
+        # key_char = key.char if hasattr(key, 'char') and key.char else ""
 
         start_time = time.time()
-    
-    # Initialize self.last_sequence if not already done
-        if not hasattr(self, 'last_sequence'):
+
+        # Initialize self.last_sequence if not already done
+        if not hasattr(self, "last_sequence"):
             self.last_sequence = ""
-
-
 
         if (
             self.ctrl_pressed
@@ -361,38 +366,42 @@ class KeyListener:
             self.winkey_pressed = False
 
         # Ignora enter quando não há  nada em self_typed_keys
-        if key == keyboard.Key.enter or key == keyboard.Key.space and not self.typed_keys:
+        if (
+            key == keyboard.Key.enter
+            or key == keyboard.Key.space
+            and not self.typed_keys
+        ):
             return
 
-       
-       
         if key not in self.omitted_keys:
-
-            if hasattr(key, 'char') and key.char:
-                
+            if hasattr(key, "char") and key.char:
                 self.handle_accents(key.char)
                 self.last_sequence += key.char  # Update last_sequence
-                print(f"Self Typed Keys:__________ {self.typed_keys}")  
+                print(f"Self Typed Keys:__________ {self.typed_keys}")
                 print(f"Last Sequence:____________ {self.last_sequence}")  # Debug
 
-        else: # Key is in omitted_keys
-
+        else:  # Key is in omitted_keys
             if key == keyboard.Key.backspace:
                 self.typed_keys = self.typed_keys[:-1]
                 self.last_sequence = self.last_sequence[:-1]  # Update last_sequence
-            
+
             elif key == keyboard.Key.space:
                 self.typed_keys += " "
                 self.last_sequence = ""  # Clear last_sequence
-                last_word = self.typed_keys.split()[-1] if self.typed_keys.split() else ''
+                last_word = (
+                    self.typed_keys.split()[-1] if self.typed_keys.split() else ""
+                )
+                self.word_buffer.append(
+                    last_word
+                )  # Add the last word to the word_buffer deque
                 print(f"Last Word:----------- {last_word}")
-        
-    
+                print(
+                    f"Word Buffer:---------- {list(self.word_buffer)}"
+                )  # Print the current word buffer
 
         try:
-            
             self.last_key = key  # Add this line to update the last key pressed
-            
+
             # Check silent mode is enabled
             if self.isRecordingMacro:
                 return
@@ -402,27 +411,27 @@ class KeyListener:
 
             if key in self.omitted_keys and self.api.is_recording:
                 return
-                      
+
             if key not in self.omitted_keys:
-                self.lookup_and_expand(self.last_sequence)  # New line for lookup_and_expand
-           
+                self.lookup_and_expand(
+                    self.last_sequence
+                )  # New line for lookup_and_expand
+
             else:
                 if key == keyboard.Key.space:
-                    last_word = self.typed_keys.split()[-1] if self.typed_keys.split() else ''
-                    self.lookup_and_expand(last_word)  # New line for lookup_and_expand when space is pressed
-            
+                    last_word = (
+                        self.typed_keys.split()[-1] if self.typed_keys.split() else ""
+                    )
+                    self.lookup_and_expand(
+                        last_word
+                    )  # New line for lookup_and_expand when space is pressed
 
             if self.stop_event.is_set():
                 return False
 
-            
-        
-            
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
             self.restart_listener()
-
-      
 
         end_time = time.time()
         elapsed_time = end_time - start_time
