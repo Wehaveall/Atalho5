@@ -374,7 +374,7 @@ class KeyListener:
                 if self.api.is_recording:
                     return
                       
-                            
+            else:                
                 
                 try:
               
@@ -386,7 +386,7 @@ class KeyListener:
                             format_value,
                             self.requires_delimiter,
                             self.delimiters,
-                        ) = lookup_word_in_all_databases(last_word)
+                        ) = lookup_word_in_all_databases(self.last_sequence)
 
                     except (
                         ValueError
@@ -402,27 +402,25 @@ class KeyListener:
                 except Exception as e:
                     print(f"An exception occurred: {e}")
 
-                print(
-                    f"Requires delimiter: {self.requires_delimiter}"
-                )  # Debug moved here
+
+                print(f"Requires delimiter: {self.requires_delimiter}") 
+               
                 print(f"Delimiters: {self.delimiters}")  # Debug moved here
 
-                if self.delimiters is not None:
-                    delimiter_list = [
-                        item.strip() for item in self.delimiters.split(",")
-                    ]
-                else:
-                    delimiter_list = []
+           
 
-                print(f"Delimiter list: {delimiter_list}")  # Debug
+    
 
-                # Add a debug line here to print the value of str(key)
-                print(f"String representation of key: {str(key)}")
-
-                key_str = self.key_to_str_map.get(str(key), str(key))
-                print(f"Human-readable key: {key_str}")  # Debug
+              
+             
 
                 if self.requires_delimiter == "yes":
+                    
+                    delimiter_list = [item.strip() for item in self.delimiters.split(",")]
+
+                    key_str = self.key_to_str_map.get(str(key), str(key))
+                    print(f"Delimiter list: {delimiter_list}")  # Debug
+                    
                     if key_str in delimiter_list:  # Use the mapped string
                         print(
                             f"Attempting to paste expansion: {expansion}"
@@ -461,22 +459,13 @@ class KeyListener:
                 return False
 
             
-
-            # Handle word and char buffering
-            
-         
-        
         
             
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
             self.restart_listener()
 
-        # Reset self.typed_keys if Enter or Space is pressed
-        #resetting_keys_conditionally = [keyboard.Key.space, keyboard.Key.enter]
-        #if key in resetting_keys_conditionally:
-         #   self.typed_keys = ""
-          #  self.char_buffer = ""  # Clear the char buffer
+      
 
         end_time = time.time()
         elapsed_time = end_time - start_time
