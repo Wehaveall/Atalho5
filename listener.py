@@ -445,7 +445,9 @@ class KeyListener:
 
                 elif self.requires_delimiter == "no":
                     if expansion is not None:
-                        self.paste_expansion(expansion)
+                        self.paste_expansion(
+                                expansion, format_value=format_value
+                            )  # Use the variable format_value
                         self.typed_keys = ""  # Reset typed keys
                         just_expanded = (
                             True  # Set this to True when an expansion happens
