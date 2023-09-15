@@ -308,10 +308,19 @@ class KeyListener:
             print("Not enough values returned from lookup")
             expansion = format_value = self.requires_delimiter = self.delimiters = None
 
-        if expansion is not None:
-            self.paste_expansion(expansion, format_value=format_value)
-            self.typed_keys = ""
-            just_expanded = True  # Set this to True when an expansion happens
+        # Check whether to actually paste the expansion
+        if self.requires_delimiter == "yes":
+            delimiter_list = [item.strip() for item in self.delimiters.split(",")]
+            key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))  # Use the last key pressed
+            if key_str in delimiter_list:
+                if expansion is not None:
+                    self.paste_expansion(expansion, format_value=format_value)
+                    self.typed_keys = ""
+        elif self.requires_delimiter == "no":
+            if expansion is not None:
+                self.paste_expansion(expansion, format_value=format_value)
+                self.typed_keys = ""
+
 
 
     #----------------------------------------------------------------   
@@ -381,6 +390,9 @@ class KeyListener:
     
 
         try:
+            
+            self.last_key = key  # Add this line to update the last key pressed
+            
             # Check silent mode is enabled
             if self.isRecordingMacro:
                 return
@@ -399,49 +411,6 @@ class KeyListener:
                     last_word = self.typed_keys.split()[-1] if self.typed_keys.split() else ''
                     self.lookup_and_expand(last_word)  # New line for lookup_and_expand when space is pressed
             
-
-            if self.requires_delimiter == "yes":
-                    
-                delimiter_list = [item.strip() for item in self.delimiters.split(",")]
-
-                key_str = self.key_to_str_map.get(str(key), str(key))
-                print(f"Delimiter list: {delimiter_list}")  # Debug
-                    
-                if key_str in delimiter_list:  # Use the mapped string
-                    print(
-                        f"Attempting to paste expansion: {expansion}"
-                    )  # Debug line
-                    print("Delimiter matched")  # Debug
-
-                    if expansion is not None:
-                        self.just_expanded_with = key_str  # Set the flag here
-                        self.paste_expansion(
-                            expansion, format_value=format_value
-                        )  # Use the variable format_value
-                        self.typed_keys = ""  # Reset typed keys
-                        just_expanded = (
-                            True  # Set this to True when an expansion happens
-                        )
-                        print(
-                            f"self.typed_keys cleared: {self.typed_keys}"
-                        )  # Debug
-
-                    else:
-                        return
-
-            elif self.requires_delimiter == "no":
-                if expansion is not None:
-                    self.paste_expansion(
-                            expansion, format_value=format_value
-                        )  # Use the variable format_value
-                    self.typed_keys = ""  # Reset typed keys
-                    just_expanded = (
-                        True  # Set this to True when an expansion happens
-                    )
-                else:
-                    self.typed_keys = (
-                        ""  # Reset typed keys if no expansion is found
-                    )
 
             if self.stop_event.is_set():
                 return False
