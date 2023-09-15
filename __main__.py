@@ -28,7 +28,6 @@ from listener import KeyListener
 from src.database.data_connect import (
     get_database_path,
     get_db_files_in_directory,
-    preload_data,
     load_db_into_memory,
     save_db_from_memory,
 )
@@ -640,9 +639,7 @@ def start_app():
     global api  # Add this line
     api = Api()
     api.create_and_position_window()
-    preload_data()
     webview.start(http_server=True)
-    
     # Check the flag and show messagebox after the webview starts
 
 
