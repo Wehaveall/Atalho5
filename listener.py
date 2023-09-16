@@ -22,10 +22,10 @@ from pynput import keyboard
 import re
 
 suffix_to_regex = {
-        'cao': '.cao',  # should only expand when following another character
-        'other_suffix': 'other_pattern'
-        # ... add more here
-    }
+    "cao": ".cao",  # should only expand when following another character
+    "other_suffix": "other_pattern"
+    # ... add more here
+}
 
 
 def move_cursor_to_last_word(self):
@@ -101,7 +101,6 @@ def format_article(article, newlines=1):
 
 
 class KeyListener:
-    
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
         self.last_word = ""  # Initialize last_word
         self.word_buffer = deque([], maxlen=5)  # Initialize with an empty deque
@@ -230,26 +229,24 @@ class KeyListener:
         self.typed_keys = ""  # Add this line
 
     # ----------------------------------------------------------------
-   
+
     @staticmethod
     def get_suffix_pattern_from_database(suffix):
         return suffix_to_regex.get(suffix)
+
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
         self.pynput_listener.stop()  # Stop listening for keys
 
         # Debug statements
-        print(f"Debug: Expansion before copy: {expansion}")
 
         # Clear previously typed keys
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
         pyautogui.press("backspace")
 
         if expansion is not None:
-            print("Actual value of format_value before casting: ", format_value)
             format_value = int(format_value)
-            print("Actual value of format_value after casting: ", format_value)
 
             if format_value == 0:
                 pyperclip.copy(expansion)
@@ -260,16 +257,15 @@ class KeyListener:
                 print("Debug: Using HTML clipboard.")
 
             # Now paste
-            print("Debug: About to paste.")
+
             pyautogui.hotkey("ctrl", "v")
-            print("Debug: Pasted.")
 
         self.typed_keys = ""
         self.last_sequence = ""  # Clear last_sequence after expansion
         self.just_expanded_with = None
         self.start_listener()  # Start listening for keys again
 
-    # ----------------------------------------------------------------
+    # ----------------------------------------------------------------Handle Accents
 
     def handle_accents(self, key_char):
         if key_char in self.accents:
@@ -279,26 +275,30 @@ class KeyListener:
             accented_char = self.accent_mapping.get(combination, "")
             if accented_char:
                 self.typed_keys += accented_char
+                self.last_sequence += accented_char  # Update last_sequence here
             self.accent = None
         else:
             self.typed_keys += key_char
+            self.last_sequence += key_char  # Update last_sequence here
 
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
+
+
+
+
     # -------------------------------------------------------------------------
 
     def lookup_and_expand(self, sequence):
-       
+        # Suffixes
         hardcoded_suffixes = {
-        'çao': ('ção', r'.çao'),  # The regex ensures there is at least one character before 'cao'
-        'mn': ('mento', r'.mn'),
-        'ao': ('ão', r'.ao'),
-        # Add more here
+            "çao": ("ção", r"(?<![ã])\bçao\b"),  # updated regex
+            "mn": ("mento", r".mn"),
+            "ao": ("ão", r".ao"),
+            # Add more here
         }
 
         for i in range(len(sequence) - 1, -1, -1):
             suffix = sequence[i:]
-            
+
             if suffix in hardcoded_suffixes:
                 expansion, regex_pattern = hardcoded_suffixes[suffix]
                 if re.search(regex_pattern, sequence):
@@ -314,6 +314,7 @@ class KeyListener:
                 self.requires_delimiter,
                 self.delimiters,
             ) = lookup_word_in_all_databases(sequence)
+
         except ValueError:
             print("Not enough values returned from lookup")
             expansion = format_value = self.requires_delimiter = self.delimiters = None
@@ -375,8 +376,9 @@ class KeyListener:
 
         if key not in self.omitted_keys:
             if hasattr(key, "char") and key.char:
-                self.handle_accents(key.char)
-                self.last_sequence += key.char  # Update last_sequence
+                
+                self.handle_accents(key.char) #Handle accents lida tanto com self_typed ou last-sequence
+   
                 print(f"Self Typed Keys:__________ {self.typed_keys}")
                 print(f"Last Sequence:____________ {self.last_sequence}")  # Debug
 
