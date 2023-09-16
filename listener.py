@@ -20,6 +20,7 @@ import platform
 import time
 from pynput import keyboard
 import re
+import win32clipboard
 
 suffix_to_regex = {
     "cao": ".cao",  # should only expand when following another character
@@ -281,10 +282,6 @@ class KeyListener:
             self.typed_keys += key_char
             self.last_sequence += key_char  # Update last_sequence here
 
-
-
-
-
     # -------------------------------------------------------------------------
 
     def lookup_and_expand(self, sequence):
@@ -376,9 +373,10 @@ class KeyListener:
 
         if key not in self.omitted_keys:
             if hasattr(key, "char") and key.char:
-                
-                self.handle_accents(key.char) #Handle accents lida tanto com self_typed ou last-sequence
-   
+                self.handle_accents(
+                    key.char
+                )  # Handle accents lida tanto com self_typed ou last-sequence
+
                 print(f"Self Typed Keys:__________ {self.typed_keys}")
                 print(f"Last Sequence:____________ {self.last_sequence}")  # Debug
 
