@@ -22,11 +22,6 @@ from pynput import keyboard
 import re
 import win32clipboard
 
-suffix_to_regex = {
-    "cao": ".cao",  # should only expand when following another character
-    "other_suffix": "other_pattern"
-    # ... add more here
-}
 
 
 def move_cursor_to_last_word(self):
