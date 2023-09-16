@@ -238,9 +238,8 @@ class KeyListener:
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
-        self.pynput_listener.stop()  # Stop listening for keys
+        self.pynput_listener.stop()  # Stop listening for keys - PARA CTRL V----------------------------------------------------------------
 
-        # Debug statements
 
         # Clear previously typed keys
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
@@ -253,6 +252,7 @@ class KeyListener:
                 pyperclip.copy(expansion)
                 print("Debug: Using REGULAR clipboard.")
             else:
+                
                 dirty_HTML = expansion  # Your variable
                 html_clipboard.PutHtml(dirty_HTML)  # Your logic
                 print("Debug: Using HTML clipboard.")
