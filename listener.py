@@ -226,9 +226,6 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    @staticmethod
-    def get_suffix_pattern_from_database(suffix):
-        return suffix_to_regex.get(suffix)
 
     # ----------------------------------------------------------------
 
