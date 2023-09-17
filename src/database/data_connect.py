@@ -155,7 +155,7 @@ def lookup_word_in_all_databases(word):
             if file.endswith(".db"):
                 db_files.append(os.path.join(root, file))
 
-    print(f"Loaded checkbox states: {checkBoxStates}")  # Debugging line
+    #print(f"Loaded checkbox states: {checkBoxStates}")  # Debugging line
 
     # Create a MetaData instance once
     metadata = MetaData()
@@ -169,14 +169,14 @@ def lookup_word_in_all_databases(word):
         # Construct the key
         key = f"{group_name}|{db_name}"
 
-        print(f"Checking key: {key}")  # Debugging line
+        #print(f"Checking key: {key}")  # Debugging line
 
         # Skip this database if its checkbox is not checked
         if not checkBoxStates.get(key, False):
-            print(f"Skipping database: {db_file}")  # Debugging line
+            #print(f"Skipping database: {db_file}")  # Debugging line
             continue
 
-        print(f"Searching in database: {db_file}")  # Debugging line
+        #print(f"Searching in database: {db_file}")  # Debugging line
 
         engine = create_engine(f"sqlite:///{db_file}")  # Get the engine
 

@@ -574,7 +574,7 @@ class Api:
     def save_checkBox_states(self, checkBoxStates):
         with open('checkBox_states.json', 'w', encoding='utf-8') as f:
             json.dump(checkBoxStates, f, ensure_ascii=False)
-        print("Saved checkbox states.")
+        #print("Saved checkbox states.")
 
 
     def load_checkBox_states(self):
@@ -582,7 +582,7 @@ class Api:
         if os.path.exists(filePath):
             with open(filePath, 'r', encoding='utf-8') as f:
                 checkBoxStates = json.load(f)
-            print(f"Loaded checkbox states from {filePath}")
+            #print(f"Loaded checkbox states from {filePath}")
         else:
             print(f"{filePath} not found. Initializing empty checkbox states.")
             checkBoxStates = {}
