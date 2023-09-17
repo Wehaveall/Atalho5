@@ -15,6 +15,7 @@ import re
 import time
 import random
 import win32clipboard
+import html2text
 
 #---------------------------------------------------------------------------
 #  Convenience functions to do the most common operation
@@ -255,10 +256,31 @@ class HtmlClipboard:
         try:
             win32clipboard.OpenClipboard(0)
             win32clipboard.EmptyClipboard()
+
+            # Encode and set the HTML data
             src = self.EncodeClipboardSource(html, fragmentStart, fragmentEnd, selectionStart, selectionEnd, source)
             src = src.encode("UTF-8")
-            #print(src)
             win32clipboard.SetClipboardData(self.GetCfHtml(), src)
+
+            # Use html2text to convert HTML to plain text with UTF-8 encoding
+            h = html2text.HTML2Text()
+            h.ignore_links = True  # Ignore hyperlinks, you can change this as needed
+            
+            # Set UNICODE_SNOB option to preserve accents
+            h.unicode_snob = True
+            
+            h.escape_snob = True
+            
+            # Set UNICODE_EMPHASIS option to remove: 
+            # - emphasis_mark is the character used when replacing the `<em>` tag. It defaults to `_`.
+            # strong_mark is the characer used when replacing the `<strong>` tag. It defaults to `**`.
+            h.ignore_emphasis = True
+            
+            plain_text = h.handle(html)
+            
+            # Encode and set the plain text data with UTF-8 encoding
+            plain_text = plain_text.encode("UTF-8")
+            win32clipboard.SetClipboardText(plain_text.decode("UTF-8"), win32clipboard.CF_UNICODETEXT)
         finally:
             win32clipboard.CloseClipboard()
 
