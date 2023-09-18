@@ -1,4 +1,6 @@
-from pynput import keyboard
+import keyboard  # Replacing pynput
+
+
 from collections import defaultdict
 from threading import Event
 import pyautogui
@@ -10,7 +12,6 @@ import time
 import logging
 
 
-from bs4 import BeautifulSoup
 import html_clipboard
 
 
@@ -19,11 +20,7 @@ import platform
 
 
 import time
-from pynput import keyboard
 import re
-
-
-
 
 
 def move_cursor_to_last_word(self):
@@ -53,9 +50,9 @@ def get_last_word_in_MS_Word():
 
 
 # Setup logging - DISABLED TO CHECK PEFORMANCE
-# logging.basicConfig(
-#     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-# )
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 def format_article(article, newlines=1):
@@ -101,8 +98,10 @@ def format_article(article, newlines=1):
 class KeyListener:
     
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-        
-        
+       
+        keyboard.on_press(lambda e: self.on_key_press(e))
+        keyboard.on_release(lambda e: self.on_key_release(e))
+
         self.last_word = ""  # Initialize last_word
         self.word_buffer = deque([], maxlen=5)  # Initialize with an empty deque
 
@@ -125,13 +124,10 @@ class KeyListener:
         self.accent = False
         self.last_key = None
         self.typed_keys = ""
-        
+
         # Added this line to store the pynput listener
-        self.pynput_listener = keyboard.Listener(on_press=self.on_key_press, on_release=self.on_key_release)
-       
-       
-        self.silent_mode = False
-        self.isRecordingMacro = False
+        # self.pynput_listener = keyboard.Listener(on_press=self.on_key_press, on_release=self.on_key_release)
+
         self.accent_mapping = defaultdict(
             lambda: "",
             {
@@ -174,51 +170,49 @@ class KeyListener:
             },
         )
         self.accents = set(["~", "´", "`", "^"])
+
         self.omitted_keys = set(
             [
-                keyboard.Key.esc,
-                keyboard.Key.shift,
-                keyboard.Key.shift_r,
-                keyboard.Key.ctrl_l,
-                keyboard.Key.ctrl_r,
-                keyboard.Key.alt_l,
-                keyboard.Key.alt_r,
-                keyboard.Key.alt_gr,
-                keyboard.Key.cmd,
-                keyboard.Key.f1,
-                keyboard.Key.f2,
-                keyboard.Key.f3,
-                keyboard.Key.f4,
-                keyboard.Key.f5,
-                keyboard.Key.f6,
-                keyboard.Key.f7,
-                keyboard.Key.f8,
-                keyboard.Key.f9,
-                keyboard.Key.f10,
-                keyboard.Key.f11,
-                keyboard.Key.f12,
-                keyboard.Key.page_up,
-                keyboard.Key.page_down,
-                keyboard.Key.home,
-                keyboard.Key.end,
-                keyboard.Key.delete,
-                keyboard.Key.insert,
-                keyboard.Key.up,
-                keyboard.Key.down,
-                keyboard.Key.left,
-                keyboard.Key.right,
-                keyboard.Key.backspace,
-                keyboard.Key.print_screen,
-                keyboard.Key.scroll_lock,
-                keyboard.Key.pause,
-                keyboard.Key.space,
-                keyboard.Key.caps_lock,
-                keyboard.Key.tab,
-                keyboard.Key.enter,
-                keyboard.Key.num_lock,
+                "esc",
+                "shift",
+                "ctrl",
+                "alt",
+                "cmd",
+                "f1",
+                "f2",
+                "f3",
+                "f4",
+                "f5",
+                "f6",
+                "f7",
+                "f8",
+                "f9",
+                "f10",
+                "f11",
+                "f12",
+                "page up",
+                "page down",
+                "home",
+                "end",
+                "delete",
+                "insert",
+                "up",
+                "down",
+                "left",
+                "right",
+                "backspace",
+                "print screen",
+                "scroll lock",
+                "pause",
+                "space",
+                "caps lock",
+                "tab",
+                "enter",
+                "num lock",
             ]
         )
-        self.resetting_keys = set([keyboard.Key.space])
+
+        self.resetting_keys = set(["space"])
 
     stop_event = Event()  # Renamed from stop_listener to stop_event
 
@@ -241,32 +235,28 @@ class KeyListener:
         # Get the last word from self.last_word
         last_word = self.last_word
         print(f"Last word: {last_word}")  # Debugging line
-     
 
         # Check if the last word matches the pattern
         if re.match(pattern, last_word):
-         
             # Convert the last word to title case with only the first letter capitalized
             converted_word = last_word[0].upper() + last_word[1:].lower()
             print(f"Converted word: {converted_word}")  # Debugging line
 
-            self.pynput_listener.stop()  # Stop listening for keys
+            keyboard.unhook()
             # Clear previously typed keys
             pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
             pyautogui.press("backspace")
             pyperclip.copy(converted_word)
-          
+
             pyautogui.hotkey("ctrl", "v")
-          
+
             pyautogui.press("space")
-            self.start_listener()  # Start listening for keys again
-
-
+            self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
 
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
-        self.pynput_listener.stop()  # Stop listening for keys - PARA CTRL V----------------------------------------------------------------
+        keyboard.unhook_all()  # Stop listening for keys - PARA CTRL V----------------------------------------------------------------
 
         # Clear previously typed keys
         pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
@@ -286,12 +276,15 @@ class KeyListener:
             # Now paste
 
             pyautogui.hotkey("ctrl", "v")
-            
 
         self.typed_keys = ""
         self.last_sequence = ""  # Clear last_sequence after expansion
         self.just_expanded_with = None
-        self.start_listener()  # Start listening for keys again
+        
+        #Restarting hook
+        self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+        self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
+        
 
     # ----------------------------------------------------------------Handle Accents
 
@@ -358,33 +351,34 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
+    # def on_key_press(self, event):
+    #     key = event.name  # Define 'key' first before using it
+    #     print(f"Key pressed: {key}")  # Debugging
+    #     if key == "shift":
+    #         self.shift_pressed = True
 
-    def on_key_press(self, key):
-        if key == keyboard.Key.shift or key == keyboard.Key.shift_r:
-            self.shift_pressed = True
-        # ... you can add other keys and actions here ...
+    ################################################################
+    ################################################################
 
+    def on_key_press(self, event):
+        print(
+            "on_key_release called"
+        )  # Debugging: Check if the method is called at all
 
+        key = event.name  # Get the key name directly
+        print(f"Key released: {key}")  # Debugging
 
-################################################################
-################################################################
-
-    def on_key_release(self, key):
         # Initialize variables to None at the start of the function
         expansion = None
         format_value = None
         self.requires_delimiter = None
         self.delimiters = None
-        # Inicia KeyChar
-        # key_char = key.char if hasattr(key, 'char') and key.char else ""
 
         start_time = time.time()
 
         # Initialize self.last_sequence if not already done
         if not hasattr(self, "last_sequence"):
             self.last_sequence = ""
-
-
 
         if (
             self.ctrl_pressed
@@ -394,100 +388,72 @@ class KeyListener:
         ):
             return
 
-        #CTRL
-        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+        # CTRL
+        if key == "ctrl":
             self.ctrl_pressed = False
-        
-        #Shift KEY
-        elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
-            
+
+        # Shift KEY
+        elif key == "shift":
             self.shift_pressed = False
-        
-        #ALT
-        elif key == keyboard.Key.alt_l or key == keyboard.Key.alt_r:
+
+        # ALT
+        elif key == "alt":
             self.alt_pressed = False
-       
-        #WINKEY
-        elif key == keyboard.Key.cmd:
+
+        # WINKEY
+        elif key == "cmd":
             self.winkey_pressed = False
 
-        # Ignora enter quando não há  nada em self_typed_keys
-        if (key == keyboard.Key.enter or key == keyboard.Key.space and not self.typed_keys):
-           return
+        # Ignore 'enter' when self.typed_keys is empty
+        if key == "enter" or (key == "space" and not self.typed_keys):
+            return
 
         if key not in self.omitted_keys:
-            
-            if hasattr(key, "char") and key.char:
-                
-                if self.shift_pressed:
-                    char = key.char.upper()  # Convert to upper case if Shift is pressed
-                    self.shift_pressed = False  # Reset the flag immediately after use
-                else:
-                    char = key.char
-                
-                
-                  
-                self.handle_accents(char)  # Handle accents lida tanto com self_typed ou last-sequence
+            if self.shift_pressed:
+                char = key.upper()  # Convert to upper case if Shift is pressed
+                self.shift_pressed = False  # Reset the flag immediately after use
+            else:
+                char = key
 
-                print(f"Self Typed Keys:__________ {self.typed_keys}")
-                print(f"Last Sequence:____________ {self.last_sequence}")  # Debug
-                
+            self.handle_accents(char)  # Handle accents
+
+            print(f"Self Typed Keys:__________ {self.typed_keys}")
+            print(f"Last Sequence:____________ {self.last_sequence}")
 
         else:  # Key is in omitted_keys
-            if key == keyboard.Key.backspace:
+            if key == "backspace":
                 self.typed_keys = self.typed_keys[:-1]
                 self.last_sequence = self.last_sequence[:-1]  # Update last_sequence
 
-           
-            elif key == keyboard.Key.space:
+            elif key == "space":
                 self.typed_keys += " "
                 self.last_sequence = ""  # Clear last_sequence
-                last_word = (self.typed_keys.split()[-1] if self.typed_keys.split() else "")
-                
-                
-                self.last_word = last_word  # Set the instance variable self.last_word
-                self.word_buffer.append(last_word)  # Add the last word to the word_buffer deque
-                print(f"Debug: last_word after assignment = {self.last_word}")  # Debugging line
+                last_word = (
+                    self.typed_keys.split()[-1] if self.typed_keys.split() else ""
+                )
+                self.last_word = last_word
+                self.word_buffer.append(last_word)
+                print(f"Debug: last_word after assignment = {self.last_word}")
+                print(f"Word Buffer Before fix_double_caps: {list(self.word_buffer)}")
+                self.fix_double_caps(last_word)
 
-              
-                print(f"Word Buffer Before fix_double_caps:---------- {list(self.word_buffer)}")  # Print the current word buffer
-                self.fix_double_caps(last_word)  # Now this should work as expected
-       
-       
-       
-       
         try:
-            self.last_key = key  # Add this line to update the last key pressed
-
-            # Check silent mode is enabled
-            if self.isRecordingMacro:
-                return
-
-            if self.silent_mode:
-                return
-
-            if key in self.omitted_keys and self.api.is_recording:
-                return
+            self.last_key = key
 
             if key not in self.omitted_keys:
-                self.lookup_and_expand(self.last_sequence)  # New line for lookup_and_expand
-                pass
-
+                self.lookup_and_expand(self.last_sequence)
             else:
-                if key == keyboard.Key.space:
+                if key == "space":
                     last_word = (
                         self.typed_keys.split()[-1] if self.typed_keys.split() else ""
                     )
-                    self.lookup_and_expand(
-                        last_word
-                    )  # New line for lookup_and_expand when space is pressed
+                    self.lookup_and_expand(last_word)
 
             if self.stop_event.is_set():
                 return False
 
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
-            self.restart_listener()
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -497,44 +463,6 @@ class KeyListener:
     # ----------------------------------------------------------------
     # ----------------------------------------------------------------
 
-    def restart_listener(self):
-        logging.info("Restarting listener...")
-        self.stop_listener()
-        self.start_listener()
 
-    def start_listener(self):
-        self.typed_keys = ""  # Clear the typed keys
-        self.pynput_listener = keyboard.Listener(on_release=self.on_key_release)
-        print("Starting GlobaL listener...")
-        self.pynput_listener.start()
-
-    def stop_listener(self):
-        if self.pynput_listener is not None:
-            if self.pynput_listener.running:
-                print("Stopping Macro listener...")
-                self.pynput_listener.stop()
-                self.pynput_listener.join()
-                self.pynput_listener = None
-                self.typed_keys = ""  # Move this line here
-            else:
-                print("Listener is not running, no need to stop it.")
-        else:
-            print("No listener to stop.")
-
-    def handle_accent_key(self, key_char):
-        self.accent = False
-        combination = self.last_key + key_char
-        accented_char = self.accent_mapping[combination]
-
-        # Add the accented character to the char_buffer
-        self.char_buffer += accented_char  # Add this line
-
-    def start(self):
-        self.start_listener()  # Change self.listener.start() to self.start_listener()
-
-    def stop(self):
-        self.stop_listener()  # Change self.listener.stop() to self.stop_listener()
-
-
-def stop_keyboard_listener(listener):
-    listener.stop_listener()  # Remove the second argument, pynput_listener
+# def stop_keyboard_listener(listener):
+#    listener.stop_listener()  # Remove the second argument, pynput_listener

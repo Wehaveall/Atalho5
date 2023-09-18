@@ -22,7 +22,9 @@ import pygetwindow as gw
 from screeninfo import get_monitors
 
 
-from listener import KeyListener
+from listener import (
+    KeyListener,
+)  # Make sure this is your new KeyListener with the keyboard library
 
 # Import database
 from src.database.data_connect import (
@@ -46,19 +48,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, MetaData, Table, select, update
 from sqlalchemy import inspect
 from threading import Lock
-
-# --------------------------------------macros
-from pynput import keyboard, mouse
-from macroPlayer import Executor
-
-
-# --------------------------------Imagem bandeja do sistema
-import pystray
-from PIL import Image
-
-
-import pyautogui
-import pyperclip
 
 
 state_lock = Lock()
@@ -202,19 +191,16 @@ def msgOC(title, message):
 
 class Api:
     def __init__(self):
+        self.listener_instance = KeyListener(
+            self
+        )  # Initialize the listener here - Keyboard Library
+
         self.is_maximized = False
         self.is_window_open = True
         self.is_recording = False
         self.events = []
-        self.listener_instance = KeyListener(self)
-        self.listener = None
-        self.mouse_listener = None
-        self.last_event_time = None
 
-        # Execução da Macro
-        self.executor = Executor()
-        self.execution_thread = None
-        self.should_execute = False
+        self.last_event_time = None
 
     def minimize_window(self):
         self.window.minimize()
@@ -248,75 +234,6 @@ class Api:
     def is_recording(self):
         return self.is_recording
 
-    def on_press(self, key):
-        # Se está gravando
-        if self.is_recording:
-            # Se apertou escape
-            if key == keyboard.Key.esc:
-                self.stop_recording()
-                msg("Atalho", "Gravação Parada.")
-                # show_message("Atalho", "Gravação Parada.")
-
-            else:
-                # If any other key is pressed, add it to the events list
-                current_time = time.time()
-                elapsed_time = current_time - self.start_time if self.start_time else 0
-                self.events.append(("key", str(key), elapsed_time))
-
-    def on_click(self, x, y, button, pressed):
-        if self.is_recording and pressed:
-            current_time = time.time()
-            elapsed_time = (
-                current_time - self.start_time if self.start_time is not None else 0
-            )
-            self.events.append(("click", (x, y), elapsed_time))
-
-    # ----------------------------------------------------------------START RECORDING
-    # ----------------------------------------------------------------
-
-    def start_recording(self):
-        confirmation = msgOC(
-            "Atalho",
-            "Ao clicar em OK, a janela do Atalho será minimizada e a gravação da macro será iniciada.",
-        )
-        if confirmation:  # Only start recording if the user clicked OK
-            self.is_recording = True
-            self.start_time = time.time()
-
-            listener_instance.startRecordingMacro()
-
-            # Stop the global listener
-            listener_instance.stop_listener()
-
-            self.events = []
-
-            # Check if the listeners already exist and stop them if they do
-            if self.listener is not None:
-                self.listener.stop()
-            if self.mouse_listener is not None:
-                self.mouse_listener.stop()
-
-            self.listener = keyboard.Listener(on_press=self.on_press)
-            self.listener.start()
-            self.mouse_listener = mouse.Listener(on_click=self.on_click)
-            self.mouse_listener.start()
-        else:  # If the user clicked Cancel, you can define the behavior here
-            print("User cancelled the recording")
-
-    # ----------------------------------------------------------------STOP RECORDING
-    # ----------------------------------------------------------------
-
-    def stop_recording(self):
-        self.is_recording = False
-        listener_instance.stopRecordingMacro()
-        # Start the global listener
-        listener_instance.start_listener()
-
-        if self.listener:
-            self.listener.stop()
-        if self.mouse_listener:
-            self.mouse_listener.stop()
-
     def save_macro(self, filename):
         # Get the path to the current file (__file__)
         current_file_path = os.path.abspath(__file__)
@@ -348,20 +265,6 @@ class Api:
     def start_macro(self, filename):
         self.executor.start_macro(filename)
 
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
     # ---------------------------------------------------------------- DATABASE  -------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
@@ -375,7 +278,7 @@ class Api:
         newContent,
         formatValue,
         label,
-        caseChoice = None,  # New parameter
+        caseChoice=None,  # New parameter
     ):
         # Convert formatValue to 0 or 1 for SQLite storage
         format_value_for_db = 1 if formatValue else 0
@@ -392,9 +295,14 @@ class Api:
             # Get the table names from the database using inspect
             table_names = inspect(engine).get_table_names()
 
-             # Filter out 'sqlite_sequence' and 'config' and get the desired table name
+            # Filter out 'sqlite_sequence' and 'config' and get the desired table name
             desired_table_name = next(
-            (name for name in table_names if name not in ["sqlite_sequence", "config"]), tableName
+                (
+                    name
+                    for name in table_names
+                    if name not in ["sqlite_sequence", "config"]
+                ),
+                tableName,
             )
 
             # Target the desired table
@@ -477,7 +385,6 @@ class Api:
                 return name
         return None  # If no table is found other than 'sqlite_sequence' and 'config'
 
-
     # -------------------------------------------------------------------
 
     # Configurar o logging
@@ -515,11 +422,17 @@ class Api:
         metadata = MetaData()
 
         with engine.connect() as conn:
-            metadata.reflect(bind=engine)  # Reflect the state of the database into the metadata
+            metadata.reflect(
+                bind=engine
+            )  # Reflect the state of the database into the metadata
             table_names = metadata.tables.keys()
 
             # Filter out the tables "sqlite_sequence" and "config"
-            return [name for name in table_names if name not in ["sqlite_sequence", "config"]]
+            return [
+                name
+                for name in table_names
+                if name not in ["sqlite_sequence", "config"]
+            ]
 
     # ----------------------------------------------------------------SETTINGS----------------------------------------------------------------
 
@@ -569,26 +482,22 @@ class Api:
             with open("state.json", "w") as file:
                 json.dump(states, file)
 
-
-
     def save_checkBox_states(self, checkBoxStates):
-        with open('checkBox_states.json', 'w', encoding='utf-8') as f:
+        with open("checkBox_states.json", "w", encoding="utf-8") as f:
             json.dump(checkBoxStates, f, ensure_ascii=False)
-        #print("Saved checkbox states.")
-
+        # print("Saved checkbox states.")
 
     def load_checkBox_states(self):
-        filePath = 'checkBox_states.json'
+        filePath = "checkBox_states.json"
         if os.path.exists(filePath):
-            with open(filePath, 'r', encoding='utf-8') as f:
+            with open(filePath, "r", encoding="utf-8") as f:
                 checkBoxStates = json.load(f)
-            #print(f"Loaded checkbox states from {filePath}")
+            # print(f"Loaded checkbox states from {filePath}")
         else:
             print(f"{filePath} not found. Initializing empty checkbox states.")
             checkBoxStates = {}
-        
-        return checkBoxStates
 
+        return checkBoxStates
 
     # ----------------------------------------------------------------CREATE WINDOW
 
@@ -622,8 +531,7 @@ class Api:
         load_handler(self.window)
 
 
-api = Api()
-listener_instance = KeyListener(api)
+# api = Api()
 
 
 def get_window():
@@ -639,17 +547,12 @@ def start_app():
     global api  # Add this line
     api = Api()
     api.create_and_position_window()
+
     webview.start(http_server=True)
     # Check the flag and show messagebox after the webview starts
 
-
-# Start the listener in a new thread
-listener_thread = threading.Thread(target=listener_instance.start_listener, daemon=True)
-listener_thread.start()
 
 try:
     start_app()
 except Exception as e:
     print(f"An error occurred: {e}")
-
-listener_thread.join()
