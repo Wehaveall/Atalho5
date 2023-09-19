@@ -28,7 +28,22 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.tag import pos_tag
 from nltk.chunk import ne_chunk
 
-################################################################
+##Capturing frequently occurring phrases can certainly be beneficial for suggesting hotstrings or automating text input.
+# To achieve this, you can use NLTK's functionality for finding collocations and extracting n-grams.
+# Here's how:
+# 1. N-gram Extraction
+# An n-gram is a contiguous sequence of #n items (such as characters or words) from a given sample of text.
+# The function ngrams from the nltk.util module can help you generate n-grams.
+
+# 2. Collocation Finding
+
+# Collocations are sequences of words that appear together more often than would be expected by chance.
+# The BigramCollocationFinder and TrigramCollocationFinder classes in the nltk.collocations module can help identify these.
+from nltk.util import ngrams
+from nltk.collocations import BigramCollocationFinder
+from nltk.metrics import BigramAssocMeasures
+import json
+
 
 def move_cursor_to_last_word(self):
     # Move cursor to the start of the last word without going to the end of the line
@@ -101,10 +116,11 @@ def format_article(article, newlines=1):
 
     return new_article
 
+
 ############################################################################
 
-class KeyListener:
 
+class KeyListener:
     ########################################################################
 
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
@@ -183,72 +199,123 @@ class KeyListener:
         self.accents = set(["~", "´", "`", "^"])
 
         self.omitted_keys = set(
-    [
-        "esc",
-        "shift",
-        "ctrl",
-        "alt",
-        "cmd",
-        "f1",
-        "f2",
-        "f3",
-        "f4",
-        "f5",
-        "f6",
-        "f7",
-        "f8",
-        "f9",
-        "f10",
-        "f11",
-        "f12",
-        "page up",
-        "page down",
-        "home",
-        "end",
-        "delete",
-        "insert",
-        "up",
-        "down",
-        "left",
-        "right",
-        "backspace",
-        "print screen",
-        "scroll lock",
-        "pause",
-        "space",
-        "caps lock",
-        "tab",
-        "enter",
-        "num lock",
-        "right ctrl",
-        "left ctrl",
-        "left shift",
-        "right shift",
-        # Add more here
-    ]
-)
+            [
+                "esc",
+                "shift",
+                "ctrl",
+                "alt",
+                "cmd",
+                "f1",
+                "f2",
+                "f3",
+                "f4",
+                "f5",
+                "f6",
+                "f7",
+                "f8",
+                "f9",
+                "f10",
+                "f11",
+                "f12",
+                "page up",
+                "page down",
+                "home",
+                "end",
+                "delete",
+                "insert",
+                "up",
+                "down",
+                "left",
+                "right",
+                "backspace",
+                "print screen",
+                "scroll lock",
+                "pause",
+                "space",
+                "caps lock",
+                "tab",
+                "enter",
+                "num lock",
+                "right ctrl",
+                "left ctrl",
+                "left shift",
+                "right shift",
+                # Add more here
+            ]
+        )
 
         self.resetting_keys = set(["space"])
 
-    # ----------------------------------------------------------------
+    # ----------------------------------------GRAMMAR AND ORTOGRAPH ---------------
 
+    def capture_ngrams_and_collocations(self):
+        # Tokenize the accumulated text
+        words = word_tokenize(self.typed_keys)
+
+        # Generate bigrams
+        bigrams = list(ngrams(words, 2))
+
+        # Find collocations using bigrams
+        bigram_finder = BigramCollocationFinder.from_words(words)
+        bigram_scored = bigram_finder.score_ngrams(BigramAssocMeasures.raw_freq)
+
+        # Write to a JSON file
+        with open("bigram_data.json", "w") as f:
+            json.dump(bigram_scored, f)
+
+        return bigrams, bigram_scored
+
+    # -------------------------------------------DOUBLE CAPS--------------------------
     def fix_double_caps(self, last_word):
         
         pattern = r"\b[A-Z]{2}[a-zA-Z]*\b"  # Removed \b
-        
+
         if re.match(pattern, last_word):
             converted_word = last_word[0].upper() + last_word[1:].lower()
             print(f"Converted word: {converted_word}")  # Debugging line
 
             keyboard.unhook_all()
-            pyautogui.hotkey("ctrl", "shiftleft", "shiftright", "left")
-            pyautogui.press("backspace")
+
+            # Set flag to indicate programmatic typing
+            self.programmatically_typing = True
+
+            # Clear previously typed keys
+            keyboard.press("ctrl")
+            keyboard.press("shift")
+            keyboard.press_and_release("left arrow")
+            keyboard.release("shift")
+            keyboard.release("ctrl")
+            keyboard.press_and_release("backspace")
+
             pyperclip.copy(converted_word)
-            pyautogui.hotkey("ctrl", "v")
-            pyautogui.press("space")
+
+            time.sleep(0.05)
+            keyboard.press_and_release("ctrl+v")
+            time.sleep(0.05)
+            # Insert a space
+            keyboard.write(" ")
+            time.sleep(0.05)
+
+            # Debugging line to check the value of self.typed_keys before modification
+            print(f"Before: {self.typed_keys}")
+
+            # Update the last word and the typed keys
+            if self.typed_keys.endswith(last_word + " "):
+                self.typed_keys = self.typed_keys[:-len(last_word) - 1] + converted_word + " "
+            
+            elif self.typed_keys.endswith(last_word):
+                self.typed_keys = self.typed_keys[:-len(last_word)] + converted_word + " "
+
+            # Debugging line to check the value of self.typed_keys after modification
+            print(f"After: {self.typed_keys}")
+
+            # Reset the flag
+            self.programmatically_typing = False
 
             # Restarting hook
             self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+            return
+
 
     # ----------------------------------------------------------------
 
@@ -278,20 +345,19 @@ class KeyListener:
             # Now paste
             keyboard.press_and_release("ctrl+v")
 
-          # Restarting hook
+        # Restarting hook
         self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
         self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
         self.programmatically_typing = False  # Reset the flag
 
         # Remove the last incorrect word from self.typed_keys
         self.typed_keys = self.typed_keys.rstrip(self.last_word)
-        
+
         # Add the corrected word
         self.typed_keys += expansion + " "
-        
+
         self.last_word = expansion  # Update the last word to the new expanded word
         self.word_buffer.append(expansion)  # Add the expanded word to the buffer
-
 
     # ----------------------------------------------------------------Handle Accents
 
@@ -332,21 +398,20 @@ class KeyListener:
                 if re.search(regex_pattern, last_word):
                     prefix = last_word[:i]
                     expansion = prefix + expansion  # Create the expanded word
-                    
+
                     # Remove the last incorrect word from self.typed_keys and self.word_buffer
                     if self.typed_keys.endswith(last_word + " "):
-                        self.typed_keys = self.typed_keys[:-len(last_word) - 1]  # Subtracting 1 to keep the space
+                        self.typed_keys = self.typed_keys[
+                            : -len(last_word) - 1
+                        ]  # Subtracting 1 to keep the space
                     elif self.typed_keys.endswith(last_word):
-                        self.typed_keys = self.typed_keys[:-len(last_word)]
-                    
+                        self.typed_keys = self.typed_keys[: -len(last_word)]
+
                     if self.word_buffer and self.word_buffer[-1] == last_word:
                         self.word_buffer.pop()
-                    
+
                     self.paste_expansion(expansion, format_value=0)
                     return
-
-                                
-                        
 
         try:
             (
@@ -385,14 +450,16 @@ class KeyListener:
     ################################################################
 
     def on_key_press(self, event):
-        
         if self.programmatically_typing:  # Skip if we are programmatically typing
             return
-        
-        
-        print("on_key_press called")  # Debugging: Changed from on_key_release to on_key_press
+
+        print(
+            "on_key_press called"
+        )  # Debugging: Changed from on_key_release to on_key_press
         key = event.name
-        print(f"Key pressed: {key}")  # Debugging: Changed from Key released to Key pressed
+        print(
+            f"Key pressed: {key}"
+        )  # Debugging: Changed from Key released to Key pressed
 
         # Initialize variables to None at the start of the function
         expansion = None
@@ -403,7 +470,8 @@ class KeyListener:
         start_time = time.time()
 
         # Initialize self.last_sequence if not already done
-        if not hasattr(self, "last_sequence"):self.last_sequence = ""
+        if not hasattr(self, "last_sequence"):
+            self.last_sequence = ""
 
         if (
             self.ctrl_pressed
@@ -454,15 +522,39 @@ class KeyListener:
                 
                 self.typed_keys += " "
                 self.last_sequence = ""  # Clear last_sequence
+
+                # ---------------------------------------WORDS--------------------------------
                 # Tokenize the sentence into words
                 words = word_tokenize(self.typed_keys)
-
                 # Get the last word
                 last_word = words[-1]
-                
+
                 self.fix_double_caps(last_word)  # Call fix_double_caps here
                 self.lookup_and_expand(last_word)
-                
+
+                # --------------------------------------SENTENCES-----------------------------
+                # Sentence Tokenization
+                sentences = sent_tokenize(self.typed_keys)
+                last_sentence = sentences[-1] if sentences else ""
+
+                # ---------------------------------------ENTITIES--------------------------------
+                # Tokenization
+                tokens = word_tokenize(
+                    self.typed_keys
+                )  # Make sure self.typed_keys is a string
+                tags = pos_tag(tokens)
+                entities = ne_chunk(tags)
+
+                # ---------------------------------------COLLECT DATA
+                # Call the new method here
+                self.capture_ngrams_and_collocations()
+
+                # --------------------------------PRINTS--------------------------------
+                print(f"Entities = {entities}")
+
+                print(f"Sentence List= {sentences}")
+                print(f"Last Sentence = {last_sentence}")
+
                 print(f"Words List= {words}")
                 print(f"Last Word= {last_word}")
 
@@ -488,9 +580,3 @@ class KeyListener:
         logging.info(f"on_key_release processing took {elapsed_time:.2f} seconds")
 
     # ----------------------------------------------------------------
-    # ----------------------------------------------------------------
-    # ----------------------------------------------------------------
-
-
-# def stop_keyboard_listener(listener):
-#    listener.stop_listener()  # Remove the second argument, pynput_listener
