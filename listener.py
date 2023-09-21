@@ -33,6 +33,7 @@ import win32gui
 import win32con
 import tkinter as tk
 from tkinter import Button
+
 ################################################################ - NATURAL TRAINIG LANGUAGE
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -53,8 +54,8 @@ from nltk.chunk import ne_chunk
 from nltk.util import ngrams
 from nltk.collocations import BigramCollocationFinder
 from nltk.metrics import BigramAssocMeasures
-#################################################################
 
+#################################################################
 
 
 def move_cursor_to_last_word(self):
@@ -131,6 +132,7 @@ def format_article(article, newlines=1):
 
 ############################################################################
 
+
 class TkinterPopupSelector:
     def __init__(self, options, callback, key_listener):
         self.callback = callback
@@ -147,14 +149,18 @@ class TkinterPopupSelector:
 
         self.top_window = tk.Toplevel(self.root)
         self.top_window.geometry("900x700")
-        self.top_window.title('Select Expansion')
-        
+        self.top_window.title("Select Expansion")
+
         input_element = tk.Entry(self.top_window)
         input_element.pack()
         input_element.focus_set()  # Move focus to the input element
 
         for i, option in enumerate(options):
-            button = tk.Button(self.top_window, text=f"{i + 1}. {option}", command=lambda i=i: self.make_selection(i))
+            button = tk.Button(
+                self.top_window,
+                text=f"{i + 1}. {option}",
+                command=lambda i=i: self.make_selection(i),
+            )
             button.pack()
 
         # Attempt to bring Tkinter window to the foreground
@@ -164,18 +170,17 @@ class TkinterPopupSelector:
 
     def bring_window_to_foreground(self):
         self.top_window.update_idletasks()
-        hwnd = win32gui.FindWindow(None, 'Select Expansion')
+        hwnd = win32gui.FindWindow(None, "Select Expansion")
         shell = win32com.client.Dispatch("WScript.Shell")
-        shell.SendKeys('%')
-        shell.SendKeys('%')  
+        shell.SendKeys("%")
+        shell.SendKeys("%")
         win32gui.SetForegroundWindow(hwnd)
         # Send another Alt key to nullify the activation
         self.top_window.focus_force()
-        
 
     def make_selection(self, index):
         print("Debug: make_selection called")
-        
+
         self.callback(index)
         self.top_window.destroy()
         self.root.quit()
@@ -183,27 +188,20 @@ class TkinterPopupSelector:
         # Restart keyboard listener
         self.key_listener.start_listener()
 
-
         # Add a small delay here
-        time.sleep(0.1)  # You can adjust the duratio
+        time.sleep(0.1)  # You can adjust the duration
 
         # Explicitly call paste_expansion here to test
         selected_expansion_data = self.key_listener.expansions_list[index]
         self.key_listener.paste_expansion(
-            selected_expansion_data['expansion'],
-            format_value=selected_expansion_data['format_value']
+            selected_expansion_data["expansion"],
+            format_value=selected_expansion_data["format_value"],
         )
-
-
-
 
 
 ########################################################################
 class KeyListener:
-   
-
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-
         self.expansions_list = []  # Define the expansions_list
 
         keyboard.on_press(lambda e: self.on_key_press(e))
@@ -328,15 +326,12 @@ class KeyListener:
 
         self.resetting_keys = set(["space"])
 
-
     def stop_listener(self):
         keyboard.unhook_all()
 
-    
     def start_listener(self):
         keyboard.on_press(lambda e: self.on_key_press(e))
         keyboard.on_release(lambda e: self.on_key_release(e))
-
 
     # ----------------------------------------GRAMMAR AND ORTOGRAPH ---------------
 
@@ -359,7 +354,6 @@ class KeyListener:
 
     # -------------------------------------------DOUBLE CAPS--------------------------
     def fix_double_caps(self, last_word):
-        
         pattern = r"\b[A-Z]{2}[a-zA-Z]*\b"  # Removed \b
 
         if re.match(pattern, last_word):
@@ -393,10 +387,14 @@ class KeyListener:
 
             # Update the last word and the typed keys
             if self.typed_keys.endswith(last_word + " "):
-                self.typed_keys = self.typed_keys[:-len(last_word) - 1] + converted_word + " "
-            
+                self.typed_keys = (
+                    self.typed_keys[: -len(last_word) - 1] + converted_word + " "
+                )
+
             elif self.typed_keys.endswith(last_word):
-                self.typed_keys = self.typed_keys[:-len(last_word)] + converted_word + " "
+                self.typed_keys = (
+                    self.typed_keys[: -len(last_word)] + converted_word + " "
+                )
 
             # Debugging line to check the value of self.typed_keys after modification
             print(f"After: {self.typed_keys}")
@@ -408,11 +406,12 @@ class KeyListener:
             self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
             return
 
-
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
-        print(f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}")
+        print(
+            f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}"
+        )
         self.programmatically_typing = True  # Set the flag
         keyboard.unhook_all()  # Stop listening for keys - PARA CTRL V
 
@@ -490,9 +489,9 @@ class KeyListener:
                     expansion = prefix + expansion
 
                     if self.typed_keys.endswith(last_word + " "):
-                        self.typed_keys = self.typed_keys[:-len(last_word) - 1]
+                        self.typed_keys = self.typed_keys[: -len(last_word) - 1]
                     elif self.typed_keys.endswith(last_word):
-                        self.typed_keys = self.typed_keys[:-len(last_word)]
+                        self.typed_keys = self.typed_keys[: -len(last_word)]
 
                     if self.word_buffer and self.word_buffer[-1] == last_word:
                         self.word_buffer.pop()
@@ -502,17 +501,24 @@ class KeyListener:
 
         expansions_list = []
         try:
-
-
-
-
             expansions_list = lookup_word_in_all_databases(sequence)
         except ValueError:
             print("Not enough values returned from lookup")
 
+        # Multiple Expansions
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
-            TkinterPopupSelector([exp['expansion'] for exp in expansions_list], self.callback, self)
+            TkinterPopupSelector(
+                [exp["expansion"] for exp in expansions_list], self.callback, self
+            )
+
+        # One expansion
+        elif len(expansions_list) == 1:  # Handling single expansion
+            print("Debug: Single expansion detected.")  # Debugging line
+            expansion_data = expansions_list[0]
+            self.paste_expansion(
+                expansion_data["expansion"], format_value=expansion_data["format_value"]
+            )
 
         try:
             (
@@ -538,7 +544,6 @@ class KeyListener:
                 self.paste_expansion(expansion, format_value=format_value)
                 self.typed_keys = ""
 
-
     # ----------------------------------------------------------------
 
     # def on_key_press(self, event):
@@ -553,11 +558,9 @@ class KeyListener:
         selected_expansion_data = self.expansions_list[index]
         print("Debug: callback called with index", index)
         self.paste_expansion(
-            selected_expansion_data['expansion'],
-            format_value=selected_expansion_data['format_value']
+            selected_expansion_data["expansion"],
+            format_value=selected_expansion_data["format_value"],
         )
-
-
 
     def on_key_press(self, event):
         if self.programmatically_typing:  # Skip if we are programmatically typing
@@ -629,8 +632,11 @@ class KeyListener:
                 self.last_sequence = self.last_sequence[:-1]  # Update last_sequence
 
             elif key == "space":
-                
                 self.typed_keys += " "
+                self.last_sequence = ""  # Clear last_sequence
+
+            elif key == "enter":  # Handling the "Enter" key
+                self.typed_keys += "\n"  # Add newline to last_typed_keys
                 self.last_sequence = ""  # Clear last_sequence
 
                 # ---------------------------------------WORDS--------------------------------
