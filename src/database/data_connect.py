@@ -149,13 +149,14 @@ def lookup_word_in_all_databases(word):
     # List to store database files
     db_files = []
 
+    # List to store all found expansions
+    all_expansions = []
+
     # Use os.walk to traverse all subdirectories of db_directory
     for root, dirs, files in os.walk(base_directory):
         for file in files:
             if file.endswith(".db"):
                 db_files.append(os.path.join(root, file))
-
-    #print(f"Loaded checkbox states: {checkBoxStates}")  # Debugging line
 
     # Create a MetaData instance once
     metadata = MetaData()
@@ -169,14 +170,9 @@ def lookup_word_in_all_databases(word):
         # Construct the key
         key = f"{group_name}|{db_name}"
 
-        #print(f"Checking key: {key}")  # Debugging line
-
         # Skip this database if its checkbox is not checked
         if not checkBoxStates.get(key, False):
-            #print(f"Skipping database: {db_file}")  # Debugging line
             continue
-
-        #print(f"Searching in database: {db_file}")  # Debugging line
 
         engine = create_engine(f"sqlite:///{db_file}")  # Get the engine
 
@@ -197,20 +193,23 @@ def lookup_word_in_all_databases(word):
             with Session(engine) as session:
                 config_result = session.execute(s_config).first()
                 if config_result:
-                   
                     requires_delimiter = config_result.requires_delimiter
                     delimiters = config_result.delimiters
-        # Continue with the existing logic for looking up words
+
         if target_table_name:
             table = Table(target_table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)
 
             with Session(engine) as session:
-                result = session.execute(s).first()
-                if result:
+                results = session.execute(s).all()  # Get all results
+                for result in results:
                     format_value = int(result.format)
-                    print(f"Format value: {result.format}, Type: {type(result.format)}")  # Debugging line
-                    return result.expansion, format_value, requires_delimiter, delimiters
+                    expansion_data = {
+                        "expansion": result.expansion,
+                        "format_value": format_value,
+                        "requires_delimiter": requires_delimiter,
+                        "delimiters": delimiters
+                    }
+                    all_expansions.append(expansion_data)
 
-    # If no result was found in any database, return None
-    return None, requires_delimiter, delimiters
+    return all_expansions
