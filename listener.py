@@ -33,6 +33,7 @@ import win32gui
 import win32con
 import tkinter as tk
 from tkinter import Button
+import customtkinter as ctk
 
 ################################################################ - NATURAL TRAINIG LANGUAGE
 import nltk
@@ -133,35 +134,49 @@ def format_article(article, newlines=1):
 ############################################################################
 
 
-class TkinterPopupSelector:
+class CustomTkinterPopupSelector:
+    
     def __init__(self, options, callback, key_listener):
+        
+        self.popup = True
+
         self.callback = callback
         self.key_listener = key_listener  # Store the key_listener instance
+        
 
-        # Stop keyboard listener
-        self.key_listener.stop_listener()
+       
 
-        # Wait for a small period to ensure the keyboard listener has fully stopped
-        time.sleep(0.1)
+        self.root = ctk.CTk()  # Using customtkinter's CTk instead of tk.Tk
+        ctk.set_appearance_mode("light")
+        ctk.set_default_color_theme("blue")
 
-        self.root = tk.Tk()
+
         self.root.withdraw()  # Hide the main window
 
-        self.top_window = tk.Toplevel(self.root)
-        self.top_window.geometry("900x700")
+        self.top_window = ctk.CTkToplevel(self.root)  # Using customtkinter's CTkToplevel
+        self.top_window.geometry("1200x500")
         self.top_window.title("Select Expansion")
 
-        input_element = tk.Entry(self.top_window)
-        input_element.pack()
-        input_element.focus_set()  # Move focus to the input element
+        # Make the window modal
+        self.top_window.grab_set()
+
+
+
+         # To capture keypress events and paste the corresponding expansion
+        self.top_window.bind('<Key>', lambda event: self.on_key(event, options))
 
         for i, option in enumerate(options):
-            button = tk.Button(
+            button = ctk.CTkButton(
                 self.top_window,
                 text=f"{i + 1}. {option}",
                 command=lambda i=i: self.make_selection(i),
+                fg_color="orange",  # Set background to orange
+                text_color="black",    # Set text to black
+                font=ctk.CTkFont(family='Work Sans', size=16),
+              
             )
-            button.pack()
+            button.pack(padx=10, pady=10, anchor='w')  # Left-align buttons
+
 
         # Attempt to bring Tkinter window to the foreground
         self.bring_window_to_foreground()
@@ -178,18 +193,34 @@ class TkinterPopupSelector:
         # Send another Alt key to nullify the activation
         self.top_window.focus_force()
 
+  
+  
+  
     def make_selection(self, index):
         print("Debug: make_selection called")
 
+         # Stop keyboard listener
+        #keyboard.unhook_all()
+
+        # Wait for a small period to ensure the keyboard listener has fully stopped
+        time.sleep(0.1)
+        
+    
+        
+        # Explicitly reset last_sequence and typed_keys to avoid capturing keys during popup
+        self.key_listener.last_sequence = ""
+        self.key_listener.typed_keys = ""
+    
+
         self.callback(index)
+        self.top_window.grab_release()  # Release the grab (modal state)
         self.top_window.destroy()
         self.root.quit()
-
-        # Restart keyboard listener
-        self.key_listener.start_listener()
-
-        # Add a small delay here
+         # Add a small delay here
         time.sleep(0.1)  # You can adjust the duration
+
+
+      
 
         # Explicitly call paste_expansion here to test
         selected_expansion_data = self.key_listener.expansions_list[index]
@@ -198,10 +229,25 @@ class TkinterPopupSelector:
             format_value=selected_expansion_data["format_value"],
         )
 
+       # Restart keyboard listener
+        #self.key_listener.start_listener()
+
+        # Add a small delay here
+        #time.sleep(0.1)  # You can adjust the duration
+
+
+    def on_key(self, event, options):
+        try:
+            index = int(event.char) - 1  # Convert to integer and 0-based index
+            if 0 <= index < len(options):
+                self.make_selection(index)
+        except ValueError:
+            pass  # Ignore non-integer keypress
 
 ########################################################################
 class KeyListener:
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
+        
         self.expansions_list = []  # Define the expansions_list
 
         keyboard.on_press(lambda e: self.on_key_press(e))
@@ -508,7 +554,7 @@ class KeyListener:
         # Multiple Expansions
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
-            TkinterPopupSelector(
+            CustomTkinterPopupSelector(
                 [exp["expansion"] for exp in expansions_list], self.callback, self
             )
 
