@@ -136,11 +136,11 @@ def format_article(article, newlines=1):
 
 class CustomTkinterPopupSelector:
     
-    def __init__(self, options, callback, key_listener):
+    def __init__(self, options,  key_listener):
         
         self.popup = True
 
-        self.callback = callback
+      
         self.key_listener = key_listener  # Store the key_listener instance
         
 
@@ -183,6 +183,9 @@ class CustomTkinterPopupSelector:
 
         self.root.mainloop()
 
+
+
+######################################################################################
     def bring_window_to_foreground(self):
         self.top_window.update_idletasks()
         hwnd = win32gui.FindWindow(None, "Select Expansion")
@@ -195,29 +198,28 @@ class CustomTkinterPopupSelector:
 
   
   
-  
+  ####################################################################################
     def make_selection(self, index):
         print("Debug: make_selection called")
 
-         # Stop keyboard listener
-        #keyboard.unhook_all()
+        #Stop keyboard listener
+        keyboard.unhook_all()
 
         # Wait for a small period to ensure the keyboard listener has fully stopped
-        time.sleep(0.1)
+        #time.sleep(0.1)
         
-    
         
         # Explicitly reset last_sequence and typed_keys to avoid capturing keys during popup
         self.key_listener.last_sequence = ""
         self.key_listener.typed_keys = ""
     
 
-        self.callback(index)
+        #self.callback(index)
         self.top_window.grab_release()  # Release the grab (modal state)
         self.top_window.destroy()
         self.root.quit()
          # Add a small delay here
-        time.sleep(0.1)  # You can adjust the duration
+        time.sleep(0.05)  # You can adjust the duration
 
 
       
@@ -246,9 +248,11 @@ class CustomTkinterPopupSelector:
 
 ########################################################################
 class KeyListener:
+    
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
         
         self.expansions_list = []  # Define the expansions_list
+        keyboard.add_abbreviation('@g', 'denisvaljean@gmail.com')
 
         keyboard.on_press(lambda e: self.on_key_press(e))
         keyboard.on_release(lambda e: self.on_key_release(e))
@@ -555,7 +559,7 @@ class KeyListener:
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
             CustomTkinterPopupSelector(
-                [exp["expansion"] for exp in expansions_list], self.callback, self
+                [exp["expansion"] for exp in expansions_list], self
             )
 
         # One expansion
@@ -600,13 +604,7 @@ class KeyListener:
 
     ################################################################
     ################################################################
-    def callback(self, index):
-        selected_expansion_data = self.expansions_list[index]
-        print("Debug: callback called with index", index)
-        self.paste_expansion(
-            selected_expansion_data["expansion"],
-            format_value=selected_expansion_data["format_value"],
-        )
+
 
     def on_key_press(self, event):
         if self.programmatically_typing:  # Skip if we are programmatically typing
