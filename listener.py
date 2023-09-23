@@ -35,6 +35,7 @@ import tkinter as tk
 from tkinter import Button
 import customtkinter as ctk
 
+
 ################################################################ - NATURAL TRAINIG LANGUAGE
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -136,17 +137,23 @@ def format_article(article, newlines=1):
 
 class CustomTkinterPopupSelector:
     
+    
     def __init__(self, options,  key_listener):
         
         
-       
+        #Stop keyboard listener
+        keyboard.unhook_all()
 
-
+        # Wait for a small period to ensure the keyboard listener has fully stopped
+        time.sleep(0.1)
         self.key_listener = key_listener  # Store the key_listener instance
         self.key_listener.popup_open = True  # Set the flag when popup is open
+        print(f"Debug: Setting popup_open to True in CustomTkinterPopupSelector")  # Debug log
         
 
+        self.key_listener.active = False  # Deactivate the key listener
        
+
 
         self.root = ctk.CTk()  # Using customtkinter's CTk instead of tk.Tk
         ctk.set_appearance_mode("light")
@@ -182,7 +189,7 @@ class CustomTkinterPopupSelector:
 
         # Attempt to bring Tkinter window to the foreground
         self.bring_window_to_foreground()
-
+      
         self.root.mainloop()
 
 
@@ -203,29 +210,22 @@ class CustomTkinterPopupSelector:
   
   ####################################################################################
     def make_selection(self, index):
-        print("Debug: make_selection called")
-
-        #Stop keyboard listener
-        keyboard.unhook_all()
-
-        # Wait for a small period to ensure the keyboard listener has fully stopped
-        time.sleep(1)
         
         
+        print(f"Debug: make_selection called. Popup open before: {self.key_listener.popup_open}")
+
         # Explicitly reset last_sequence and typed_keys to avoid capturing keys during popup
         self.key_listener.last_sequence = ""
         self.key_listener.typed_keys = ""
-    
 
         #self.callback(index)
         self.top_window.grab_release()  # Release the grab (modal state)
         self.top_window.destroy()
         self.root.quit()
          # Add a small delay here
-        time.sleep(1)  # You can adjust the duration
+        time.sleep(0.1)  # You can adjust the duration
 
 
-      
 
         # Explicitly call paste_expansion here to test
         selected_expansion_data = self.key_listener.expansions_list[index]
@@ -234,8 +234,10 @@ class CustomTkinterPopupSelector:
             format_value=selected_expansion_data["format_value"],
         )
 
-        time.sleep(1)  # Add a slight delay
-        self.key_listener.popup_open = False  # Reset the flag when popup is closed
+        time.sleep(0.1)  # Add a slight delay
+        #self.key_listener.popup_open = False  # Reset the flag when popup is closed
+
+        print(f"Debug: make_selection called. Popup open after: {self.key_listener.popup_open}")
         #Restart keyboard listener
         #self.key_listener.start_listener()
 
@@ -245,11 +247,17 @@ class CustomTkinterPopupSelector:
 
     def on_key(self, event, options):
         try:
+            time.sleep(0.1)  # Add a slight delay
             index = int(event.char) - 1  # Convert to integer and 0-based index
             if 0 <= index < len(options):
                 self.make_selection(index)
+                self.key_listener.popup_open = True  # Use self.key_listener to access the instance variable
+                return
         except ValueError:
             pass  # Ignore non-integer keypress
+
+
+        
 
 ########################################################################
 class KeyListener:
@@ -257,7 +265,8 @@ class KeyListener:
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
         
 
-        self.popup_open = False  # Initialize the flag here
+        self.popup_open = False  # Initialize the flag here as False
+        print(f"Debug: Initializing popup_open to False in KeyListener")  # Debug log
 
         self.expansions_list = []  # Define the expansions_list
         keyboard.add_abbreviation('@g', 'denisvaljean@gmail.com')
@@ -566,9 +575,9 @@ class KeyListener:
         # Multiple Expansions
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
-            CustomTkinterPopupSelector(
-                [exp["expansion"] for exp in expansions_list], self
-            )
+
+        
+            popup_selector = CustomTkinterPopupSelector([exp["expansion"] for exp in expansions_list], self)
 
         # One expansion
         elif len(expansions_list) == 1:  # Handling single expansion
@@ -577,18 +586,16 @@ class KeyListener:
             self.paste_expansion(
                 expansion_data["expansion"], format_value=expansion_data["format_value"]
             )
-
+        
+        ######
         try:
-            (
-                expansion,
-                format_value,
-                self.requires_delimiter,
-                self.delimiters,
-            ) = lookup_word_in_all_databases(sequence)
+            (expansion, format_value, self.requires_delimiter, self.delimiters) = lookup_word_in_all_databases(sequence)
+        
         except ValueError:
             print("Not enough values returned from lookup")
             expansion = format_value = self.requires_delimiter = self.delimiters = None
-
+        
+        #####
         if self.requires_delimiter == "yes":
             delimiter_list = [item.strip() for item in self.delimiters.split(",")]
             key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))
@@ -604,7 +611,7 @@ class KeyListener:
 
     # ----------------------------------------------------------------
 
-    # def on_key_press(self, event):
+    #def on_key_press(self, event):
     #     key = event.name  # Define 'key' first before using it
     #     print(f"Key pressed: {key}")  # Debugging
     #     if key == "shift":
@@ -615,8 +622,8 @@ class KeyListener:
 
 
     def on_key_press(self, event):
-        print(f"Popup open flag: {self.popup_open}")  # Debugging line
-        if self.programmatically_typing or self.popup_open:  # Skip if we are programmatically typing or popup is open
+        print(f"Debug: Checking popup_open in on_key_press: {self.popup_open}")  # Debug log
+        if self.programmatically_typing or self.popup_open == True:  # Skip if we are programmatically typing or popup is open
             return
 
         print(
