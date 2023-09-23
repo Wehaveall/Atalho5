@@ -138,10 +138,12 @@ class CustomTkinterPopupSelector:
     
     def __init__(self, options,  key_listener):
         
-        self.popup = True
+        
+       
 
-      
+
         self.key_listener = key_listener  # Store the key_listener instance
+        self.key_listener.popup_open = True  # Set the flag when popup is open
         
 
        
@@ -191,6 +193,7 @@ class CustomTkinterPopupSelector:
         hwnd = win32gui.FindWindow(None, "Select Expansion")
         shell = win32com.client.Dispatch("WScript.Shell")
         shell.SendKeys("%")
+        time.sleep(0.05)
         shell.SendKeys("%")
         win32gui.SetForegroundWindow(hwnd)
         # Send another Alt key to nullify the activation
@@ -206,7 +209,7 @@ class CustomTkinterPopupSelector:
         keyboard.unhook_all()
 
         # Wait for a small period to ensure the keyboard listener has fully stopped
-        #time.sleep(0.1)
+        time.sleep(1)
         
         
         # Explicitly reset last_sequence and typed_keys to avoid capturing keys during popup
@@ -219,7 +222,7 @@ class CustomTkinterPopupSelector:
         self.top_window.destroy()
         self.root.quit()
          # Add a small delay here
-        time.sleep(0.05)  # You can adjust the duration
+        time.sleep(1)  # You can adjust the duration
 
 
       
@@ -231,7 +234,9 @@ class CustomTkinterPopupSelector:
             format_value=selected_expansion_data["format_value"],
         )
 
-       # Restart keyboard listener
+        time.sleep(1)  # Add a slight delay
+        self.key_listener.popup_open = False  # Reset the flag when popup is closed
+        #Restart keyboard listener
         #self.key_listener.start_listener()
 
         # Add a small delay here
@@ -251,6 +256,9 @@ class KeyListener:
     
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
         
+
+        self.popup_open = False  # Initialize the flag here
+
         self.expansions_list = []  # Define the expansions_list
         keyboard.add_abbreviation('@g', 'denisvaljean@gmail.com')
 
@@ -463,7 +471,7 @@ class KeyListener:
             f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}"
         )
         self.programmatically_typing = True  # Set the flag
-        keyboard.unhook_all()  # Stop listening for keys - PARA CTRL V
+        #keyboard.unhook_all()  # Stop listening for keys - PARA CTRL V
 
         # Clear previously typed keys
         keyboard.press("ctrl")
@@ -488,8 +496,8 @@ class KeyListener:
             keyboard.press_and_release("ctrl+v")
 
         # Restarting hook
-        self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
-        self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
+        #self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+
         self.programmatically_typing = False  # Reset the flag
 
         # Remove the last incorrect word from self.typed_keys
@@ -607,7 +615,8 @@ class KeyListener:
 
 
     def on_key_press(self, event):
-        if self.programmatically_typing:  # Skip if we are programmatically typing
+        print(f"Popup open flag: {self.popup_open}")  # Debugging line
+        if self.programmatically_typing or self.popup_open:  # Skip if we are programmatically typing or popup is open
             return
 
         print(
