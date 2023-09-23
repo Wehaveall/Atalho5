@@ -50,6 +50,11 @@ from sqlalchemy import inspect
 from threading import Lock
 
 
+from src.classes.popup import (
+    CustomTkinterPopupSelector,
+)  # Adjust the import based on your directory structure
+
+
 state_lock = Lock()
 
 
@@ -550,6 +555,8 @@ def start_app():
 
     webview.start(http_server=True)
     # Check the flag and show messagebox after the webview starts
+    key_listener = KeyListener(api)
+    key_listener.start_listener()  # Assuming you have a start_listener method in KeyListener
 
 
 try:
