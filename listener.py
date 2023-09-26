@@ -361,7 +361,7 @@ class KeyListener:
             f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}"
         )
         self.programmatically_typing = True  # Set the flag
-        # keyboard.unhook_all()  # Stop listening for keys - PARA CTRL V
+       
 
         # Clear previously typed keys
         keyboard.press("ctrl")
@@ -385,8 +385,7 @@ class KeyListener:
             # Now paste
             keyboard.press_and_release("ctrl+v")
 
-        # Restarting hook
-        # self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+    
 
         self.programmatically_typing = False  # Reset the flag
 
