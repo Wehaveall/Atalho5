@@ -132,15 +132,21 @@ def format_article(article, newlines=1):
     return new_article
 
 
-############################################################################
 
 
-########################################################################
+
+
+
+
+######################################################    KEYLISTENER    ###############################################################
+########################################################################################################################################
 class KeyListener:
+    
+    
+    
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
        
        
-        
 
         self.expansions_list = []  # Define the expansions_list
         #keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
@@ -412,7 +418,7 @@ class KeyListener:
     # -------------------------------------------------------------------------
 
     
-    
+    #Open choose expansion popup  - Will open others later
     def open_popup(self):
         # Stop the listener
         self.stop_listener()
@@ -427,11 +433,7 @@ class KeyListener:
         
         
     
-    
-    
-    
-    
-    
+
     
     def lookup_and_expand(self, sequence):
         hardcoded_suffixes = {
@@ -469,14 +471,37 @@ class KeyListener:
         except ValueError:
             print("Not enough values returned from lookup")
 
+       
+       
+       
+        ################################################################    MULTIPLE EXPANSIONS
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
 
+
+            #########################################  VERY IMPORTANT
             # Open the popup in a separate thread
             popup_thread = threading.Thread(target=self.open_popup)
             popup_thread.start()
-            
-        # One expansion
+            ##########################################################
+
+        #How Threading Works in Python
+        #In Python, threading allows you to run multiple threads (smaller units of a program) 
+        # in the same process space. Each thread runs independently of the others. 
+        # This is particularly useful when you want to carry out multiple operations independently without
+        #  having to wait for one to complete before moving on to the next.
+
+        #The Problem You Faced
+        #In your case, the problem was that opening the popup window was blocking the main thread, 
+        # preventing your listener from being stopped or restarted effectively. 
+        # This happens because both the popup and the keyboard listener were competing for time on the same thread, and the popup was "hogging" the resources.
+
+        #The Threading Solution
+        #The threading solution worked by offloading the task of opening the popup to a separate thread 
+        # (popup_thread), allowing the main thread to continue its operations uninterrupted
+
+
+        ###############################################################     ONE EXPANSION
         elif len(expansions_list) == 1:  # Handling single expansion
             print("Debug: Single expansion detected.")  # Debugging line
             expansion_data = expansions_list[0]
