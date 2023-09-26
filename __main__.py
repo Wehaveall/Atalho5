@@ -196,9 +196,7 @@ def msgOC(title, message):
 
 class Api:
     def __init__(self):
-        self.listener_instance = KeyListener(
-            self
-        )  # Initialize the listener here - Keyboard Library
+        
 
         self.is_maximized = False
         self.is_window_open = True
@@ -549,14 +547,24 @@ def load_handler(window):
 
 
 def start_app():
+    
     global api  # Add this line
     api = Api()
     api.create_and_position_window()
-
-    webview.start(http_server=True)
-    # Check the flag and show messagebox after the webview starts
+    
+    
+     # Start KeyListener in a new thread before starting the webview
     key_listener = KeyListener(api)
-    key_listener.start_listener()  # Assuming you have a start_listener method in KeyListener
+    key_listener_thread = threading.Thread(target=key_listener.start_listener)
+    key_listener_thread.start()
+    print("Starting Listener from Main.py")
+    
+    
+    
+    
+    
+    webview.start(http_server=True)
+   
 
 
 try:

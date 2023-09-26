@@ -17,7 +17,7 @@ import html_clipboard
 
 from collections import deque
 import platform
-
+import threading
 
 import time
 import re
@@ -138,14 +138,12 @@ def format_article(article, newlines=1):
 ########################################################################
 class KeyListener:
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
-        self.popup_open = False  # Initialize the flag here as False
-        print(f"Debug: Initializing popup_open to False in KeyListener")  # Debug log
+       
+       
+        
 
         self.expansions_list = []  # Define the expansions_list
-        keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
-
-        keyboard.on_press(lambda e: self.on_key_press(e))
-        keyboard.on_release(lambda e: self.on_key_release(e))
+        #keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
 
         self.programmatically_typing = False  # Initialize the flag here
 
@@ -266,12 +264,16 @@ class KeyListener:
 
         self.resetting_keys = set(["space"])
 
+
     def stop_listener(self):
-        keyboard.unhook_all()
+         print ("Stopping Listener from Listerner.py")
+         keyboard.unhook(self.press_hook)
+         keyboard.unhook(self.release_hook)
 
     def start_listener(self):
-        keyboard.on_press(lambda e: self.on_key_press(e))
-        keyboard.on_release(lambda e: self.on_key_release(e))
+        print ("Starting Listener from Listerner.py")
+        self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+        self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
 
     # ----------------------------------------GRAMMAR AND ORTOGRAPH ---------------
 
@@ -409,6 +411,28 @@ class KeyListener:
 
     # -------------------------------------------------------------------------
 
+    
+    
+    def open_popup(self):
+        # Stop the listener
+        self.stop_listener()
+
+        popup_selector = CustomTkinterPopupSelector(
+            [exp["expansion"] for exp in self.expansions_list], self
+        )
+
+        # Restart the listener
+        self.start_listener()
+        
+        
+        
+    
+    
+    
+    
+    
+    
+    
     def lookup_and_expand(self, sequence):
         hardcoded_suffixes = {
             "çao": ("ção", r"(?<![ã])\bçao\b"),
@@ -445,14 +469,13 @@ class KeyListener:
         except ValueError:
             print("Not enough values returned from lookup")
 
-        # Multiple Expansions
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
 
-            popup_selector = CustomTkinterPopupSelector(
-                [exp["expansion"] for exp in expansions_list], self
-            )
-
+            # Open the popup in a separate thread
+            popup_thread = threading.Thread(target=self.open_popup)
+            popup_thread.start()
+            
         # One expansion
         elif len(expansions_list) == 1:  # Handling single expansion
             print("Debug: Single expansion detected.")  # Debugging line
@@ -500,12 +523,8 @@ class KeyListener:
     ################################################################
 
     def on_key_press(self, event):
-        print(
-            f"Debug: Checking popup_open in on_key_press: {self.popup_open}"
-        )  # Debug log
-        if (
-            self.programmatically_typing or self.popup_open == True
-        ):  # Skip if we are programmatically typing or popup is open
+    
+        if (self.programmatically_typing):  # Skip if we are programmatically typing or popup is open
             return
 
         print(

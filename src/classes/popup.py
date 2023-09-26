@@ -15,13 +15,12 @@ class CustomTkinterPopupSelector:
     def __init__(self, options,  key_listener):
         
         
-        #Stop keyboard listener
-        keyboard.unhook_all()
+       
 
         # Wait for a small period to ensure the keyboard listener has fully stopped
         time.sleep(0.1)
         self.key_listener = key_listener  # Store the key_listener instance
-        self.key_listener.popup_open = True  # Set the flag when popup is open
+       
         print(f"Debug: Setting popup_open to True in CustomTkinterPopupSelector")  # Debug log
         
 
@@ -86,7 +85,7 @@ class CustomTkinterPopupSelector:
     def make_selection(self, index):
         
         
-        print(f"Debug: make_selection called. Popup open before: {self.key_listener.popup_open}")
+      
 
         # Explicitly reset last_sequence and typed_keys to avoid capturing keys during popup
         self.key_listener.last_sequence = ""
@@ -111,9 +110,6 @@ class CustomTkinterPopupSelector:
         time.sleep(0.1)  # Add a slight delay
         #self.key_listener.popup_open = False  # Reset the flag when popup is closed
 
-        print(f"Debug: make_selection called. Popup open after: {self.key_listener.popup_open}")
-       
-        self.key_listener.popup_open = False  # Reset the flag when popup is closed
       
 
 
