@@ -412,26 +412,27 @@ class KeyListener:
     # ----------------------------------------------------------------Handle Accents
 
     def handle_accents(self, key_char):
-        
         if key_char in self.accents:
             self.accent = key_char
             return None  # No character to append to multi_line_string
-       
+        
         elif self.accent:
             combination = self.accent + key_char
             accented_char = self.accent_mapping.get(combination, "")
+           
             if accented_char:
                 self.typed_keys += accented_char
                 self.last_sequence += accented_char  # Update last_sequence here
                 self.accent = None
                 return accented_char  # Return the accented character
+            
             self.accent = None
-       
+        
         else:
             self.typed_keys += key_char
             self.last_sequence += key_char  # Update last_sequence here
             return key_char  # Return the original character
-            
+
 
     # -------------------------------------------------------------------------
 
@@ -629,8 +630,9 @@ class KeyListener:
 
 
 
-            self.handle_accents(char)  # Handle accents
+            processed_char = self.handle_accents(char)  # Call handle_accents and save the returned character
 
+           
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
             print(f"Last Sequence:__ {self.last_sequence}")
@@ -717,16 +719,13 @@ class KeyListener:
       
 
 
-        if char is not None:  # Highlighted Change
-            # Highlighted Changes: Start
+        if processed_char is not None:  # Update multi_line_string using the returned character
             lines = self.multi_line_string.split('\n')
             current_line = lines[self.cursor_row]
-            # Insert the character at the cursor position within the specific line
-            lines[self.cursor_row] = current_line[:self.cursor_col] + char + current_line[self.cursor_col:]
+            lines[self.cursor_row] = current_line[:self.cursor_col] + processed_char + current_line[self.cursor_col:]
             self.cursor_col += 1  # Move the cursor to the right by 1 position
-            # Join the lines back into a single string
             self.multi_line_string = '\n'.join(lines)
-            # Highlighted Changes: End
+
 
 
         elif key == "backspace":
