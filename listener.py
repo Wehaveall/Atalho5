@@ -412,19 +412,26 @@ class KeyListener:
     # ----------------------------------------------------------------Handle Accents
 
     def handle_accents(self, key_char):
+        
         if key_char in self.accents:
             self.accent = key_char
+            return None  # No character to append to multi_line_string
+       
         elif self.accent:
             combination = self.accent + key_char
             accented_char = self.accent_mapping.get(combination, "")
             if accented_char:
                 self.typed_keys += accented_char
                 self.last_sequence += accented_char  # Update last_sequence here
+                self.accent = None
+                return accented_char  # Return the accented character
             self.accent = None
+       
         else:
             self.typed_keys += key_char
             self.last_sequence += key_char  # Update last_sequence here
-          
+            return key_char  # Return the original character
+            
 
     # -------------------------------------------------------------------------
 
@@ -669,16 +676,19 @@ class KeyListener:
             # ---------------------------------------WORDS--------------------------------
             # Tokenize the sentence into words
             words = word_tokenize(self.typed_keys)
-            # Get the last word
-            last_word = words[-1]
-
-            self.fix_double_caps(last_word)  # Call fix_double_caps here
-            self.lookup_and_expand(last_word)
+            
+            # Get the last word only if words list is not empty
+            last_word = words[-1] if words else None  # Highlighted Change
+           
+            if last_word:  # Highlighted Change: Only call fix_double_caps if last_word is not None
+                self.fix_double_caps(last_word)  # Call fix_double_caps here
+                self.lookup_and_expand(last_word)
 
             # --------------------------------------SENTENCES-----------------------------
             # Sentence Tokenization
             sentences = sent_tokenize(self.typed_keys)
             last_sentence = sentences[-1] if sentences else ""
+            last_sentence = sentences[-1] if sentences else None  # Highlighted Change
 
             # ---------------------------------------ENTITIES--------------------------------
             # Tokenization
@@ -720,13 +730,14 @@ class KeyListener:
 
 
         elif key == "backspace":
-            # Update the line at the cursor position within the specific line
-            lines = self.multi_line_string.split('\n')
-            current_line = lines[self.cursor_row]
-            lines[self.cursor_row] = current_line[:max(0, self.cursor_col - 1)] + current_line[self.cursor_col:]
-            self.cursor_col = max(0, self.cursor_col - 1)  # Update cursor position
-            # Join the lines back into a single string
-            self.multi_line_string = '\n'.join(lines)
+            if self.cursor_row < len(self.multi_line_string.split('\n')) and self.cursor_col > 0:  # Highlighted Change: Added checks
+                # Update the line at the cursor position within the specific line
+                lines = self.multi_line_string.split('\n')
+                current_line = lines[self.cursor_row]
+                lines[self.cursor_row] = current_line[:max(0, self.cursor_col - 1)] + current_line[self.cursor_col:]
+                self.cursor_col = max(0, self.cursor_col - 1)  # Update cursor position
+                # Join the lines back into a single string
+                self.multi_line_string = '\n'.join(lines)
 
         elif key == "space":
             # Update the line at the cursor position within the specific line
@@ -784,7 +795,9 @@ class KeyListener:
                     words = word_tokenize(self.multi_line_string)
 
                     # Get the last word
-                    last_word = words[-1]
+                    
+                    # Get the last word only if words list is not empty
+                    last_word = words[-1] if words else None  # Highlighted Change
                     self.lookup_and_expand(last_word)
 
 
