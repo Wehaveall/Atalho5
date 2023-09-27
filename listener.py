@@ -136,7 +136,11 @@ def format_article(article, newlines=1):
 
 
 
+global cursor_row         # Declare cursor_row as global to modify it
+global cursor_col         # Declare cursor_col as global to modify it
 
+cursor_row = 0
+cursor_col = 0
 
 ######################################################    KEYLISTENER    ###############################################################
 ########################################################################################################################################
@@ -146,15 +150,15 @@ class KeyListener:
     
     def __init__(self, api):  # Adicione um parâmetro window com valor padrão None
        
-       
-
+        
+        
         self.expansions_list = []  # Define the expansions_list
         #keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
 
         self.programmatically_typing = False  # Initialize the flag here
 
         self.last_word = ""  # Initialize last_word
-        self.word_buffer = deque([], maxlen=50)  # Initialize with an empty deque
+        self.word_buffer = deque([], maxlen=500)  # Initialize with an empty deque
 
         self.ctrl_pressed = False
         self.shift_pressed = False
@@ -174,7 +178,14 @@ class KeyListener:
 
         self.accent = False
         self.last_key = None
-        self.typed_keys = ""
+        
+        
+        self.cursor_row = 0
+        self.cursor_col = 0
+        self.multi_line_string = """"""
+        self.typed_keys = """"""
+        self.lines = """""" 
+        
 
         # Added this line to store the pynput listener
         # self.pynput_listener = keyboard.Listener(on_press=self.on_key_press, on_release=self.on_key_release)
@@ -413,6 +424,7 @@ class KeyListener:
         else:
             self.typed_keys += key_char
             self.last_sequence += key_char  # Update last_sequence here
+          
 
     # -------------------------------------------------------------------------
 
@@ -430,7 +442,7 @@ class KeyListener:
         self.start_listener()
         
         
-        
+    #------------------------------------------------------------------------#  
     
 
     
@@ -528,12 +540,12 @@ class KeyListener:
             if key_str in delimiter_list:
                 if expansion is not None:
                     self.paste_expansion(expansion, format_value=format_value)
-                    self.typed_keys = ""
+                    self.typed_keys = """"""
 
         elif self.requires_delimiter == "no":
             if expansion is not None:
                 self.paste_expansion(expansion, format_value=format_value)
-                self.typed_keys = ""
+                self.typed_keys = """"""
 
     # ----------------------------------------------------------------
 
@@ -551,13 +563,9 @@ class KeyListener:
         if (self.programmatically_typing):  # Skip if we are programmatically typing or popup is open
             return
 
-        print(
-            "on_key_press called"
-        )  # Debugging: Changed from on_key_release to on_key_press
+        print("on_key_press called")  # Debugging: Changed from on_key_release to on_key_press
         key = event.name
-        print(
-            f"Key pressed: {key}"
-        )  # Debugging: Changed from Key released to Key pressed
+        print(f"Key pressed: {key}")  # Debugging: Changed from Key released to Key pressed
 
         # Initialize variables to None at the start of the function
         expansion = None
@@ -571,12 +579,7 @@ class KeyListener:
         if not hasattr(self, "last_sequence"):
             self.last_sequence = ""
 
-        if (
-            self.ctrl_pressed
-            or self.shift_pressed
-            or self.alt_pressed
-            or self.winkey_pressed
-        ):
+        if (self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed):
             return
 
         # CTRL
@@ -595,23 +598,52 @@ class KeyListener:
         elif key == "cmd":
             self.winkey_pressed = False
 
-        # Ignore 'enter' when self.typed_keys is empty
-        if key == "enter" or (key == "space" and not self.typed_keys):
-            return
+        # Ignore 'space' when self.typed_keys is empty
+        if (key == "space" and not self.typed_keys):
+           return
 
         if key not in self.omitted_keys:
+            
+            #key = event.name
+            # Update the multi-line string here
+            #self.multi_line_string += key
+            
+            
             if self.shift_pressed:
                 char = key.upper()  # Convert to upper case if Shift is pressed
                 self.shift_pressed = False  # Reset the flag immediately after use
+           
             else:
                 char = key
 
+
+
+
+            # Highlighted Changes: Start
+            lines = self.multi_line_string.split('\n')
+            current_line = lines[self.cursor_row]
+            # Insert the character at the cursor position within the specific line
+            lines[self.cursor_row] = current_line[:self.cursor_col] + char + current_line[self.cursor_col:]
+            self.cursor_col += 1  # Move the cursor to the right by 1 position
+            # Join the lines back into a single string
+            self.multi_line_string = '\n'.join(lines)
+            # Highlighted Changes: End
+
+
+
+
+
+
             self.handle_accents(char)  # Handle accents
+
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
             print(f"Last Sequence:__ {self.last_sequence}")
+          
+         
 
         else:  # Key is in omitted_keys
+            
             if key == "backspace":
                 self.typed_keys = self.typed_keys[:-1]
                 self.last_sequence = self.last_sequence[:-1]  # Update last_sequence
@@ -621,8 +653,33 @@ class KeyListener:
                 self.last_sequence = ""  # Clear last_sequence
 
             elif key == "enter":  # Handling the "Enter" key
-                self.typed_keys += "\n"  # Add newline to last_typed_keys
+                #self.typed_keys += '\n' # Add newline to last_typed_keys
                 self.last_sequence = ""  # Clear last_sequence
+
+           
+                self.lines.insert(self.cursor_row + 1, self.lines[self.cursor_row][self.cursor_col:])
+                self.lines[cursor_row] = self.lines[self.cursor_row][:self.cursor_col]
+                self.cursor_row += 1
+                self.cursor_col = 0
+
+
+            # Highlighted Changes: Start
+            elif key == "left":
+                self.cursor_col = max(0, self.cursor_col - 1)
+                
+            elif key == "right":
+                self.cursor_col = min(len(self.lines[self.cursor_row]), self.cursor_col + 1)
+                
+            elif key == "up":
+                # Removed cursor movement, only reset last_sequence
+                self.last_sequence = ""
+                
+            elif key == "down":
+                # Removed cursor movement, only reset last_sequence
+                self.last_sequence = ""
+
+
+             
 
                 # ---------------------------------------WORDS--------------------------------
                 # Tokenize the sentence into words
@@ -651,6 +708,8 @@ class KeyListener:
                 self.capture_ngrams_and_collocations()
 
                 # --------------------------------PRINTS--------------------------------
+                
+  
                 print(f"Entities = {entities}")
 
                 print(f"Sentence List= {sentences}")
@@ -658,6 +717,19 @@ class KeyListener:
 
                 print(f"Words List= {words}")
                 print(f"Last Word= {last_word}")
+
+
+     
+
+       
+        
+        # Reconstruct the multi-line string
+        #self.multi_line_string = '\n'.join(self.lines)
+
+            
+        # Print the current state of the multi-line string
+        print("Current multi-line string-------------------------------------------:")
+        print(self.multi_line_string)      
 
         try:
             self.last_key = key
@@ -672,6 +744,9 @@ class KeyListener:
                     # Get the last word
                     last_word = words[-1]
                     self.lookup_and_expand(last_word)
+
+
+             
 
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
