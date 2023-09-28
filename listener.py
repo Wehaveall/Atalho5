@@ -152,6 +152,11 @@ class KeyListener:
        
         
         
+        
+        self.popup_done_event = threading.Event()
+        
+        
+        
         self.expansions_list = []  # Define the expansions_list
         #keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
 
@@ -442,14 +447,19 @@ class KeyListener:
         # Stop the listener
         self.stop_listener()
 
+         # Reset the event before opening a new popup
+        self.popup_done_event.clear()
+
         popup_selector = CustomTkinterPopupSelector(
-            [exp["expansion"] for exp in self.expansions_list], self
+            [exp["expansion"] for exp in self.expansions_list], self, self.popup_done_event
         )
 
+        # Wait until the popup is done
+        self.popup_done_event.wait()
+        
         # Restart the listener
-        self.start_listener()
-        
-        
+        #self.start_listener()
+  
     #------------------------------------------------------------------------#  
     
 
