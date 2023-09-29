@@ -1,3 +1,71 @@
+
+import queue
+import keyboard  # Replacing pynput
+import webview
+import pygetwindow as gw
+from functools import partial
+from queue import Queue
+
+
+from collections import defaultdict
+from threading import Event
+import pyautogui
+from src.database.data_connect import lookup_word_in_all_databases
+
+import pyperclip  # We add this import for clipboard manipulation
+from src.utils import number_utils
+import time
+import logging
+
+
+import html_clipboard
+
+
+from collections import deque
+import platform
+import threading
+
+import time
+import re
+import json
+
+#######################################
+######################### POP UP FOR MULTIPLE EXPANSIONS
+from src.classes.popup import (
+    CustomTkinterPopupSelector,
+)  # Adjust the import based on your directory structure
+import win32gui
+
+import win32con
+import tkinter as tk
+from tkinter import Button
+import customtkinter as ctk
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 api = None  # Declare api as a global variable
 
 # pywebview
@@ -534,7 +602,55 @@ class Api:
         load_handler(self.window)
 
 
-# api = Api()
+
+
+def create_popup(tk_queue, key_listener_instance):
+    while True:
+        queue_data = tk_queue.get()
+        msg, data = queue_data[:2]  # Only take the first two values
+        main_win_title = "*ce3 - Notepad"  # Moved out of if block
+        
+        if msg == "create_popup":
+            key_listener_instance.stop_listener()  # Stop the listener
+
+            # Existing code
+            windows = gw.getWindowsWithTitle(main_win_title)
+            if windows:
+                main_win = windows[0]
+                pyautogui.click(main_win.left + 10, main_win.top + 10)
+            else:
+                print(f"No window with title '{main_win_title}' found.")
+
+            popup = tk.Tk()
+            popup.title("Multiple Expansions Found")
+            popup.geometry("750x400")
+
+            for i, option in enumerate(key_listener_instance.expansions_list):
+
+                button_text = option['expansion'] if 'expansion' in option else "Undefined"
+                button = tk.Button(
+                    popup,
+                    text=button_text,
+                    command=partial(key_listener_instance.make_selection, i, popup),  # Note the instance here
+
+                    bg="orange",
+                    fg="black",
+                    font=("Work Sans", 12),
+                    anchor="w"
+                )
+                button.pack(fill=tk.X, padx=10, pady=5)
+
+            def on_closing():
+                key_listener_instance.start_listener()  # Start the listener
+                popup.destroy()
+
+            popup.protocol("WM_DELETE_WINDOW", on_closing)
+
+            popup.attributes("-topmost", True)
+            popup.focus_force()
+            popup.mainloop()
+
+
 
 
 def get_window():
@@ -546,28 +662,57 @@ def load_handler(window):
     pass
 
 
-def start_app():
-    
-    global api  # Add this line
-    api = Api()
-    api.create_and_position_window()
-    
-    
-     # Start KeyListener in a new thread before starting the webview
-    key_listener = KeyListener(api)
-    key_listener_thread = threading.Thread(target=key_listener.start_listener)
+
+
+
+
+
+def start_app(tk_queue):
+    global api  # Existing line
+    api = Api()  # Existing line
+    api.create_and_position_window()  # Existing line
+
+    key_listener_instance = KeyListener(api, tk_queue)  # Moved inside start_app
+    key_listener_thread = threading.Thread(target=key_listener_instance.start_listener)
     key_listener_thread.start()
-    print("Starting Listener from Main.py")
-    
-    
-    
-    
-    
-    webview.start(http_server=True)
-   
+
+    # Pass the key_listener_instance to create_popup
+    threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance)).start()
+
+    print("Starting Listener from Main.py")  # Existing line
+    webview.start(http_server=True)  # Existing line
 
 
-try:
-    start_app()
-except Exception as e:
-    print(f"An error occurred: {e}")
+
+
+
+
+
+
+
+
+
+
+
+def main():
+    tk_queue = queue.Queue()  # Make sure to import the 'queue' module
+
+    # Initialize Tkinter root window
+    root = tk.Tk()
+    root.withdraw()  # Hide the main Tkinter window
+
+    # Create a thread to run Tkinter event loop
+    #threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance)).start()
+
+
+    # Call start_app
+    start_app(tk_queue)
+
+    root.mainloop()
+
+# Start the application
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"An error occurred: {e}")
