@@ -483,7 +483,7 @@ class KeyListener:
                 expansion, regex_pattern = hardcoded_suffixes[suffix]
                 if re.search(regex_pattern, last_word):
                     prefix = last_word[:i]
-                    expansion = prefix + expansion + keyboard.send ("space")
+                    expansion = prefix + expansion
 
                     if self.typed_keys.endswith(last_word + " "):
                         self.typed_keys = self.typed_keys[: -len(last_word) - 1]
@@ -494,6 +494,24 @@ class KeyListener:
                         self.word_buffer.pop()
 
                     self.paste_expansion(expansion, format_value=0)
+                   
+
+
+                # Simulate a space key press and update necessary variables
+                    #self.typed_keys += " "
+                    
+                    # Update the multi-line string
+                    lines = self.multi_line_string.split('\n')
+                    current_line = lines[self.cursor_row]
+                    lines[self.cursor_row] = current_line[:self.cursor_col] + ' ' + current_line[self.cursor_col:]
+                    self.cursor_col += 1  # Move the cursor to the right by 1 position
+                    self.multi_line_string = '\n'.join(lines)
+                    
+                    # Programmatically press the space key
+                    keyboard.press_and_release('space')
+
+
+
                     return
 
         expansions_list = []
