@@ -450,6 +450,8 @@ class KeyListener:
          # Reset the event before opening a new popup
         self.popup_done_event.clear()
 
+        
+
         popup_selector = CustomTkinterPopupSelector(
             [exp["expansion"] for exp in self.expansions_list], self, self.popup_done_event
         )
@@ -577,7 +579,7 @@ class KeyListener:
     ################################################################
 
     def on_key_press(self, event):
-
+        processed_char = None
         next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
 
