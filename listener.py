@@ -483,7 +483,7 @@ class KeyListener:
                 expansion, regex_pattern = hardcoded_suffixes[suffix]
                 if re.search(regex_pattern, last_word):
                     prefix = last_word[:i]
-                    expansion = prefix + expansion
+                    expansion = prefix + expansion + keyboard.send ("space")
 
                     if self.typed_keys.endswith(last_word + " "):
                         self.typed_keys = self.typed_keys[: -len(last_word) - 1]
