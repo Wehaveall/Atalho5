@@ -143,6 +143,7 @@ class CustomTkinterPopupSelector:
         #self.key_listener.popup_open = False  # Reset the flag when popup is closed
 
         self.event.set()  # Notify that the popup is done
+        self.key_listener.start_listener()
 
 
     def on_key(self, event, options):
