@@ -430,26 +430,64 @@ class KeyListener:
     # -------------------------------------------------------------------------
 
 
-
-
-
     def make_selection(self, index, popup):  # Added popup as an argument
        
 
         popup.destroy()  # Destroy the popup
         
-        time.sleep(0.1)  # Add a small delay here
+        time.sleep(0.05)  # Add a small delay here
         
         selected_expansion_data = self.expansions_list[index]
+        expansion_to_paste = selected_expansion_data["expansion"]  # Define the variable here
         self.paste_expansion(
-            selected_expansion_data["expansion"],
+            expansion_to_paste,
             format_value=selected_expansion_data["format_value"],
-        )
+    )
+
+
+
+        # Update the multi_line_string
+        lines = self.multi_line_string.split("\n")
+        current_line = lines[self.cursor_row]
+        lines[self.cursor_row] = current_line[:self.cursor_col] + expansion_to_paste + current_line[self.cursor_col:]
+        self.multi_line_string = "\n".join(lines)
+        
+        # Update the cursor position
+        self.cursor_col += len(expansion_to_paste)  # Move the cursor to the end of the expansion
 
 
 
 
-   
+        # Update last_sequence with the selected expansion
+        self.last_sequence = selected_expansion_data["expansion"]
+        print(f"LAST SEQ - AFTER PAste: {self.last_sequence}")  # Debugging: Changed from Key released to Key pressed
+
+       
+
+        # Update last_sequence with the last word in multi_line_string
+        words_in_multi_line_string = word_tokenize(self.multi_line_string)
+        
+        if words_in_multi_line_string:
+            self.last_sequence = words_in_multi_line_string[-1]  # Take the last word
+        else:
+            self.last_sequence = ""  # If no words, set to empty string
+
+
+
+
+    # Set a flag to indicate that the next key press should be skipped
+        self.skip_next_key_press = True
+
+
+        # Clear typed_keys and last_sequence after pasting
+        self.typed_keys = selected_expansion_data["expansion"]
+       
+        self.start_listener()
+        return
+
+
+   ############################################################################################################
+
     def create_popup(self):
         if self.tk_queue:
             self.tk_queue.put(("create_popup", self.expansions_list, self))
@@ -589,6 +627,13 @@ class KeyListener:
         next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
 
+
+
+    
+
+
+
+
         if (
             self.programmatically_typing
         ):  # Skip if we are programmatically typing or popup is open
@@ -659,7 +704,7 @@ class KeyListener:
             )  # Call handle_accents and save the returned character
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
-            print(f"Last Sequence:__ {self.last_sequence}")
+            print(f"Last Sequence:__1 {self.last_sequence}")
 
         else:  # Key is in omitted_keys
             if key == "backspace":
@@ -769,6 +814,8 @@ class KeyListener:
                 self.multi_line_string = "\n".join(lines)
 
         elif key == "space":
+
+            
             # Update the line at the cursor position within the specific line
             lines = self.multi_line_string.split("\n")
             current_line = lines[self.cursor_row]
@@ -804,7 +851,7 @@ class KeyListener:
 
         print("Current multi-line string-------------------------------------------:")
         print(self.multi_line_string)
-        print(f"Last Sequence:__ {self.last_sequence}")
+        print(f"Last Sequence:__2 {self.last_sequence}")
 
         try:
             self.last_key = key

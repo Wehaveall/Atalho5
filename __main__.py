@@ -1,4 +1,4 @@
-
+import atexit
 import queue
 import keyboard  # Replacing pynput
 import webview
@@ -604,13 +604,17 @@ class Api:
 
 
 
+
+
 def create_popup(tk_queue, key_listener_instance):
+    print("Entered create_popup")  # Debugging
     while True:
         queue_data = tk_queue.get()
         msg, data = queue_data[:2]  # Only take the first two values
         main_win_title = "*ce3 - Notepad"  # Moved out of if block
         
         if msg == "create_popup":
+            print("About to stop listener and create popup")  # Debugging
             key_listener_instance.stop_listener()  # Stop the listener
 
             # Existing code
@@ -641,13 +645,22 @@ def create_popup(tk_queue, key_listener_instance):
                 button.pack(fill=tk.X, padx=10, pady=5)
 
             def on_closing():
-                key_listener_instance.start_listener()  # Start the listener
-                popup.destroy()
+                try:
+                    print("Trying to restart the listener...")  # Debugging
+                    key_listener_instance.start_listener()  # Start the listener
+                   
+                except Exception as e:
+                    print(f"Failed to restart listener. Exception: {e}")
+                finally:
+                    popup.destroy()
 
             popup.protocol("WM_DELETE_WINDOW", on_closing)
+            print("Setting WM_DELETE_WINDOW protocol")  # Debugging
 
             popup.attributes("-topmost", True)
             popup.focus_force()
+
+            print("Entering Tkinter mainloop")  # Debugging
             popup.mainloop()
 
 
@@ -680,11 +693,21 @@ def start_app(tk_queue):
     threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance)).start()
 
     print("Starting Listener from Main.py")  # Existing line
-    webview.start(http_server=True)  # Existing line
+    
+   
+    
+    try:
+        webview.start(http_server=True)
+   
+    finally:
+        print('Cleanup function called.')
+        key_listener_instance.stop_listener()
+   
+   
+   
+   
 
-
-
-
+ 
 
 
 
@@ -709,6 +732,8 @@ def main():
     start_app(tk_queue)
 
     root.mainloop()
+    
+
 
 # Start the application
 if __name__ == "__main__":
