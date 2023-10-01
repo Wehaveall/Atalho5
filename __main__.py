@@ -1,4 +1,4 @@
-import atexit
+
 import queue
 import keyboard  # Replacing pynput
 import webview
@@ -14,6 +14,7 @@ import pyperclip  # We add this import for clipboard manipulation
 from src.utils import number_utils
 import time
 import logging
+import ctypes
 
 
 
@@ -29,9 +30,7 @@ import json
 
 #######################################
 ######################### POP UP FOR MULTIPLE EXPANSIONS
-from src.classes.popup import (
-    CustomTkinterPopupSelector,
-)  # Adjust the import based on your directory structure
+from src.classes.popup import (CustomTkinterPopupSelector,)  # Adjust the import based on your directory structure
 
 import tkinter as tk
 from tkinter import Button
@@ -41,20 +40,7 @@ import customtkinter as ctk
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import customtkinter as ctk  # Import customtkinter instead of tkinter
 
 
 
@@ -600,6 +586,56 @@ class Api:
 
 
 
+# Define POINT structure
+class POINT(ctypes.Structure):
+    _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
+
+# Load necessary DLLs
+user32 = ctypes.windll.user32
+kernel32 = ctypes.windll.kernel32
+
+def get_caret_position():
+    """Get the screen coordinates of the caret in the currently active window."""
+
+    # Get current thread ID from kernel32.dll
+    current_thread_id = kernel32.GetCurrentThreadId()
+
+    # Get the window handle for the current foreground window
+    foreground_window = user32.GetForegroundWindow()
+    
+    # Get the thread ID of the process that created the window
+    window_thread_id = user32.GetWindowThreadProcessId(foreground_window, None)
+
+    # Attach the current thread to the window's thread to share input states
+    user32.AttachThreadInput(current_thread_id, window_thread_id, True)
+
+    # Initialize POINT for caret position
+    caret_pos = POINT()
+
+    # Get the caret's position
+    user32.GetCaretPos(ctypes.byref(caret_pos))
+
+    # Get the window handle that has the keyboard focus
+    focused_window = user32.GetFocus()
+
+    # Convert the caret's position to screen coordinates
+    user32.ClientToScreen(focused_window, ctypes.byref(caret_pos))
+
+    # Detach the current thread from the window's thread
+    user32.AttachThreadInput(current_thread_id, window_thread_id, False)
+
+    return (caret_pos.x, caret_pos.y)
+
+
+
+
+
+
+
+
+
+def truncate_text(text, max_length):
+    return text[:max_length - 3] + "..." if len(text) > max_length else text
 
 
 def create_popup(tk_queue, key_listener_instance):
@@ -608,49 +644,54 @@ def create_popup(tk_queue, key_listener_instance):
         queue_data = tk_queue.get()
         msg, data = queue_data[:2]  # Only take the first two values
 
-        # Get the title of the current active window
         current_window = getActiveWindow()
         current_win_title = current_window.title if current_window else "Unknown Window"
         
-        
         if msg == "create_popup":
             print("About to stop listener and create popup")  # Debugging
-            key_listener_instance.stop_listener()  # Stop the listener
+            key_listener_instance.stop_listener()
 
-            # Existing code
-            windows = gw.getWindowsWithTitle(current_win_title)  # Use current_win_title instead of main_win_title
+            windows = gw.getWindowsWithTitle(current_win_title)
             if windows:
                 main_win = windows[0]
                 pyautogui.click(main_win.left + 10, main_win.top + 10)
             else:
                 print(f"No window with title '{current_win_title}' found.")
 
-            popup = tk.Tk()
-            popup.title("Select Expansion")  # Set the title to the current window's title
-            popup.geometry("750x400")
+            popup = ctk.CTk()  # Use ctk instead of tk
+            popup.title("Select Expansion")
 
-            
-            
             for i, option in enumerate(key_listener_instance.expansions_list):
-
-                button_text = option['expansion'] if 'expansion' in option else "Undefined"
-                button = tk.Button(
+                raw_button_text = option['expansion'] if 'expansion' in option else "Undefined"
+                button_text = truncate_text(raw_button_text, 60)
+                button = ctk.CTkButton(
                     popup,
                     text=button_text,
-                    command=partial(key_listener_instance.make_selection, i, popup),  # Note the instance here
-
-                    bg="orange",
-                    fg="black",
+                    command=partial(key_listener_instance.make_selection, i, popup),
                     font=("Work Sans", 12),
                     anchor="w"
                 )
-                button.pack(fill=tk.X, padx=10, pady=5)
+                button.pack(fill=ctk.X, padx=10, pady=5)
 
+            # Update idle tasks to get updated dimensions
+            popup.update_idletasks()
+
+            # Get the content width and height
+            content_width = 400
+            content_height = popup.winfo_height()
+
+              # Get the caret's screen coordinates
+            caret_x, caret_y = get_caret_position()
+
+                # Set the popup window's position to be 20 pixels below the y-coordinate of the caret
+            popup.geometry(f"{content_width}x{content_height}+{caret_x}+{caret_y + 120}")
+
+          
+         
             def on_closing():
                 try:
                     print("Trying to restart the listener...")  # Debugging
                     key_listener_instance.start_listener()  # Start the listener
-                   
                 except Exception as e:
                     print(f"Failed to restart listener. Exception: {e}")
                 finally:
@@ -664,6 +705,7 @@ def create_popup(tk_queue, key_listener_instance):
 
             print("Entering Tkinter mainloop")  # Debugging
             popup.mainloop()
+
 
 
 
@@ -696,6 +738,7 @@ def start_app(tk_queue):
 
     print("Starting Listener from Main.py")  # Existing line
     
+    
    
     
     try:
@@ -704,6 +747,8 @@ def start_app(tk_queue):
     finally:
         print('Cleanup function called.')
         key_listener_instance.stop_listener()
+        key_listener_thread.join() 
+           
    
    
    
