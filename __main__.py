@@ -4,11 +4,9 @@ import keyboard  # Replacing pynput
 import webview
 import pygetwindow as gw
 from functools import partial
-from queue import Queue
 
+from pygetwindow import getActiveWindow  # Add this import at the top of your code file
 
-from collections import defaultdict
-from threading import Event
 import pyautogui
 from src.database.data_connect import lookup_word_in_all_databases
 
@@ -18,15 +16,15 @@ import time
 import logging
 
 
-import html_clipboard
+
 
 
 from collections import deque
-import platform
+
 import threading
 
 import time
-import re
+
 import json
 
 #######################################
@@ -34,9 +32,7 @@ import json
 from src.classes.popup import (
     CustomTkinterPopupSelector,
 )  # Adjust the import based on your directory structure
-import win32gui
 
-import win32con
 import tkinter as tk
 from tkinter import Button
 import customtkinter as ctk
@@ -611,24 +607,30 @@ def create_popup(tk_queue, key_listener_instance):
     while True:
         queue_data = tk_queue.get()
         msg, data = queue_data[:2]  # Only take the first two values
-        main_win_title = "*ce3 - Notepad"  # Moved out of if block
+
+        # Get the title of the current active window
+        current_window = getActiveWindow()
+        current_win_title = current_window.title if current_window else "Unknown Window"
+        
         
         if msg == "create_popup":
             print("About to stop listener and create popup")  # Debugging
             key_listener_instance.stop_listener()  # Stop the listener
 
             # Existing code
-            windows = gw.getWindowsWithTitle(main_win_title)
+            windows = gw.getWindowsWithTitle(current_win_title)  # Use current_win_title instead of main_win_title
             if windows:
                 main_win = windows[0]
                 pyautogui.click(main_win.left + 10, main_win.top + 10)
             else:
-                print(f"No window with title '{main_win_title}' found.")
+                print(f"No window with title '{current_win_title}' found.")
 
             popup = tk.Tk()
-            popup.title("Multiple Expansions Found")
+            popup.title("Select Expansion")  # Set the title to the current window's title
             popup.geometry("750x400")
 
+            
+            
             for i, option in enumerate(key_listener_instance.expansions_list):
 
                 button_text = option['expansion'] if 'expansion' in option else "Undefined"
