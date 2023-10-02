@@ -146,11 +146,9 @@ cursor_col = 0
 ########################################################################################################################################
 class KeyListener:
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
-
         self.tk_queue = tk_queue  # Assign it to an instance variable
 
-
-        self.popup_done_event = threading.Event()
+        # self.popup_done_event = threading.Event()
 
         self.expansions_list = []  # Define the expansions_list
         # keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
@@ -281,13 +279,21 @@ class KeyListener:
 
     def stop_listener(self):
         print("Stopping Listener from Listerner.py")
-        keyboard.unhook(self.press_hook)
-        keyboard.unhook(self.release_hook)
+        try:
+            keyboard.unhook(self.press_hook)
+            keyboard.unhook(self.release_hook)
+            print("Successfully unhooked the keyboard listeners.")
+        except Exception as e:
+            print(f"An error occurred while unhooking: {e}")
 
     def start_listener(self):
         print("Starting Listener from Listerner.py")
-        self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
-        self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
+        try:
+            self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+            self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
+            print("Successfully hooked the keyboard listeners.")
+        except Exception as e:
+            print(f"An error occurred while hooking: {e}")
 
     # ----------------------------------------GRAMMAR AND ORTOGRAPH ---------------
 
@@ -429,71 +435,63 @@ class KeyListener:
 
     # -------------------------------------------------------------------------
 
-
     def make_selection(self, index, popup):  # Added popup as an argument
-       
+        popup.destroy()  # Destroy the
 
-        popup.destroy()  # Destroy the popup
-        
         time.sleep(0.05)  # Add a small delay here
-        
+
         selected_expansion_data = self.expansions_list[index]
-        expansion_to_paste = selected_expansion_data["expansion"]  # Define the variable here
+        expansion_to_paste = selected_expansion_data[
+            "expansion"
+        ]  # Define the variable here
         self.paste_expansion(
             expansion_to_paste,
             format_value=selected_expansion_data["format_value"],
-    )
-
-
+        )
 
         # Update the multi_line_string
         lines = self.multi_line_string.split("\n")
         current_line = lines[self.cursor_row]
-        lines[self.cursor_row] = current_line[:self.cursor_col] + expansion_to_paste + current_line[self.cursor_col:]
+        lines[self.cursor_row] = (
+            current_line[: self.cursor_col]
+            + expansion_to_paste
+            + current_line[self.cursor_col :]
+        )
         self.multi_line_string = "\n".join(lines)
-        
+
         # Update the cursor position
-        self.cursor_col += len(expansion_to_paste)  # Move the cursor to the end of the expansion
-
-
-
+        self.cursor_col += len(
+            expansion_to_paste
+        )  # Move the cursor to the end of the expansion
 
         # Update last_sequence with the selected expansion
         self.last_sequence = selected_expansion_data["expansion"]
-        print(f"LAST SEQ - AFTER PAste: {self.last_sequence}")  # Debugging: Changed from Key released to Key pressed
-
-       
+        print(
+            f"LAST SEQ - AFTER PAste: {self.last_sequence}"
+        )  # Debugging: Changed from Key released to Key pressed
 
         # Update last_sequence with the last word in multi_line_string
         words_in_multi_line_string = word_tokenize(self.multi_line_string)
-        
+
         if words_in_multi_line_string:
             self.last_sequence = words_in_multi_line_string[-1]  # Take the last word
         else:
             self.last_sequence = ""  # If no words, set to empty string
 
-
-
-
-    # Set a flag to indicate that the next key press should be skipped
+        # Set a flag to indicate that the next key press should be skipped
         self.skip_next_key_press = True
-
 
         # Clear typed_keys and last_sequence after pasting
         self.typed_keys = selected_expansion_data["expansion"]
-       
+
         self.start_listener()
         return
 
-
-   ############################################################################################################
+    ############################################################################################################
 
     def create_popup(self):
         if self.tk_queue:
             self.tk_queue.put(("create_popup", self.expansions_list, self))
-
-
-
 
     # ------------------------------------------------------------------------#
 
@@ -626,13 +624,6 @@ class KeyListener:
         processed_char = None
         next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
-
-
-
-    
-
-
-
 
         if (
             self.programmatically_typing
@@ -814,8 +805,6 @@ class KeyListener:
                 self.multi_line_string = "\n".join(lines)
 
         elif key == "space":
-
-            
             # Update the line at the cursor position within the specific line
             lines = self.multi_line_string.split("\n")
             current_line = lines[self.cursor_row]

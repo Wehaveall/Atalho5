@@ -212,4 +212,7 @@ def lookup_word_in_all_databases(word):
                     }
                     all_expansions.append(expansion_data)
 
+    
+    
+    
     return all_expansions

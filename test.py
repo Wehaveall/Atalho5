@@ -1,42 +1,72 @@
-import ctypes
+import threading
+import tkinter as tk
+import webview
+import queue
+import keyboard
+import time
 
-# Define POINT structure
-class POINT(ctypes.Structure):
-    _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
+# Use an Event object to signal all threads to stop
+stop_threads = threading.Event()
 
-# Load necessary DLLs
-user32 = ctypes.windll.user32
-kernel32 = ctypes.windll.kernel32
 
-def get_caret_position():
-    """Get the screen coordinates of the caret in the currently active window."""
+def keyboard_listener(q):
+    print("Keyboard listener started")  # Debugging
+    while not stop_threads.is_set():
+        event = keyboard.read_event()
+        if event.event_type == "down":
+            q.put(("key_event", event.name))
+        time.sleep(0.1)
+    print("Keyboard listener stopped")  # Debugging
 
-    # Get current thread ID from kernel32.dll
-    current_thread_id = kernel32.GetCurrentThreadId()
 
-    # Get the window handle for the current foreground window
-    foreground_window = user32.GetForegroundWindow()
-    
-    # Get the thread ID of the process that created the window
-    window_thread_id = user32.GetWindowThreadProcessId(foreground_window, None)
+def on_closed():
+    print("on_closed triggered")  # Debugging
+    stop_threads.set()
 
-    # Attach the current thread to the window's thread to share input states
-    user32.AttachThreadInput(current_thread_id, window_thread_id, True)
 
-    # Initialize POINT for caret position
-    caret_pos = POINT()
+def create_popup(tk_queue):
+    print("Popup thread started")  # Debugging
+    while not stop_threads.is_set():
+        try:
+            msg, data = tk_queue.get(timeout=1)  # Timeout after 1 second
+            if stop_threads.is_set():
+                break
+            if msg == "key_event":
+                root = tk.Tk()
+                label = tk.Label(root, text=f"Key pressed: {data}")
+                label.pack()
+                if not stop_threads.is_set():
+                    root.mainloop()
+                else:
+                    root.destroy()
+        except queue.Empty:
+            if stop_threads.is_set():
+                break
+            continue
+    print("Popup thread stopped")  # Debugging
 
-    # Get the caret's position
-    user32.GetCaretPos(ctypes.byref(caret_pos))
 
-    # Get the window handle that has the keyboard focus
-    focused_window = user32.GetFocus()
+def start_app(tk_queue):
+    # Start tkinter popup in a new thread
+    popup_thread = threading.Thread(target=create_popup, args=(tk_queue,))
+    popup_thread.start()
 
-    # Convert the caret's position to screen coordinates
-    user32.ClientToScreen(focused_window, ctypes.byref(caret_pos))
+    # Start keyboard listener in a new thread
+    keyboard_thread = threading.Thread(target=keyboard_listener, args=(tk_queue,))
+    keyboard_thread.start()
 
-    # Detach the current thread from the window's thread
-    user32.AttachThreadInput(current_thread_id, window_thread_id, False)
+    # Create and show pywebview window
+    window = webview.create_window("Hello", "https://www.google.com")
+    window.events.closed += on_closed  # Attach close event handler
 
-    return (caret_pos.x, caret_pos.y)
+    # Start pywebview in the main thread
+    webview.start()
 
+    # Stop all threads when pywebview window is closed
+    popup_thread.join()
+    keyboard_thread.join()
+
+
+if __name__ == "__main__":
+    tk_queue = queue.Queue()
+    start_app(tk_queue)
