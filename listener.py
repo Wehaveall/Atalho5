@@ -145,7 +145,9 @@ cursor_col = 0
 ######################################################    KEYLISTENER    ###############################################################
 ########################################################################################################################################
 class KeyListener:
+   
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
+       
         self.tk_queue = tk_queue  # Assign it to an instance variable
 
         # self.popup_done_event = threading.Event()

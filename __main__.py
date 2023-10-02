@@ -634,68 +634,56 @@ def truncate_text(text, max_length):
 
 
 def create_popup(tk_queue, key_listener_instance):
-    print("Entered create_popup")  # Debugging
-    print(f"create_popup's tk_queue: {tk_queue}")
+    print("Entered create_popup")
     root = None
+    should_create_popup = False  # Add this flag
 
     def destroy_popup():
+        nonlocal root, should_create_popup  # Add should_create_popup here
         if root is not None:
             print("Received message: destroy_popup")
             root.destroy()
+            should_create_popup = False  # Reset the flag when destroying the popup
 
     def create_popup_internal():
-       
-        nonlocal root
-        print("About to stop listener and create popup")  # Debugging
+        nonlocal root, should_create_popup  # Add should_create_popup here
+        print("About to stop listener and create popup")
         key_listener_instance.stop_listener()
         windows = gw.getWindowsWithTitle(current_win_title)
-       
-       
         if windows:
             main_win = windows[0]
             pyautogui.click(main_win.left + 10, main_win.top + 10)
-       
         else:
             print(f"No window with title '{current_win_title}' found.")
-        root = tk.Tk()  # Use tk instead of ctk
-        root.title("Select Expansion")
-        
-        
-        for i, option in enumerate(key_listener_instance.expansions_list):
-            raw_button_text = (
-                option["expansion"] if "expansion" in option else "Undefined"
-            )
-            button_text = truncate_text(raw_button_text, 60)
-            button = Button(
-                root,
-                text=button_text,
-                command=partial(key_listener_instance.make_selection, i, root),
-                font=("Work Sans", 12),
-                anchor="w",
-            )
-            button.pack(fill=tk.X, padx=10, pady=5)
-        root.mainloop()  # Start the mainloop immediately
 
-    while not stop_threads.is_set():  # Assuming stop_threads is defined somewhere
+        root = tk.Tk()
+        root.title("Select Expansion")
+        for i, option in enumerate(key_listener_instance.expansions_list):
+            raw_button_text = option["expansion"] if "expansion" in option else "Undefined"
+            button_text = truncate_text(raw_button_text, 60)
+            button = Button(root, text=button_text, command=partial(key_listener_instance.make_selection, i, root), font=("Work Sans", 12), anchor="w")
+            button.pack(fill=tk.X, padx=10, pady=5)
+        should_create_popup = True  # Set the flag to True when the popup is created
+
+    while not stop_threads.is_set():
         try:
             queue_data = tk_queue.get(timeout=0.5)
-            print(f"Polled queue data: {queue_data}")  # Debug log
-            msg = queue_data[0]  # Only take the first value
-            print(f"Received queue data: {queue_data}")  # New debug log
-            current_window = getActiveWindow()  # Assuming this method is defined
-            current_win_title = (
-                current_window.title if current_window else "Unknown Window"
-            )
-            if msg == "destroy_popup" and root is not None:
+            print(f"Polled queue data: {queue_data}")
+            msg = queue_data[0]
+            print(f"Received queue data: {queue_data}")
+            current_window = getActiveWindow()
+            current_win_title = current_window.title if current_window else "Unknown Window"
+            if msg == "destroy_popup":
                 destroy_popup()
-                root = None
                 continue
             if msg == "create_popup":
-                if root is None:  # Check if root is None before calling create_popup_internal
-                    print("Scheduling create_popup_internal")  # Debugging
-                    create_popup_internal()  # Call create_popup_internal directly
-        except Empty:  # Use Empty for the correct exception
+                create_popup_internal()
+        except Empty:
             continue
+
+        if should_create_popup:  # Check the flag before running the main loop
+            root.mainloop()
+            should_create_popup = False  # Reset the flag after the main loop is terminated
 
     print("Popup thread stopped")
 
@@ -722,8 +710,11 @@ def start_app(tk_queue):
     global api  # Existing line
     api = Api()  # Existing line
     # api.create_and_position_window()  # Existing line
+   
     # Move this line up to initialize before starting the threads
     key_listener_instance = KeyListener(api, tk_queue)  # Moved inside start_app
+   
+   
     # --------Start Pop-Up Thread
     global stop_threads
     popup_thread = threading.Thread(
@@ -731,6 +722,8 @@ def start_app(tk_queue):
     )
     popup_thread.daemon = True  # Set daemon status
     popup_thread.start()
+   
+   
     # --------Start Key Listener Thread
     key_listener_thread = threading.Thread(
         target=keyboard_listener, args=(key_listener_instance,)
@@ -738,11 +731,15 @@ def start_app(tk_queue):
     key_listener_thread.daemon = True  # Set daemon status
     key_listener_thread.start()
     # Pass the key_listener_instance to create_popup
+   
     # threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance)).start()
     print("Starting Listener from Main.py")  # Existing line
     main_window = api.create_and_position_window()  # Existing line
     main_window.events.closed += api.on_closed
+    
     webview.start(http_server=True)
+   
+   
     print("About to join threads")
     popup_thread.join()
     key_listener_thread.join()
