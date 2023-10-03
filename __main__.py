@@ -657,7 +657,7 @@ def create_popup(tk_queue, key_listener_instance):
             
             
             try:
-                print("Trying to restart the listener")
+                
                 key_listener_instance.start_listener()  # Assuming `start_listener` is the method to restart the listener
                 print("Listener restarted successfully")
             except Exception as e:

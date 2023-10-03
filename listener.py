@@ -561,21 +561,7 @@ class KeyListener:
 
             ##########################################################
 
-        # How Threading Works in Python
-        # In Python, threading allows you to run multiple threads (smaller units of a program)
-        # in the same process space. Each thread runs independently of the others.
-        # This is particularly useful when you want to carry out multiple operations independently without
-        #  having to wait for one to complete before moving on to the next.
-
-        # The Problem You Faced
-        # In your case, the problem was that opening the popup window was blocking the main thread,
-        # preventing your listener from being stopped or restarted effectively.
-        # This happens because both the popup and the keyboard listener were competing for time on the same thread, and the popup was "hogging" the resources.
-
-        # The Threading Solution
-        # The threading solution worked by offloading the task of opening the popup to a separate thread
-        # (popup_thread), allowing the main thread to continue its operations uninterrupted
-
+    
         ###############################################################     ONE EXPANSION
         elif len(expansions_list) == 1:  # Handling single expansion
             print("Debug: Single expansion detected.")  # Debugging line
@@ -692,9 +678,7 @@ class KeyListener:
             else:
                 char = key
 
-            processed_char = self.handle_accents(
-                char
-            )  # Call handle_accents and save the returned character
+            processed_char = self.handle_accents(char )  # Call handle_accents and save the returned character
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
             print(f"Last Sequence:__1 {self.last_sequence}")
@@ -743,11 +727,10 @@ class KeyListener:
             # Get the last word only if words list is not empty
             last_word = words[-1] if words else None  # Highlighted Change
 
-            if (
-                last_word
-            ):  # Highlighted Change: Only call fix_double_caps if last_word is not None
-                self.fix_double_caps(last_word)  # Call fix_double_caps here
-                self.lookup_and_expand(last_word)
+            if (last_word):  # Highlighted Change: Only call fix_double_caps if last_word is not None
+                if key != "backspace":  # Highlighted Change: Add condition to skip "backspace"
+                    self.fix_double_caps(last_word)  # Call fix_double_caps here
+                    self.lookup_and_expand(last_word)
 
             # --------------------------------------SENTENCES-----------------------------
             # Sentence Tokenization
@@ -847,19 +830,27 @@ class KeyListener:
         try:
             self.last_key = key
 
+    
+
             if key not in self.omitted_keys:
-                self.lookup_and_expand(self.last_sequence)
+                 
+                 if key != "backspace":  # Highlighted Change: Add condition to skip "backspace"
+                    self.lookup_and_expand(self.last_sequence)
 
             else:
                 if key == "space":
-                    # Tokenize the sentence into words
-                    words = word_tokenize(self.multi_line_string)
+                    
+                    if key != "backspace":  # Highlighted Change: Add condition to skip "backspace"
+                        
+                        self.lookup_and_expand(last_word)
+                        # Tokenize the sentence into words
+                        words = word_tokenize(self.multi_line_string)
 
-                    # Get the last word
+                        # Get the last word
 
-                    # Get the last word only if words list is not empty
-                    last_word = words[-1] if words else None  # Highlighted Change
-                    self.lookup_and_expand(last_word)
+                        # Get the last word only if words list is not empty
+                        last_word = words[-1] if words else None  # Highlighted Change
+                        self.lookup_and_expand(last_word)
 
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
