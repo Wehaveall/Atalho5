@@ -46,7 +46,6 @@ from src.utils import number_utils
 api = None
 
 
-
 state_lock = Lock()
 
 
@@ -55,30 +54,25 @@ logging.basicConfig(
 )
 
 
-# Create an instance of KeyListener
-# listener_instance = KeyListener()
-# Start the listener in a new thread
-
-
+## Constants
 WINDOW_TITLE = "Atalho"
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 700
 
+# Logging Configuration
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-# Use an Event object to signal all threads to stop
-# Declaring variable as global
-stop_threads = threading.Event()
-
-
-# Get the absolute path of the directory the script is in.
+# Global Variables
 script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Change the current working directory to the script directory.
 os.chdir(script_dir)
+stop_threads = threading.Event()
+state_lock = Lock()
+engines = {}
 
 
-# Window Resize classes and Functions
-####################################
+# Utility Classes
 class POINT(Structure):
     _fields_ = [("x", c_long), ("y", c_long)]
 
@@ -98,15 +92,6 @@ def setsizer(window, perW, perH):
     w = w * (perW / 100)  # resize to 80% of user screen W
     y = h * (perH / 100)  # resize to 80% of user screen H
     window.resize(round(w), round(y))
-
-
-# Add a function to handle database operations
-from sqlalchemy import inspect
-
-
-# Dicionário global para armazenar engines
-# Removendo a criação duplicada do dicionário engines e função get_engine
-engines = {}
 
 
 def get_engine(database_path):
@@ -164,8 +149,7 @@ def get_relative_path(filename):
     return os.path.join(script_dir, filename)
 
 
-
-
+##--------------------------------------------------------------------------
 ##--------------------------------------------------------------------------
 
 
@@ -181,9 +165,6 @@ class Api:
     def on_closed(self):
         print("on_closed triggered")
         stop_threads.set()
-
-    def minimize_window(self):
-        self.window.minimize()
 
     def get_events(self):
         # Initialize an empty list to hold the events with intervals
@@ -210,40 +191,6 @@ class Api:
 
     def clear_events(self):
         self.events = []
-
-    def is_recording(self):
-        return self.is_recording
-
-    def save_macro(self, filename):
-        # Get the path to the current file (__file__)
-        current_file_path = os.path.abspath(__file__)
-
-        # Get the parent directory of the current file
-        parent_directory = os.path.dirname(current_file_path)
-
-        # Get the path to the macros directory
-        macros_directory = os.path.join(parent_directory, "src", "macros")
-
-        # Create the full file path
-        full_file_path = os.path.join(macros_directory, filename)
-
-        # Save your recording to the file
-        # ...
-        try:
-            with open(full_file_path, "w") as f:
-                json.dump(self.events, f)
-            return full_file_path
-        except Exception as e:
-            print(f"An error occurred while saving the macro: {e}")
-            return None
-
-    # ---------------------------------------------------------------- EXECUÇAO MACROs--------------------------------
-
-    def get_macro_filename(self):
-        return self.executor.get_macro_filename()
-
-    def start_macro(self, filename):
-        self.executor.start_macro(filename)
 
     # ---------------------------------------------------------------- DATABASE  -------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
@@ -510,11 +457,6 @@ class Api:
     def call_load_handler_after_delay(self):
         time.sleep(0.5)
         load_handler(self.window)
-
-
-# Define POINT structure
-class POINT(ctypes.Structure):
-    _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
 
 
 # Load necessary DLLs
