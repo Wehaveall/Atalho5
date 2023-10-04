@@ -1,107 +1,50 @@
-import sys
-from pywinauto import Application    #---To get caret position - Windows UI Automation
-
-from shared_variables import should_close_popup
-from threading import enumerate as list_threads  # Import the enumerate function from the threading module
-
-import queue
-from queue import SimpleQueue
-from queue import Empty  # Import Empty for the correct exception handling
-
-import keyboard  # Replacing pynput
-import webview
-import pygetwindow as gw
-from functools import partial
-
-from pygetwindow import getActiveWindow  # Add this import at the top of your code file
-
-import pyautogui
-from src.database.data_connect import lookup_word_in_all_databases
-
-import pyperclip  # We add this import for clipboard manipulation
-from src.utils import number_utils
-import time
-import logging
-import ctypes
-
-
+# Standard Library Imports
 from collections import deque
-
-import threading
-
-import time
-
+from ctypes import windll, Structure, c_long, byref
+from functools import partial
+import ctypes
+from queue import SimpleQueue, Empty
+import glob
 import json
-
-#######################################
-######################### POP UP FOR MULTIPLE EXPANSIONS
-from src.classes.popup import (
-    CustomTkinterPopupSelector,
-)  # Adjust the import based on your directory structure
-
-import tkinter as tk
-from tkinter import Button
-import customtkinter as ctk
-
-
-import customtkinter as ctk  # Import customtkinter instead of tkinter
-
-
-api = None  # Declare api as a global variable
-
-# pywebview
-import webview
-
-# Dialog box
-import tkinter
-from tkinter import messagebox
-from tkinter import font
-
-# custom message box
-from tkinter import Toplevel, Label, Button, PhotoImage
-
-
+import logging
+import os
+from threading import enumerate as list_threads, Lock
+import queue
+import sys
+import threading
+import time
 import traceback
 
-import glob
-import webview
-import threading
-import time
+# Third-Party Imports
+from pywinauto import Application
+import customtkinter as ctk
+import keyboard
+import pyautogui
 import pygetwindow as gw
+import pyperclip
 from screeninfo import get_monitors
+from sqlalchemy import create_engine, MetaData, Table, select, update, inspect
+from sqlalchemy.orm import Session
+import tkinter as tk
+from tkinter import Toplevel, Label, Button, PhotoImage, messagebox, font
+import webview
 
-
-from listener import (
-    KeyListener,
-)  # Make sure this is your new KeyListener with the keyboard library
-
-# Import database
+# Custom Module Imports
+from listener import KeyListener
+from shared_variables import should_close_popup
+from src.classes.popup import CustomTkinterPopupSelector
 from src.database.data_connect import (
     get_database_path,
     get_db_files_in_directory,
     load_db_into_memory,
     save_db_from_memory,
+    lookup_word_in_all_databases,
 )
+from src.utils import number_utils
 
-from ctypes import windll, Structure, c_long, byref
+# Global Variable Initialization
+api = None
 
-# ------------------------------------ Save/Restore States
-import json
-import os
-import logging
-
-
-from sqlalchemy.orm import Session
-
-
-from sqlalchemy import create_engine, MetaData, Table, select, update
-from sqlalchemy import inspect
-from threading import Lock
-
-
-from src.classes.popup import (
-    CustomTkinterPopupSelector,
-)  # Adjust the import based on your directory structure
 
 
 state_lock = Lock()
@@ -221,28 +164,6 @@ def get_relative_path(filename):
     return os.path.join(script_dir, filename)
 
 
-def msg(title, message):
-    # No need to create a root Tk() instance with tkinter.messagebox
-    messagebox.showinfo(title, message)
-
-
-def msgOC(title, message):
-    # Create a root window and immediately withdraw it (hide it)
-    root = tkinter.Tk()
-    root.withdraw()
-
-    result = messagebox.askokcancel(title, message)
-
-    if result:
-        print("User clicked OK")
-    else:
-        print("User clicked Cancel")
-
-    # Destroy the root window
-    root.destroy()
-
-    # Return the result
-    return result
 
 
 ##--------------------------------------------------------------------------
@@ -647,37 +568,31 @@ def create_popup(tk_queue, key_listener_instance):
         print("destroy_popup called")  # Debug print
         nonlocal root, should_create_popup  # Add should_create_popup here
         print(f"Root is None: {root is None}")  # Debug print
-        
-        
+
         if root is not None:
             print("Received message: destroy_popup")
             root.destroy()
-             # Restart the keyboard listener here
+            # Restart the keyboard listener here
             should_create_popup = False  # Reset the flag when destroying the popup
-            
-            
+
             try:
-                
                 key_listener_instance.start_listener()  # Assuming `start_listener` is the method to restart the listener
                 print("Listener restarted successfully")
             except Exception as e:
                 print(f"Failed to restart the listener: {e}")
 
-    
     def create_popup_internal():
-       
         nonlocal root, should_create_popup  # Add should_create_popup here
         print("About to stop listener and create popup")
         key_listener_instance.stop_listener()
-        
+
         root = tk.Tk()
         root.title("Select Expansion")
-         # Register the destroy_popup function for the close button
+        # Register the destroy_popup function for the close button
         root.protocol("WM_DELETE_WINDOW", destroy_popup)  # Add this line
 
-       
         caret_x, caret_y = get_caret_position()
-        
+
         print(f"Caret position: x={caret_x}, y={caret_y}")
 
         # Set the window size and position it below the caret
@@ -685,22 +600,26 @@ def create_popup(tk_queue, key_listener_instance):
         window_height = 300
         root.geometry(f"{window_width}x{window_height}+{caret_x}+{caret_y}")
 
-        root.attributes('-topmost', True)  # This line makes the window stay on top
-        #root.grab_set()  # This line captures all events
+        root.attributes("-topmost", True)  # This line makes the window stay on top
+        # root.grab_set()  # This line captures all events
         # Make sure the window is created
         root.update_idletasks()
         root.update()
-        
 
-    
-        
         for i, option in enumerate(key_listener_instance.expansions_list):
-            raw_button_text = option["expansion"] if "expansion" in option else "Undefined"
+            raw_button_text = (
+                option["expansion"] if "expansion" in option else "Undefined"
+            )
             button_text = truncate_text(raw_button_text, 60)
-            button = Button(root, text=button_text, command=partial(key_listener_instance.make_selection, i, root), font=("Work Sans", 11), anchor="w")
+            button = Button(
+                root,
+                text=button_text,
+                command=partial(key_listener_instance.make_selection, i, root),
+                font=("Work Sans", 11),
+                anchor="w",
+            )
             button.pack(fill=tk.X, padx=10, pady=5)
         should_create_popup = True  # Set the flag to True when the popup is created
-
 
         ## Simulate the mouse click to focus the popup window
         windows = gw.getWindowsWithTitle("Select Expansion")
@@ -708,32 +627,26 @@ def create_popup(tk_queue, key_listener_instance):
             popup_win = windows[0]
             pyautogui.click(popup_win.left + 10, popup_win.top + 10)
 
-
-
-
-
     while not stop_threads.is_set():
         try:
             queue_data = tk_queue.get(timeout=0.5)
-            
-        
+
             msg = queue_data[0]
-           
-            current_window = getActiveWindow()
-            current_win_title = current_window.title if current_window else "Unknown Window"
+
             if msg == "destroy_popup":
                 destroy_popup()
                 continue
             if msg == "create_popup":
                 create_popup_internal()
-        
-        
+
         except Empty:
             continue
 
         if should_create_popup:  # Check the flag before running the main loop
             root.mainloop()
-            should_create_popup = False  # Reset the flag after the main loop is terminated
+            should_create_popup = (
+                False  # Reset the flag after the main loop is terminated
+            )
 
     print("Popup thread stopped")
 
@@ -741,13 +654,6 @@ def create_popup(tk_queue, key_listener_instance):
 def get_window():
     windows = gw.getWindowsWithTitle(WINDOW_TITLE)
     return windows[0] if windows else None
-
-
-
-
-
-
-
 
 
 def load_handler(window):
@@ -767,51 +673,54 @@ def start_app(tk_queue):
     global api  # Existing line
     api = Api()  # Existing line
     # api.create_and_position_window()  # Existing line
-   
+
     # Move this line up to initialize before starting the threads
     key_listener_instance = KeyListener(api, tk_queue)  # Moved inside start_app
-   
-   
+
     # --------Start Pop-Up Thread
     global stop_threads
-    popup_thread = threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance), name="Pop-Up Thread")
-    
+    popup_thread = threading.Thread(
+        target=create_popup,
+        args=(tk_queue, key_listener_instance),
+        name="Pop-Up Thread",
+    )
+
     popup_thread.daemon = True  # Set daemon status
     popup_thread.start()
-   
-   
+
     # --------Start Key Listener Thread
-    key_listener_thread = threading.Thread(target=keyboard_listener, args=(key_listener_instance,), name="KeyBoard Listener Thread")
-    
+    key_listener_thread = threading.Thread(
+        target=keyboard_listener,
+        args=(key_listener_instance,),
+        name="KeyBoard Listener Thread",
+    )
+
     key_listener_thread.daemon = True  # Set daemon status
     key_listener_thread.start()
     # Pass the key_listener_instance to create_popup
-   
+
     # threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance)).start()
     print("Starting Listener from Main.py")  # Existing line
     main_window = api.create_and_position_window()  # Existing line
     main_window.events.closed += api.on_closed
-    
-    webview.start(http_server=True)
-   
-   
-    print("Cleanup function called.")
 
+    webview.start(http_server=True)
+
+    print("Cleanup function called.")
 
     print("About to join threads")
     popup_thread.join()
     key_listener_thread.join()
-    
-    
-    
-    
+
     while True:
         active_threads = [t for t in threading.enumerate() if t.is_alive()]
-        
+
         # Check if the key_listener and popup threads are still active
-        key_listener_active = any(t.name == "KeyBoard Listener Thread" for t in active_threads)
+        key_listener_active = any(
+            t.name == "KeyBoard Listener Thread" for t in active_threads
+        )
         popup_active = any(t.name == "Pop-Up Thread" for t in active_threads)
-        
+
         # If both are no longer active, break the loop
         if not key_listener_active and not popup_active:
             print("Key listener and Popup threads have terminated.")
@@ -819,20 +728,13 @@ def start_app(tk_queue):
 
         for thread in active_threads:
             print(f"Thread {thread.name} is still active.")
-        
+
         stop_threads.set()
-        
+
         time.sleep(1)
 
     print("Exiting main thread.")
     sys.exit()
-
-
-
-
-
-
-
 
 
 # Start the application
