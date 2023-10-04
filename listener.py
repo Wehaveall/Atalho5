@@ -145,9 +145,7 @@ cursor_col = 0
 ######################################################    KEYLISTENER    ###############################################################
 ########################################################################################################################################
 class KeyListener:
-   
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
-       
         self.tk_queue = tk_queue  # Assign it to an instance variable
 
         # self.popup_done_event = threading.Event()
@@ -492,8 +490,12 @@ class KeyListener:
     ############################################################################################################
 
     def create_popup(self):
+        print("Entered create_popup method")  # Debugging line
         if self.tk_queue:
             self.tk_queue.put(("create_popup", self.expansions_list, self))
+            print("Added to tk_queue")  # Debugging line
+        else:
+            print("tk_queue is None")  # Debugging line
 
     # ------------------------------------------------------------------------#
 
@@ -561,7 +563,6 @@ class KeyListener:
 
             ##########################################################
 
-    
         ###############################################################     ONE EXPANSION
         elif len(expansions_list) == 1:  # Handling single expansion
             print("Debug: Single expansion detected.")  # Debugging line
@@ -678,7 +679,9 @@ class KeyListener:
             else:
                 char = key
 
-            processed_char = self.handle_accents(char )  # Call handle_accents and save the returned character
+            processed_char = self.handle_accents(
+                char
+            )  # Call handle_accents and save the returned character
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
             print(f"Last Sequence:__1 {self.last_sequence}")
@@ -727,8 +730,12 @@ class KeyListener:
             # Get the last word only if words list is not empty
             last_word = words[-1] if words else None  # Highlighted Change
 
-            if (last_word):  # Highlighted Change: Only call fix_double_caps if last_word is not None
-                if key != "backspace":  # Highlighted Change: Add condition to skip "backspace"
+            if (
+                last_word
+            ):  # Highlighted Change: Only call fix_double_caps if last_word is not None
+                if (
+                    key != "backspace"
+                ):  # Highlighted Change: Add condition to skip "backspace"
                     self.fix_double_caps(last_word)  # Call fix_double_caps here
                     self.lookup_and_expand(last_word)
 
@@ -830,18 +837,17 @@ class KeyListener:
         try:
             self.last_key = key
 
-    
-
             if key not in self.omitted_keys:
-                 
-                 if key != "backspace":  # Highlighted Change: Add condition to skip "backspace"
+                if (
+                    key != "backspace"
+                ):  # Highlighted Change: Add condition to skip "backspace"
                     self.lookup_and_expand(self.last_sequence)
 
             else:
                 if key == "space":
-                    
-                    if key != "backspace":  # Highlighted Change: Add condition to skip "backspace"
-                        
+                    if (
+                        key != "backspace"
+                    ):  # Highlighted Change: Add condition to skip "backspace"
                         self.lookup_and_expand(last_word)
                         # Tokenize the sentence into words
                         words = word_tokenize(self.multi_line_string)

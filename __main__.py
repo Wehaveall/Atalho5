@@ -30,6 +30,9 @@ from tkinter import Toplevel, Label, Button, PhotoImage, messagebox, font
 import webview
 
 # Custom Module Imports
+
+from popup_manager import create_popup
+
 from listener import KeyListener
 from shared_variables import should_close_popup
 from src.classes.popup import CustomTkinterPopupSelector
@@ -154,18 +157,24 @@ def get_relative_path(filename):
 
 
 class Api:
+    # Initialize API class variables
+    # Used in: main.py
     def __init__(self):
         self.is_maximized = False
         self.is_window_open = True
         self.is_recording = False
         self.events = []
-
         self.last_event_time = None
 
+    # Triggered when the window is closed
+    # Used in: main.py
     def on_closed(self):
         print("on_closed triggered")
         stop_threads.set()
 
+    #######################################################################
+    # Get all recorded events with intervals
+    # Used in: main.py
     def get_events(self):
         # Initialize an empty list to hold the events with intervals
         events_with_intervals = []
@@ -189,13 +198,18 @@ class Api:
         # Return the modified list of events
         return events_with_intervals
 
+    ###############################################################
+
+    # Clear all recorded events
+    # Used in: main.py
     def clear_events(self):
         self.events = []
 
-    # ---------------------------------------------------------------- DATABASE  -------------------------------------
+    # ---------------------------------------------------------------- DATABASE  -----------------------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------------------------------------------------------
-
+    # Save changes to the database
+    # Used in: main.py and invoked from JavaScript
     def save_changes(
         self,
         groupName,
@@ -268,6 +282,10 @@ class Api:
                 )
             )
 
+    ##################################################################
+
+    # Get all database names
+    # Used in: main.py and invoked from JavaScript
     def get_database_names(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "groups")
@@ -278,6 +296,10 @@ class Api:
 
         return database_names
 
+    ################################################################
+
+    # Get all .db files in all subdirectories
+    # Used in: main.py and invoked from JavaScript
     def get_all_db_files(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         groups_dir = os.path.join(base_dir, "src", "database", "groups")
@@ -304,6 +326,9 @@ class Api:
         return all_db_files
 
     # ----------------------------------------------------------------EXCLUIR - SQLITE_SEQUENCY AND CONFIG TABLE
+
+    # Get the target table name from the database
+    # Used in: This API class (self.get_data)
     def get_target_table_name(self, engine):
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
@@ -314,8 +339,8 @@ class Api:
 
     # -------------------------------------------------------------------
 
-    # Configurar o logging
-    logging.basicConfig(filename="app.log", level=logging.INFO)
+    # Fetch data from the database
+    # Used in: main.py and invoked from JavaScript
 
     def get_data(self, groupName, databaseName, tableName):
         try:
@@ -342,6 +367,8 @@ class Api:
             return None
 
     # -------------------------------------------------------------------------------------------
+    # Get table names from the database
+    # Used in: main.py and invoked from JavaScript
 
     def get_tables(self, groupName, databaseName):
         database_path = get_database_path(groupName, databaseName)
@@ -361,7 +388,9 @@ class Api:
                 if name not in ["sqlite_sequence", "config"]
             ]
 
-    # ----------------------------------------------------------------SETTINGS----------------------------------------------------------------
+    # ----------------------------------------------------------------LANGUAGE----------------------------------------------------------------
+    # Load translations from the languages.json file
+    # Used in: main.py
 
     def load_translations(self):
         try:
@@ -374,6 +403,10 @@ class Api:
         except Exception as e:
             logging.error(f"Error in load_translations: {e}")
 
+    # ----------------------------------------------------------------------------------------------------------------------------------------
+    # Load the current language setting
+    # Used in: This API class (self.load_translations)
+
     def load_language_setting(self):
         try:
             logging.debug("load_language_setting called")
@@ -384,6 +417,10 @@ class Api:
             return language
         except Exception as e:
             logging.error(f"Error in load_language_setting: {e}")
+
+    # ----------------------------------------------------------------------------------------------------------------------------------------
+    # Change the current language setting
+    # Used in: main.py and invoked from JavaScript
 
     def change_language(self, language_code):
         try:
@@ -396,6 +433,9 @@ class Api:
         except Exception as e:
             logging.error(f"Error in change_language: {e}")
 
+    # -------------------------------------------------------------------------STATES-------------------------------------------------------------
+    # Load all saved states from the state.json file
+    # Used in: main.py
     def load_all_states(self):
         if not os.path.exists("state.json"):
             return {}
@@ -404,16 +444,24 @@ class Api:
                 data = json.load(file)
                 return data
 
+    # Save all states to the state.json file
+    # Used in: main.py
+
     def save_all_states(self, states):
         with state_lock:
             with open("state.json", "w") as file:
                 json.dump(states, file)
+
+    # Save checkbox states to the checkBox_states.json file
+    # Used in: main.py and invoked from JavaScript
 
     def save_checkBox_states(self, checkBoxStates):
         with open("checkBox_states.json", "w", encoding="utf-8") as f:
             json.dump(checkBoxStates, f, ensure_ascii=False)
         # print("Saved checkbox states.")
 
+    # Load checkbox states from the checkBox_states.json file
+    # Used in: main.py
     def load_checkBox_states(self):
         filePath = "checkBox_states.json"
         if os.path.exists(filePath):
@@ -426,7 +474,7 @@ class Api:
 
         return checkBoxStates
 
-    # ----------------------------------------------------------------CREATE WINDOW
+    # -------------------------------------------------------------------------CREATE WINDOW
 
     def create_and_position_window(self):
         monitor = get_monitors()[0]
@@ -454,143 +502,19 @@ class Api:
         threading.Thread(target=self.call_load_handler_after_delay).start()
         return self.window
 
+    # Call the load_handler after a short delay
+    # Used in: This API class (self.create_and_position_window)
+
     def call_load_handler_after_delay(self):
         time.sleep(0.5)
         load_handler(self.window)
 
 
-# Load necessary DLLs
-user32 = ctypes.windll.user32
-kernel32 = ctypes.windll.kernel32
+# Configure logging
+logging.basicConfig(filename="app.log", level=logging.INFO)
 
 
-def get_caret_position():
-    """Get the screen coordinates of the caret in the currently active window."""
-
-    # Get current thread ID from kernel32.dll
-    current_thread_id = kernel32.GetCurrentThreadId()
-
-    # Get the window handle for the current foreground window
-    foreground_window = user32.GetForegroundWindow()
-
-    # Get the thread ID of the process that created the window
-    window_thread_id = user32.GetWindowThreadProcessId(foreground_window, None)
-
-    # Attach the current thread to the window's thread to share input states
-    user32.AttachThreadInput(current_thread_id, window_thread_id, True)
-
-    # Initialize POINT for caret position
-    caret_pos = POINT()
-
-    # Get the caret's position
-    user32.GetCaretPos(ctypes.byref(caret_pos))
-
-    # Get the window handle that has the keyboard focus
-    focused_window = user32.GetFocus()
-
-    # Convert the caret's position to screen coordinates
-    user32.ClientToScreen(focused_window, ctypes.byref(caret_pos))
-
-    # Detach the current thread from the window's thread
-    user32.AttachThreadInput(current_thread_id, window_thread_id, False)
-
-    return (caret_pos.x, caret_pos.y)
-
-
-def truncate_text(text, max_length):
-    return text[: max_length - 3] + "..." if len(text) > max_length else text
-
-
-def create_popup(tk_queue, key_listener_instance):
-    print("Entered create_popup")
-    root = None
-    should_create_popup = False  # Add this flag
-
-    def destroy_popup():
-        print("destroy_popup called")  # Debug print
-        nonlocal root, should_create_popup  # Add should_create_popup here
-        print(f"Root is None: {root is None}")  # Debug print
-
-        if root is not None:
-            print("Received message: destroy_popup")
-            root.destroy()
-            # Restart the keyboard listener here
-            should_create_popup = False  # Reset the flag when destroying the popup
-
-            try:
-                key_listener_instance.start_listener()  # Assuming `start_listener` is the method to restart the listener
-                print("Listener restarted successfully")
-            except Exception as e:
-                print(f"Failed to restart the listener: {e}")
-
-    def create_popup_internal():
-        nonlocal root, should_create_popup  # Add should_create_popup here
-        print("About to stop listener and create popup")
-        key_listener_instance.stop_listener()
-
-        root = tk.Tk()
-        root.title("Select Expansion")
-        # Register the destroy_popup function for the close button
-        root.protocol("WM_DELETE_WINDOW", destroy_popup)  # Add this line
-
-        caret_x, caret_y = get_caret_position()
-
-        print(f"Caret position: x={caret_x}, y={caret_y}")
-
-        # Set the window size and position it below the caret
-        window_width = 500
-        window_height = 300
-        root.geometry(f"{window_width}x{window_height}+{caret_x}+{caret_y}")
-
-        root.attributes("-topmost", True)  # This line makes the window stay on top
-        # root.grab_set()  # This line captures all events
-        # Make sure the window is created
-        root.update_idletasks()
-        root.update()
-
-        for i, option in enumerate(key_listener_instance.expansions_list):
-            raw_button_text = (
-                option["expansion"] if "expansion" in option else "Undefined"
-            )
-            button_text = truncate_text(raw_button_text, 60)
-            button = Button(
-                root,
-                text=button_text,
-                command=partial(key_listener_instance.make_selection, i, root),
-                font=("Work Sans", 11),
-                anchor="w",
-            )
-            button.pack(fill=tk.X, padx=10, pady=5)
-        should_create_popup = True  # Set the flag to True when the popup is created
-
-        ## Simulate the mouse click to focus the popup window
-        windows = gw.getWindowsWithTitle("Select Expansion")
-        if windows:
-            popup_win = windows[0]
-            pyautogui.click(popup_win.left + 10, popup_win.top + 10)
-
-    while not stop_threads.is_set():
-        try:
-            queue_data = tk_queue.get(timeout=0.5)
-
-            msg = queue_data[0]
-
-            if msg == "destroy_popup":
-                destroy_popup()
-                continue
-            if msg == "create_popup":
-                create_popup_internal()
-
-        except Empty:
-            continue
-
-        if should_create_popup:  # Check the flag before running the main loop
-            root.mainloop()
-            should_create_popup = (
-                False  # Reset the flag after the main loop is terminated
-            )
-
-    print("Popup thread stopped")
+#########------------------------------
 
 
 def get_window():
@@ -611,7 +535,13 @@ def keyboard_listener(key_listener_instance):
     print("Keyboard listener stopped")
 
 
+
+###-------------------------------------------------------------START APP
+#stop_threads = threading.Event()
+
+
 def start_app(tk_queue):
+    
     global api  # Existing line
     api = Api()  # Existing line
     # api.create_and_position_window()  # Existing line
@@ -619,22 +549,19 @@ def start_app(tk_queue):
     # Move this line up to initialize before starting the threads
     key_listener_instance = KeyListener(api, tk_queue)  # Moved inside start_app
 
-    # --------Start Pop-Up Thread
-    global stop_threads
-    popup_thread = threading.Thread(
-        target=create_popup,
-        args=(tk_queue, key_listener_instance),
+    # -------------------------------------------------------------------------------------Start Pop-Up Thread
+    # Initialize Popup Thread
+    popup_thread = threading.Thread(target=create_popup,  # Note: This should be the create_popup from popup_manager.py
+        args=(tk_queue, key_listener_instance, stop_threads),  # Added stop_threads here
         name="Pop-Up Thread",
     )
-
-    popup_thread.daemon = True  # Set daemon status
+    popup_thread.daemon = True
     popup_thread.start()
 
-    # --------Start Key Listener Thread
+    # --------------------------------------------------------------------------------------Start Key Listener Thread
     key_listener_thread = threading.Thread(
         target=keyboard_listener,
         args=(key_listener_instance,),
-        name="KeyBoard Listener Thread",
     )
 
     key_listener_thread.daemon = True  # Set daemon status
@@ -645,7 +572,10 @@ def start_app(tk_queue):
     print("Starting Listener from Main.py")  # Existing line
     main_window = api.create_and_position_window()  # Existing line
     main_window.events.closed += api.on_closed
-
+   
+   
+   
+    #--------------------------------------------START
     webview.start(http_server=True)
 
     print("Cleanup function called.")
