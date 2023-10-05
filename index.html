@@ -70,175 +70,175 @@
 
 
 
-    <div class="tab">
-      <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
-      <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
-      <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
-      <button id="macros" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
-      <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab5')">""</button>
-    </div>
-
-
-    <div id="Tab1" class="tabcontent">
-      <!-- Your existing div "content" goes here -->
-
-
-
-      <!-- --------------------Content------------------------------ -->
-      <div id="content" class="content">
-
-        <!-- Aqui onde vão ficar as configurações do Grupo/ Banco de Dados -->
-
-
-
-        <div id="leftPanel" class="content">
-          <div id="topLeftContent">
-            <input type="text" placeholder="Pesquisar...">
-            <button id="folderAdd" onclick=""><img src="/src/images/addFolder.png"></button>
-          </div>
-        </div>
-
-
-
-        <div id="middleAndRightContainer" class="content">
-
-          <div id="dataSettingsPanel" class="data-settings-panel" style="display: none;">
-
-            <div class="settings-item" id="configTitle">Configurações do Grupo:</div>
-
-            <div class="settings-item" id="nomeGrupo">Nome:
-              <input type="text" id="nomeGrupoInput" maxlength="30" />
-            </div>
-
-            <div class="settings-item" id="notasGrupo">Notas:
-              <textarea id="notasGrupoInput" rows="5"></textarea>
-            </div>
-
-            <div class="quem" id="em_Grupo">Expandir em:
-
-              <select data-custom id="expandir_Em">
-                <option id="padrao">Padrão - Configurações</option>
-                <option id="em_Todos">Em todos os aplicativos</option>
-                <option id="apenas">Apenas nestes aplicativos</option>
-                <option id="desativar">Desativar</option>
-              </select>
-
-            </div>
-
-            <div class="quando" id="quando_Grupo">Expandir quando:
-              <select data-custom id="expandir_Quando">
-                <option id="em_Branco">Espaço em branco precede abreviação</option>
-                <option id="qualquer_exceto">Qualquer caractere (exceto letra/número) precede abreviação</option>
-                <option id="qualquer">Qualquer caractere precede abreviação</option>
-
-              </select>
-
-
-            </div>
-
-            <div class="settings-item" id="prefixo">Prefixo:</div>
-
-          </div>
-
-
-
-
-
-          <div id="middlePanel" class="content">
-
-            <div id="groupManage">
-              <p id="selectedDbName"></p>
-              <div id="iconContainer">
-                <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
-                <button id="dataSettings" onclick="showDataSettingsPanel()"><img
-                    src="/src/images/data_Settings.png"></button>
-
-              </div>
-            </div>
-
-
-            <table id="header" class="content">
-              <tr>
-                <td>Descrição/Expansão</td>
-                <td>Atalho</td>
-              </tr>
-            </table>
-
-
-
-            <div id="tableContainer" class="content">
-
-              <table id="myTable">
-
-                <thead>
-                  <tr id="nomeDatabase"></tr>
-                </thead>
-
-
-                <tbody>
-                </tbody>
-
-                <!-- Table content goes here -->
-              </table>
-            </div>
-
-
-          </div>
-
-
-          <div id="rightPanel" class="content">
-
-            <div id="shortcutName">
-              Atalho:
-              <div class="buttons-container">
-                <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
-                <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
-              </div>
-            </div>
-
-
-            <div id="contentType" class="escolha">
-              Tipo de Conteúdo:
-              <select data-custom id="escolha">
-                <option value="0" id="noFormat">Texto sem formatação</option>
-                <option value="1" id="format">Texto Formatado/Imagens</option>
-              </select>
-            </div>
-
-
-
-            <div id="editor" class="editor-container" ></div>
-            <div id="editor-buffer" class="editor-container" style="display: none;"></div>
-
-
-
-
-
-            <div id="inputContainer">
-              <div id="labelRight">
-                <input id="label" type="text" placeholder="Descrição:" size="60">
-              </div>
-              <div id="rightInputs">
-                <div id="atalhoRight">
-                  <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
-                </div>
-                <div id="caseRight" class="case">
-                  <select data-custom id="caseChoice">
-                    <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
-                    <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
-                    <option id="adapt">Adaptar ao atalho</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
+      <div class="tab">
+        <button id="principal" class="tablinks" onclick="openTab(event, 'Tab1')">""</button>
+        <button id="config" class="tablinks" onclick="openTab(event, 'Tab2')">""</button>
+        <button id="rascunho" class="tablinks" onclick="openTab(event, 'Tab3')">""</button>
+        <button id="macros" class="tablinks" onclick="openTab(event, 'Tab4')">""</button>
+        <button id="ajuda" class="tablinks" onclick="openTab(event, 'Tab5')">""</button>
       </div>
 
 
-    </div>
+    
+    
+      <div id="Tab1" class="tabcontent">
+      <!-- Your existing div "content" goes here -->
+
+        <!-- --------------------Content------------------------------ -->
+        <div id="content" class="content">
+
+          <!-- Aqui onde vão ficar as configurações do Grupo/ Banco de Dados -->
+
+
+
+            <div id="leftPanel" class="content">
+              <div id="topLeftContent">
+                <input type="text" placeholder="Pesquisar...">
+                <button id="folderAdd" onclick=""><img src="/src/images/addFolder.png"></button>
+              </div>
+            </div>
+
+
+
+            <div id="middleAndRightContainer" class="content">
+
+              <div id="dataSettingsPanel" class="data-settings-panel" style="display: none;">
+
+                <div class="settings-item" id="configTitle">Configurações do Grupo:</div>
+
+                <div class="settings-item" id="nomeGrupo">Nome:
+                  <input type="text" id="nomeGrupoInput" maxlength="30" />
+                </div>
+
+                <div class="settings-item" id="notasGrupo">Notas:
+                  <textarea id="notasGrupoInput" rows="5"></textarea>
+                </div>
+
+                <div class="quem" id="em_Grupo">Expandir em:
+
+                  <select data-custom id="expandir_Em">
+                    <option id="padrao">Padrão - Configurações</option>
+                    <option id="em_Todos">Em todos os aplicativos</option>
+                    <option id="apenas">Apenas nestes aplicativos</option>
+                    <option id="desativar">Desativar</option>
+                  </select>
+
+                </div>
+
+                <div class="quando" id="quando_Grupo">Expandir quando:
+                  <select data-custom id="expandir_Quando">
+                    <option id="em_Branco">Espaço em branco precede abreviação</option>
+                    <option id="qualquer_exceto">Qualquer caractere (exceto letra/número) precede abreviação</option>
+                    <option id="qualquer">Qualquer caractere precede abreviação</option>
+
+                  </select>
+
+
+                </div>
+
+                <div class="settings-item" id="prefixo">Prefixo:</div>
+
+              </div>
+
+
+
+
+
+              <div id="middlePanel" class="content">
+
+                <div id="groupManage">
+                  <p id="selectedDbName"></p>
+                  <div id="iconContainer">
+                    <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
+                    <button id="dataSettings" onclick="showDataSettingsPanel()"><img
+                        src="/src/images/data_Settings.png"></button>
+
+                  </div>
+                </div>
+
+
+                <table id="header" class="content">
+                  <tr>
+                    <td>Descrição/Expansão</td>
+                    <td>Atalho</td>
+                  </tr>
+                </table>
+
+
+
+                <div id="tableContainer" class="content">
+
+                  <table id="myTable">
+
+                    <thead>
+                      <tr id="nomeDatabase"></tr>
+                    </thead>
+
+
+                    <tbody>
+                    </tbody>
+
+                    <!-- Table content goes here -->
+                  </table>
+                </div>
+
+
+              </div>
+
+
+              <div id="rightPanel" class="content">
+
+                <div id="shortcutName">
+                  Atalho:
+                  <div class="buttons-container">
+                    <button id="duplicate" onclick=""><img src="/src/images/button_Duplicate.png"></button>
+                    <button id="delete" onclick=""><img src="/src/images/button_Trash.png"></button>
+                  </div>
+                </div>
+
+
+                <div id="contentType" class="escolha">
+                  Tipo de Conteúdo:
+                  <select data-custom id="escolha">
+                    <option value="0" id="noFormat">Texto sem formatação</option>
+                    <option value="1" id="format">Texto Formatado/Imagens</option>
+                  </select>
+                </div>
+
+
+
+                <div id="editor" class="editor-container" ></div>
+                <div id="editor-buffer" class="editor-container" style="display: none;"></div>
+
+
+
+
+
+                <div id="inputContainer">
+                  <div id="labelRight">
+                    <input id="label" type="text" placeholder="Descrição:" size="60">
+                  </div>
+                  <div id="rightInputs">
+                    <div id="atalhoRight">
+                      <input type="text" placeholder="Atalho:" size="30" id="shortcutInput">
+                    </div>
+                    <div id="caseRight" class="case">
+                      <select data-custom id="caseChoice">
+                        <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
+                        <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
+                        <option id="adapt">Adaptar ao atalho</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+        </div>
+
+
+      </div>
 
 
 
@@ -254,15 +254,14 @@
 
     <div id="Tab2" class="tabcontent">
 
-      <div id="content2" class="content">
+      <div id="content2">
 
         <div class="flex-container">
           
           
             <div class="left-column">
               <div class="dropdown">
-                <button class="dropbtn" onclick="toggleDropdown('general')">General</button>
-
+                <button class="dropbtn" onclick="toggleDropdown('general')">Geral</button>
                 <div class="dropdown-content" id="general">
                   <a href="#" onclick="showContent('appearance')">Appearance</a>
                   <a href="#" onclick="showContent('popup')">Popup</a>
@@ -271,6 +270,12 @@
                   <a href="#" onclick="showContent('sounds')">Sounds</a>
                   <a href="#" onclick="showContent('language')">Language</a>
                 </div>
+
+                <button class="dropbtn" onclick="toggleDropdown('text_expander')">Expansão de Texto</button>
+                <div class="dropdown-content" id="text_expander">
+                  <a href="#" onclick="showContent('text_expander')">Avançado</a>
+               
+
               </div>
                 <!-- Other menu items can go here -->
             </div>
@@ -353,24 +358,20 @@
 
     <div id="Tab5" class="tabcontent">
       <!-- Tab3 content goes here -->
+    
     </div>
 
 
 
     <!-- end of content-wrapper -->
 
-    <div id=bottomPanel class="mainContainer"></div>
-
-
-
-
-
+    
 
 
 
   </div>
 
-
+  <div id=bottomPanel class="mainContainer"></div>
 
 
   <script>

@@ -52,17 +52,14 @@
 
 
 #Tab1 {
-    height: 100%; /* Add this line */
-    
+    flex-grow: 1;
+    /* This allows it to grow and fill all available space */
+    overflow: auto;
+    /* In case the content overflows */
 }
-
 
 /*  CONFIG MENU  */
 
-#Tab2 {
-
-    display: none;
-}
 
 .flex-container {
     background-color: rgb(174, 12, 12);
