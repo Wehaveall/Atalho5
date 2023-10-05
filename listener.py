@@ -559,6 +559,7 @@ class KeyListener:
                 # self.typed_keys += '\n' # Add newline to last_typed_keys
                 self.last_sequence = ""  # Clear last_sequence
 
+
             # Highlighted Changes: Start
             elif key == "left":
                 self.cursor_col = max(0, self.cursor_col - 1)
@@ -656,6 +657,24 @@ class KeyListener:
                 # Join the lines back into a single string
                 self.multi_line_string = "\n".join(lines)
 
+       
+        elif key == "delete":
+            if (
+                self.cursor_row < len(self.multi_line_string.split("\n"))
+                and self.cursor_col < len(self.multi_line_string.split("\n")[self.cursor_row])
+            ):  # Highlighted Change: Added checks for "delete"
+                # Update the line at the cursor position within the specific line
+                lines = self.multi_line_string.split("\n")
+                current_line = lines[self.cursor_row]
+                lines[self.cursor_row] = (
+                    current_line[: self.cursor_col]
+                    + current_line[self.cursor_col + 1 :]
+                )
+                # Cursor position remains the same for "delete"
+                # Join the lines back into a single string
+                self.multi_line_string = "\n".join(lines)
+
+        
         elif key == "space":
             # Update the line at the cursor position within the specific line
             lines = self.multi_line_string.split("\n")
@@ -685,10 +704,7 @@ class KeyListener:
         else:
             self.last_sequence = ""  # If no words, set to empty string
 
-        # Reconstruct the multi-line string
-        # self.multi_line_string = '\n'.join(self.lines)
-
-        # Print the current state of the multi-line string
+    
 
         print("Current multi-line string-------------------------------------------:")
         print(self.multi_line_string)

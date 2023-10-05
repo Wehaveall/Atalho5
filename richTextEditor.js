@@ -7,9 +7,6 @@ window.addEventListener('load', function () {
 });
 
 
-
-
-
 //Editor oculto para as formatações
 tinymce.init({
     selector: '#hiddenEditor',
