@@ -18,7 +18,7 @@ class POINT(ctypes.Structure):
 
 # All your existing methods can be here, like `get_caret_position`, `truncate_text`, etc.
 
-
+# Get Caret Positiom -  Work in MS Word - Wont work in NOTEPAD
 def get_caret_position():
     # Get current thread ID from kernel32.dll
     current_thread_id = kernel32.GetCurrentThreadId()
@@ -54,17 +54,11 @@ def on_leave(event):
 
 
 
-
-
-
-
-
 def create_popup(tk_queue, key_listener_instance, stop_threads):
     print("Entered create_popup")
     root = None
     should_create_popup = False
 
-    
     
     def destroy_popup():
         nonlocal root, should_create_popup
@@ -106,9 +100,6 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         root.bind('<Key-8>', key_press)
         root.bind('<Key-9>', key_press)
         
-
-
-
 
 
         caret_x, caret_y = get_caret_position()

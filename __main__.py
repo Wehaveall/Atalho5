@@ -15,14 +15,10 @@ import time
 import traceback
 
 # Third-Party Imports
-from pywinauto import Application
-import customtkinter as ctk
 import pygetwindow as gw
 from screeninfo import get_monitors
 from sqlalchemy import create_engine, MetaData, Table, select, update, inspect
 from sqlalchemy.orm import Session
-import tkinter as tk
-from tkinter import Toplevel, Label, Button, PhotoImage, messagebox, font
 import webview
 
 # Custom Module Imports
