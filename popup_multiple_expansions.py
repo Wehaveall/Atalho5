@@ -6,6 +6,8 @@ from tkinter import Button
 from functools import partial
 import pyautogui
 import pygetwindow as gw
+from tkinter import ttk
+import re
 
 # Load necessary DLLs
 user32 = ctypes.windll.user32
@@ -14,6 +16,15 @@ kernel32 = ctypes.windll.kernel32
 
 class POINT(ctypes.Structure):
     _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
+
+
+
+# New function for formatting text of the buttons of the popup
+def format_expansion(expansion, table_name):
+    if table_name == 'aTable':
+        expansion = re.sub(r'[$#%&@*]', '', expansion)
+        expansion = re.sub(r'\+\+', '', expansion)
+    return expansion
 
 
 # All your existing methods can be here, like `get_caret_position`, `truncate_text`, etc.
@@ -44,10 +55,8 @@ def get_caret_position():
 def truncate_text(text, max_length):
     return text[: max_length - 3] + "..." if len(text) > max_length else text
 
-
-
 def on_enter(event):
-    event.widget.config(bg='orange')  # Change background to light orange
+    event.widget.config(bg='#fbb347')  # Change background to light orange
 
 def on_leave(event):
     event.widget.config(bg='SystemButtonFace')  # Change background to default
@@ -120,10 +129,16 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         highlightbackground="orange"  # <-- Border color
     )  # <-- Changed background to a darker grey
         frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+      
+      
+    
 
         for i, option in enumerate(key_listener_instance.expansions_list):
             raw_button_text = option.get("expansion", "Undefined")
-            button_text = f"{i + 1}. {truncate_text(raw_button_text, 60)}"  # Show number followed by a dot
+            # Use the format_expansion function here
+            formatted_button_text = format_expansion(raw_button_text, 'aTable')
+            button_text = f"{i + 1}. {truncate_text(formatted_button_text, 60)}"  # Show number followed by a dot
+           
             button = tk.Button(
                 frame,
                 text=button_text,

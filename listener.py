@@ -26,18 +26,6 @@ import time
 import re
 import json
 
-#######################################
-######################### POP UP FOR MULTIPLE EXPANSIONS
-from src.classes.popup import (
-    CustomTkinterPopupSelector,
-)  # Adjust the import based on your directory structure
-import win32gui
-
-import win32con
-import tkinter as tk
-from tkinter import Button
-import customtkinter as ctk
-
 
 ################################################################ - NATURAL TRAINIG LANGUAGE
 import nltk
