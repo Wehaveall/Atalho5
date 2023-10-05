@@ -45,11 +45,27 @@ def truncate_text(text, max_length):
     return text[: max_length - 3] + "..." if len(text) > max_length else text
 
 
+
+def on_enter(event):
+    event.widget.config(bg='orange')  # Change background to light orange
+
+def on_leave(event):
+    event.widget.config(bg='SystemButtonFace')  # Change background to default
+
+
+
+
+
+
+
+
 def create_popup(tk_queue, key_listener_instance, stop_threads):
     print("Entered create_popup")
     root = None
     should_create_popup = False
 
+    
+    
     def destroy_popup():
         nonlocal root, should_create_popup
         if root is not None:
@@ -69,8 +85,31 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         key_listener_instance.stop_listener()
 
         root = tk.Tk()
-        root.overrideredirect(True)  # <-- Remove the title bar
+        root.title("Escolha a Expansão")  # <-- Set the window title here
         root.protocol("WM_DELETE_WINDOW", destroy_popup)
+
+
+        # Bind numeric keys (1-9) to the root window
+        # Moved the key_press function and root.bind here, after root is initialized
+        def key_press(event):
+            index = int(event.char) - 1  # Convert the key character to an index (0-based)
+            if 0 <= index < len(key_listener_instance.expansions_list):
+                key_listener_instance.make_selection(index, root)
+
+        root.bind('<Key-1>', key_press)
+        root.bind('<Key-2>', key_press)
+        root.bind('<Key-3>', key_press)
+        root.bind('<Key-4>', key_press)
+        root.bind('<Key-5>', key_press)
+        root.bind('<Key-6>', key_press)
+        root.bind('<Key-7>', key_press)
+        root.bind('<Key-8>', key_press)
+        root.bind('<Key-9>', key_press)
+        
+
+
+
+
 
         caret_x, caret_y = get_caret_position()
 
@@ -83,33 +122,40 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         root.update()
 
         # Create a frame to hold all the buttons and center it
-        frame = tk.Frame(root)
+        frame = tk.Frame(
+        root,
+        bg="SystemButtonFace",  # <-- Background set to a darker grey
+        highlightthickness=1,  # <-- Border thickness
+        highlightbackground="orange"  # <-- Border color
+    )  # <-- Changed background to a darker grey
         frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         for i, option in enumerate(key_listener_instance.expansions_list):
             raw_button_text = option.get("expansion", "Undefined")
-            button_text = truncate_text(raw_button_text, 60)
+            button_text = f"{i + 1}. {truncate_text(raw_button_text, 60)}"  # Show number followed by a dot
             button = tk.Button(
                 frame,
                 text=button_text,
                 command=partial(key_listener_instance.make_selection, i, root),
                 font=("Work Sans", 11),
-                anchor="w"  # <-- Aligned text to the left
+                anchor="w"
             )
             button.pack(fill=tk.X, padx=10, pady=5)
 
+            button.bind("<Enter>", on_enter)
+            button.bind("<Leave>", on_leave)
+
         # Create Close button and align it to bottom right
         close_button = tk.Button(
-            frame, text="Close", command=destroy_popup, font=("Work Sans", 11)
+            frame, text="Fechar", command=destroy_popup, font=("Work Sans", 11)
         )
         close_button.pack(side=tk.RIGHT, padx=10, pady=5)  # <-- Align to bottom-right
 
         should_create_popup = True
 
-
-
+ 
         ## Simulate the mouse click to focus the popup window
-        windows = gw.getWindowsWithTitle("Select Expansion")
+        windows = gw.getWindowsWithTitle("Escolha a Expansão")
         if windows:
             popup_win = windows[0]
             pyautogui.click(popup_win.left + 10, popup_win.top + 10)
