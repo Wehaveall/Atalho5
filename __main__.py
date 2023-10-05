@@ -2,7 +2,6 @@
 from collections import deque
 from ctypes import windll, Structure, c_long, byref
 from functools import partial
-import ctypes
 from queue import SimpleQueue, Empty
 import glob
 import json
@@ -18,10 +17,7 @@ import traceback
 # Third-Party Imports
 from pywinauto import Application
 import customtkinter as ctk
-import keyboard
-import pyautogui
 import pygetwindow as gw
-import pyperclip
 from screeninfo import get_monitors
 from sqlalchemy import create_engine, MetaData, Table, select, update, inspect
 from sqlalchemy.orm import Session
@@ -31,11 +27,9 @@ import webview
 
 # Custom Module Imports
 
-from popup_manager import create_popup
+from popup_multiple_expansions import create_popup
 
 from listener import KeyListener
-from shared_variables import should_close_popup
-from src.classes.popup import CustomTkinterPopupSelector
 from src.database.data_connect import (
     get_database_path,
     get_db_files_in_directory,

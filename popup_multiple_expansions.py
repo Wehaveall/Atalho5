@@ -1,6 +1,7 @@
 import ctypes
 from queue import Empty
 import tkinter as tk
+import customtkinter as ctk
 from tkinter import Button
 from functools import partial
 import pyautogui
@@ -44,69 +45,68 @@ def truncate_text(text, max_length):
     return text[: max_length - 3] + "..." if len(text) > max_length else text
 
 
-def create_popup(
-    tk_queue, key_listener_instance, stop_threads
-):  # Added stop_threads as an argument
+def create_popup(tk_queue, key_listener_instance, stop_threads):
     print("Entered create_popup")
     root = None
-    should_create_popup = False  # Add this flag
+    should_create_popup = False
 
     def destroy_popup():
-        print("destroy_popup called")  # Debug print
-        nonlocal root, should_create_popup  # Add should_create_popup here
-        print(f"Root is None: {root is None}")  # Debug print
-
+        nonlocal root, should_create_popup
         if root is not None:
             print("Received message: destroy_popup")
             root.destroy()
-            # Restart the keyboard listener here
-            should_create_popup = False  # Reset the flag when destroying the popup
+            should_create_popup = False
 
             try:
-                key_listener_instance.start_listener()  # Assuming `start_listener` is the method to restart the listener
+                key_listener_instance.start_listener()
                 print("Listener restarted successfully")
             except Exception as e:
                 print(f"Failed to restart the listener: {e}")
 
     def create_popup_internal():
-        nonlocal root, should_create_popup  # Add should_create_popup here
+        nonlocal root, should_create_popup
         print("About to stop listener and create popup")
         key_listener_instance.stop_listener()
 
         root = tk.Tk()
-        root.title("Select Expansion")
-        # Register the destroy_popup function for the close button
-        root.protocol("WM_DELETE_WINDOW", destroy_popup)  # Add this line
+        root.overrideredirect(True)  # <-- Remove the title bar
+        root.protocol("WM_DELETE_WINDOW", destroy_popup)
 
         caret_x, caret_y = get_caret_position()
 
-        print(f"Caret position: x={caret_x}, y={caret_y}")
-
-        # Set the window size and position it below the caret
         window_width = 500
         window_height = 300
         root.geometry(f"{window_width}x{window_height}+{caret_x}+{caret_y}")
 
-        root.attributes("-topmost", True)  # This line makes the window stay on top
-        # root.grab_set()  # This line captures all events
-        # Make sure the window is created
+        root.attributes("-topmost", True)
         root.update_idletasks()
         root.update()
 
+        # Create a frame to hold all the buttons and center it
+        frame = tk.Frame(root)
+        frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
         for i, option in enumerate(key_listener_instance.expansions_list):
-            raw_button_text = (
-                option["expansion"] if "expansion" in option else "Undefined"
-            )
+            raw_button_text = option.get("expansion", "Undefined")
             button_text = truncate_text(raw_button_text, 60)
-            button = Button(
-                root,
+            button = tk.Button(
+                frame,
                 text=button_text,
                 command=partial(key_listener_instance.make_selection, i, root),
                 font=("Work Sans", 11),
-                anchor="w",
+                anchor="w"  # <-- Aligned text to the left
             )
             button.pack(fill=tk.X, padx=10, pady=5)
-        should_create_popup = True  # Set the flag to True when the popup is created
+
+        # Create Close button and align it to bottom right
+        close_button = tk.Button(
+            frame, text="Close", command=destroy_popup, font=("Work Sans", 11)
+        )
+        close_button.pack(side=tk.RIGHT, padx=10, pady=5)  # <-- Align to bottom-right
+
+        should_create_popup = True
+
+
 
         ## Simulate the mouse click to focus the popup window
         windows = gw.getWindowsWithTitle("Select Expansion")
