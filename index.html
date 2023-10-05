@@ -254,7 +254,7 @@
 
     <div id="Tab2" class="tabcontent">
 
-      <div id="content2">
+      <div id="content">
 
         <div class="flex-container">
           
@@ -262,28 +262,30 @@
             <div class="left-column">
               <div class="dropdown">
                 <button class="dropbtn" onclick="toggleDropdown('general')">Geral</button>
-                <div class="dropdown-content" id="general">
-                  <a href="#" onclick="showContent('appearance')">Appearance</a>
-                  <a href="#" onclick="showContent('popup')">Popup</a>
-                  <a href="#" onclick="showContent('shortcuts')">Shortcuts</a>
-                  <a href="#" onclick="showContent('folders')">Folders</a>
-                  <a href="#" onclick="showContent('sounds')">Sounds</a>
-                  <a href="#" onclick="showContent('language')">Language</a>
-                </div>
+                    <div class="dropdown-content" id="general">
+                      <a href="#" onclick="showContent('appearance')">Appearance</a>
+                      <a href="#" onclick="showContent('popup')">Popup</a>
+                      <a href="#" onclick="showContent('shortcuts')">Shortcuts</a>
+                      <a href="#" onclick="showContent('folders')">Folders</a>
+                      <a href="#" onclick="showContent('sounds')">Sounds</a>
+                      <a href="#" onclick="showContent('language')">Language</a>
+                    </div>
 
                 <button class="dropbtn" onclick="toggleDropdown('text_expander')">Expansão de Texto</button>
+                
                 <div class="dropdown-content" id="text_expander">
                   <a href="#" onclick="showContent('text_expander')">Avançado</a>
-               
-
-              </div>
+                </div>
                 <!-- Other menu items can go here -->
+              </div>
+
             </div>
+              
 
 
           <div class="right-column">
 
-            <div id="languageSection" style="display: none;">
+            <div id="languageSection">
               
               <div id="language_choice">Escolha seu idioma:</div>
 
@@ -307,16 +309,6 @@
             </div>
 
           </div>
-
-
-
-
-
-
-
-
-
-
 
 
         </div>

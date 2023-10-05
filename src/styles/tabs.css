@@ -1,5 +1,4 @@
 .tab {
-   
     overflow: visible;
     display: flex;
     /* Add this line */
@@ -44,51 +43,56 @@
 
 .tabcontent {
     display: flex;
-    border-top: none;
-    height: calc(100% - 30px); /* Add this line to take up the remaining height minus the tab bar height */
-
-    /* adjust 50px if the bottomPanel height changes */
+    flex-direction: column;
+    height: 100%;
 }
 
 
 #Tab1 {
     flex-grow: 1;
-    /* This allows it to grow and fill all available space */
-    overflow: auto;
-    /* In case the content overflows */
+    overflow: hidden;
 }
+
 
 /*  CONFIG MENU  */
 
+#Tab2 {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
 
 .flex-container {
-    background-color: rgb(174, 12, 12);
+    flex-grow: 1;
+    /* Added this line */
+    background-color: rgb(228, 228, 12);
     display: flex;
     flex-direction: row;
     height: 100%;
+    /* Ensures it takes full height of its parent */
     width: 100%;
     font-family: 'Work Sans', sans-serif;
 }
-
 .left-column {
     width: 200px;
-    background-color: rgb(46, 12, 138);
-    /* For demonstration */
     flex-shrink: 0;
-    /* Prevents the column from shrinking */
+    background-color: rgb(25, 108, 225);
 }
 
 .right-column {
-    flex-grow: 0;
-    /* Makes the right column take up the remaining space */
+    background-color: #4CAF50;
+    flex-grow: 1;
+    height: 100%;
 }
-
 .dropdown {
+    height: 100%;
     position: relative;
     display: inline-block;
 }
 
 .dropbtn {
+    flex-grow: 1;
     background-color: #4CAF50;
     color: white;
     padding: 16px;
@@ -97,12 +101,11 @@
 }
 
 .dropdown-content {
+    flex-grow: 1;
     display: block;
     max-height: 0;
-    /* Start height, fully collapsed */
     overflow: hidden;
     transition: max-height 0.5s ease-out;
-    /* Animation */
 }
 
 .dropdown-content.show {
