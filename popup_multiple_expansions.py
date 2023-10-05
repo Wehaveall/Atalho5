@@ -18,7 +18,6 @@ class POINT(ctypes.Structure):
     _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
 
 
-
 # New function for formatting text of the buttons of the popup
 def format_expansion(expansion, table_name):
     if table_name == 'aTable':
@@ -60,7 +59,6 @@ def on_enter(event):
 
 def on_leave(event):
     event.widget.config(bg='SystemButtonFace')  # Change background to default
-
 
 
 def create_popup(tk_queue, key_listener_instance, stop_threads):
@@ -109,8 +107,6 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         root.bind('<Key-8>', key_press)
         root.bind('<Key-9>', key_press)
         
-
-
         caret_x, caret_y = get_caret_position()
 
         window_width = 500
@@ -122,16 +118,9 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         root.update()
 
         # Create a frame to hold all the buttons and center it
-        frame = tk.Frame(
-        root,
-        bg="SystemButtonFace",  # <-- Background set to a darker grey
-        highlightthickness=1,  # <-- Border thickness
-        highlightbackground="orange"  # <-- Border color
-    )  # <-- Changed background to a darker grey
+        frame = tk.Frame(root,bg="SystemButtonFace",  )  
         frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
       
-      
-    
 
         for i, option in enumerate(key_listener_instance.expansions_list):
             raw_button_text = option.get("expansion", "Undefined")
@@ -152,9 +141,7 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
             button.bind("<Leave>", on_leave)
 
         # Create Close button and align it to bottom right
-        close_button = tk.Button(
-            frame, text="Fechar", command=destroy_popup, font=("Work Sans", 11)
-        )
+        close_button = tk.Button(frame, text="Fechar", command=destroy_popup, font=("Work Sans", 11))
         close_button.pack(side=tk.RIGHT, padx=10, pady=5)  # <-- Align to bottom-right
 
         should_create_popup = True
@@ -169,11 +156,11 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
     while not stop_threads.is_set():  # Using the passed-in stop_threads
         try:
             queue_data = tk_queue.get(timeout=0.5)
-
             msg = queue_data[0]
 
             if msg == "destroy_popup":
                 destroy_popup()
+                
                 continue
             if msg == "create_popup":
                 create_popup_internal()
@@ -183,8 +170,6 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
 
         if should_create_popup:  # Check the flag before running the main loop
             root.mainloop()
-            should_create_popup = (
-                False  # Reset the flag after the main loop is terminated
-            )
+            should_create_popup = (False)
 
     print("Popup thread stopped")
