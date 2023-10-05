@@ -1,8 +1,6 @@
 import ctypes
 from queue import Empty
 import tkinter as tk
-import tkinter.font as font
-from  tkinter import ttk
 import customtkinter as ctk
 from tkinter import Button
 from functools import partial
@@ -103,62 +101,75 @@ def create_popup(tk_queue, key_listener_instance, stop_threads):
         root.bind('<Key-9>', key_press)
         
 
-    # Create and configure custom style for hover effect
-        style = ttk.Style()
-        style.configure('Hover.TButton', font=('Work Sans', 12, 'normal'))  # Set the font here
-        style.map('Hover.TButton',
-                background=[('active', 'orange'), ('!active', 'SystemButtonFace')],  # Added '!active' state
-                relief=[('active', 'groove')],
-                anchor=[('active', 'w')]  # Align text to the left when hovered
-                )
 
         caret_x, caret_y = get_caret_position()
+
         window_width = 500
         window_height = 300
         root.geometry(f"{window_width}x{window_height}+{caret_x}+{caret_y}")
+
         root.attributes("-topmost", True)
         root.update_idletasks()
         root.update()
 
-        frame = ttk.Frame(root)
+        # Create a frame to hold all the buttons and center it
+        frame = tk.Frame(
+        root,
+        bg="SystemButtonFace",  # <-- Background set to a darker grey
+        highlightthickness=1,  # <-- Border thickness
+        highlightbackground="orange"  # <-- Border color
+    )  # <-- Changed background to a darker grey
         frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         for i, option in enumerate(key_listener_instance.expansions_list):
             raw_button_text = option.get("expansion", "Undefined")
-            button_text = f"{i + 1}. {truncate_text(raw_button_text, 60)}"
-            button = ttk.Button(
+            button_text = f"{i + 1}. {truncate_text(raw_button_text, 60)}"  # Show number followed by a dot
+            button = tk.Button(
                 frame,
                 text=button_text,
                 command=partial(key_listener_instance.make_selection, i, root),
-                style='Hover.TButton'
+                font=("Work Sans", 11),
+                anchor="w"
             )
             button.pack(fill=tk.X, padx=10, pady=5)
 
-        close_button = ttk.Button(frame, text="Fechar", command=destroy_popup, style='Hover.TButton')
-        close_button.pack(side=tk.RIGHT, padx=10, pady=5)
+            button.bind("<Enter>", on_enter)
+            button.bind("<Leave>", on_leave)
+
+        # Create Close button and align it to bottom right
+        close_button = tk.Button(
+            frame, text="Fechar", command=destroy_popup, font=("Work Sans", 11)
+        )
+        close_button.pack(side=tk.RIGHT, padx=10, pady=5)  # <-- Align to bottom-right
 
         should_create_popup = True
 
-        # Simulate the mouse click to focus the popup window
+ 
+        ## Simulate the mouse click to focus the popup window
         windows = gw.getWindowsWithTitle("Escolha a Expansão")
         if windows:
             popup_win = windows[0]
             pyautogui.click(popup_win.left + 10, popup_win.top + 10)
 
-    while not stop_threads.is_set():
+    while not stop_threads.is_set():  # Using the passed-in stop_threads
         try:
             queue_data = tk_queue.get(timeout=0.5)
+
             msg = queue_data[0]
+
             if msg == "destroy_popup":
                 destroy_popup()
                 continue
             if msg == "create_popup":
                 create_popup_internal()
+
         except Empty:
             continue
 
-        if should_create_popup:
+        if should_create_popup:  # Check the flag before running the main loop
             root.mainloop()
-            should_create_popup = False
+            should_create_popup = (
+                False  # Reset the flag after the main loop is terminated
+            )
 
     print("Popup thread stopped")
