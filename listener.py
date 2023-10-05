@@ -257,6 +257,12 @@ class KeyListener:
             # Now paste
             keyboard.press_and_release("ctrl+v")
 
+            # Move the mouse 1 pixel to the right (This is the new line)
+            # Provisional solution because paste will only appear after mouse move
+            current_x, current_y = pyautogui.position()  # Get current mouse position
+            pyautogui.moveTo(current_x + 1, current_y)  # Move mouse 1 pixel to the right
+
+
         self.programmatically_typing = False  # Reset the flag
 
         # Remove the last incorrect word from self.typed_keys
@@ -417,11 +423,9 @@ class KeyListener:
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
 
-         
-
             self.create_popup()  # Call the create_popup function to create a Tkinter window
 
-           
+        
 
         ###############################################################     ONE EXPANSION
         elif len(expansions_list) == 1:  # Handling single expansion
@@ -474,18 +478,12 @@ class KeyListener:
         next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
 
-        if (
-            self.programmatically_typing
-        ):  # Skip if we are programmatically typing or popup is open
+        if (self.programmatically_typing):  # Skip if we are programmatically typing or popup is open
             return
 
-        print(
-            "on_key_press called"
-        )  # Debugging: Changed from on_key_release to on_key_press
+        print("on_key_press called" )  # Debugging: Changed from on_key_release to on_key_press
         key = event.name
-        print(
-            f"Key pressed: {key}"
-        )  # Debugging: Changed from Key released to Key pressed
+        print(f"Key pressed: {key}")  # Debugging: Changed from Key released to Key pressed
 
         # Initialize variables to None at the start of the function
         expansion = None
@@ -499,12 +497,7 @@ class KeyListener:
         if not hasattr(self, "last_sequence"):
             self.last_sequence = ""
 
-        if (
-            self.ctrl_pressed
-            or self.shift_pressed
-            or self.alt_pressed
-            or self.winkey_pressed
-        ):
+        if (self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed):
             return
 
         # CTRL

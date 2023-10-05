@@ -257,28 +257,64 @@
       <div id="content2" class="content">
 
         <div class="flex-container">
-          <div id="language_choice">Escolha seu idioma:</div>
+          
+          
+            <div class="left-column">
+              <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('general')">General</button>
 
-          <div>
-            <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
-              title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
-            <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
-              onclick="changeLanguage('en')">
-            <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
-              onclick="changeLanguage('es')">
-            <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
-              onclick="changeLanguage('it')">
-            <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
-              onclick="changeLanguage('de')">
-            <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
-              onclick="changeLanguage('fr')">
+                <div class="dropdown-content" id="general">
+                  <a href="#" onclick="showContent('appearance')">Appearance</a>
+                  <a href="#" onclick="showContent('popup')">Popup</a>
+                  <a href="#" onclick="showContent('shortcuts')">Shortcuts</a>
+                  <a href="#" onclick="showContent('folders')">Folders</a>
+                  <a href="#" onclick="showContent('sounds')">Sounds</a>
+                  <a href="#" onclick="showContent('language')">Language</a>
+                </div>
+              </div>
+                <!-- Other menu items can go here -->
+            </div>
+
+
+          <div class="right-column">
+
+            <div id="languageSection" style="display: none;">
+              
+              <div id="language_choice">Escolha seu idioma:</div>
+
+                <div>
+                  <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
+                    title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
+                  <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
+                    onclick="changeLanguage('en')">
+                  <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
+                    onclick="changeLanguage('es')">
+                  <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
+                    onclick="changeLanguage('it')">
+                  <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
+                    onclick="changeLanguage('de')">
+                  <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
+                    onclick="changeLanguage('fr')">
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
 
 
 
-        </div>
 
-      </div>
+
+
+
+
+
+
+
+
+        </div>
 
     </div>
 
@@ -349,6 +385,7 @@
   <script src="richTextEditor.js"></script>
   <script src="/src/classes/class_Select.js" type="module"></script>
   <script src="src/classes/class_Select_change.js" type="module"></script>
+  <script src="src/classes/class_config_Menu.js"></script>
 
 
 

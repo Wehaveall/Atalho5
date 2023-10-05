@@ -120,7 +120,7 @@ html {
 
 
 
-.flex-container {
+/* .flex-container {
   overflow: visible;
   display: flex;
   align-items: center;
@@ -132,16 +132,16 @@ html {
 .flex-container>div:first-child {
   margin-right: 20px;
   /* adjust as needed */
-}
+/* } */
 
 
-.flag {
+ .flag {
   width: 40px;
-  /* adjust as needed */
+
   height: auto;
-  /* keeps aspect ratio */
+ 
   margin-right: 10px;
-  /* space between flags */
-  cursor: pointer;
-  /* shows a hand cursor when the mouse is over the flag */
-}
+ 
+} 
+
+
