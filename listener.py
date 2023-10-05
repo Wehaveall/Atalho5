@@ -1,126 +1,38 @@
-import keyboard  # Replacing pynput
-import webview
-import pygetwindow as gw
+# Standard Libraries
+from collections import defaultdict, deque
 from functools import partial
-
-
-from collections import defaultdict
 from threading import Event
-import pyautogui
-from src.database.data_connect import lookup_word_in_all_databases
-
-import pyperclip  # We add this import for clipboard manipulation
-from src.utils import number_utils
-import time
-import logging
-
-
-import html_clipboard
-
-
-from collections import deque
-import platform
-import threading
-
-import time
-import re
 import json
+import logging
+import platform
+import re
+import time
 
+# Third-Party Libraries
+import html_clipboard
+import keyboard  # Replacing pynput
+import pyautogui
+import pyperclip  # Added for clipboard manipulation
 
+# Project-Specific Libraries
+from src.database.data_connect import lookup_word_in_all_databases
+from src.utils import number_utils
 ################################################################ - NATURAL TRAINIG LANGUAGE
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.tag import pos_tag
 from nltk.chunk import ne_chunk
-
-##Capturing frequently occurring phrases can certainly be beneficial for suggesting hotstrings or automating text input.
-# To achieve this, you can use NLTK's functionality for finding collocations and extracting n-grams.
-# Here's how:
-# 1. N-gram Extraction
-# An n-gram is a contiguous sequence of #n items (such as characters or words) from a given sample of text.
-# The function ngrams from the nltk.util module can help you generate n-grams.
-
-# 2. Collocation Finding
-
-# Collocations are sequences of words that appear together more often than would be expected by chance.
-# The BigramCollocationFinder and TrigramCollocationFinder classes in the nltk.collocations module can help identify these.
 from nltk.util import ngrams
 from nltk.collocations import BigramCollocationFinder
 from nltk.metrics import BigramAssocMeasures
 
-#################################################################
-
-
-def move_cursor_to_last_word(self):
-    # Move cursor to the start of the last word without going to the end of the line
-    pyautogui.hotkey("ctrl", "left")
-
-
-def get_last_word_in_MS_Word():
-    if platform.system() == "Windows":
-        import win32com.client
-
-        word = win32com.client.Dispatch("Word.Application")
-        doc = word.ActiveDocument
-        content = doc.Content.Text
-        words = content.split()
-        if words:
-            return words[-1]
-        else:
-            return None
-    elif platform.system() == "Darwin":  # macOS
-        # Code for Mac
-        print("This function is not supported on macOS")
-        return None
-    else:
-        print("Unsupported OS")
-        return None
-
+########################################################################################################
 
 # Setup logging - DISABLE TO CHECK PEFORMANCE
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
-def format_article(article, newlines=1):
-    # Replacing other delimiters
-    delimiters = ["*", "#", "%", "@", "$"]
-    for delimiter in delimiters:
-        article = article.replace(delimiter, "\n")
 
-    # Handling "++" delimiter
-    plus_sections = article.split("++")
-    new_article = plus_sections[0]  # Keep the first section as it is
-
-    if len(plus_sections) > 1:  # Only proceed if "++" exists in the article
-        counter = 0  # Counter to keep track of "++" occurrences after the first one
-        for section in plus_sections[1:]:
-            # If counter is zero, simply remove the "++"
-            if counter == 0:
-                new_article += section
-            # If counter is more than zero, add newline before "Art."
-            else:
-                art_split = section.split(
-                    "Art.", 1
-                )  # Split by the first occurrence of "Art."
-                if len(art_split) > 1:
-                    new_article += "\n" * newlines + "Art.".join(art_split)
-                    counter = 0  # Reset the counter
-                else:
-                    new_article += "\n" * newlines + section
-
-            # Increment the counter after the first "++"
-            counter += 1
-
-        # Add a newline before the first occurrence of "Art." if "++" exists
-        first_art_index = new_article.find("Art.")
-        if first_art_index != -1:
-            new_article = (
-                new_article[:first_art_index] + "\n" + new_article[first_art_index:]
-            )
-
-    return new_article
 
 
 global cursor_row  # Declare cursor_row as global to modify it
@@ -133,26 +45,21 @@ cursor_col = 0
 ######################################################    KEYLISTENER    ###############################################################
 ########################################################################################################################################
 class KeyListener:
+    
+    
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
         self.tk_queue = tk_queue  # Assign it to an instance variable
-
         # self.popup_done_event = threading.Event()
-
         self.expansions_list = []  # Define the expansions_list
         # keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
-
         self.programmatically_typing = False  # Initialize the flag here
-
         self.last_word = ""  # Initialize last_word
         self.word_buffer = deque([], maxlen=500)  # Initialize with an empty deque
-
         self.ctrl_pressed = False
         self.shift_pressed = False
         self.alt_pressed = False
         self.winkey_pressed = False
-
         self.api = api
-
         self.key_to_str_map = {
             "Key.space": "space",
             "Key.enter": "enter",
@@ -161,10 +68,8 @@ class KeyListener:
 
         self.requires_delimiter = None
         self.delimiters = None
-
         self.accent = False
         self.last_key = None
-
         self.cursor_row = 0
         self.cursor_col = 0
         self.multi_line_string = """"""
@@ -174,97 +79,61 @@ class KeyListener:
         # Added this line to store the pynput listener
         # self.pynput_listener = keyboard.Listener(on_press=self.on_key_press, on_release=self.on_key_release)
 
-        self.accent_mapping = defaultdict(
-            lambda: "",
-            {
-                "~a": "ã",
-                "~A": "Ã",
-                "~o": "õ",
-                "~O": "Õ",
-                "~n": "ñ",
-                "~N": "Ñ",
-                "´a": "á",
-                "´A": "Á",
-                "´e": "é",
-                "´E": "É",
-                "´i": "í",
-                "´I": "Í",
-                "´o": "ó",
-                "´O": "Ó",
-                "´u": "ú",
-                "´U": "Ú",
-                "`a": "à",
-                "`A": "À",
-                "`e": "è",
-                "`E": "È",
-                "`i": "ì",
-                "`I": "Ì",
-                "`o": "ò",
-                "`O": "Ò",
-                "`u": "ù",
-                "`U": "Ù",
-                "^a": "â",
-                "^A": "Â",
-                "^e": "ê",
-                "^E": "Ê",
-                "^i": "î",
-                "^I": "Î",
-                "^o": "ô",
-                "^O": "Ô",
-                "^u": "û",
-                "^U": "Û",
-            },
-        )
+        self.accent_mapping = defaultdict(lambda: "", {"~a": "ã", "~A": "Ã", "~o": "õ", "~O": "Õ", "~n": "ñ", "~N": "Ñ", "´a": "á", "´A": "Á", 
+        "´e": "é", "´E": "É", "´i": "í", "´I": "Í", "´o": "ó", "´O": "Ó", "´u": "ú", "´U": "Ú", "`a": "à", "`A": "À", "`e": "è", "`E": "È",
+        "`i": "ì", "`I": "Ì", "`o": "ò", "`O": "Ò", "`u": "ù", "`U": "Ù", "^a": "â", "^A": "Â", "^e": "ê", "^E": "Ê", "^i": "î", "^I": "Î",
+        "^o": "ô", "^O": "Ô", "^u": "û", "^U": "Û"})
+        
+        
         self.accents = set(["~", "´", "`", "^"])
-
-        self.omitted_keys = set(
-            [
-                "esc",
-                "shift",
-                "ctrl",
-                "alt",
-                "cmd",
-                "f1",
-                "f2",
-                "f3",
-                "f4",
-                "f5",
-                "f6",
-                "f7",
-                "f8",
-                "f9",
-                "f10",
-                "f11",
-                "f12",
-                "page up",
-                "page down",
-                "home",
-                "end",
-                "delete",
-                "insert",
-                "up",
-                "down",
-                "left",
-                "right",
-                "backspace",
-                "print screen",
-                "scroll lock",
-                "pause",
-                "space",
-                "caps lock",
-                "tab",
-                "enter",
-                "num lock",
-                "right ctrl",
-                "left ctrl",
-                "left shift",
-                "right shift",
-                # Add more here
-            ]
-        )
+        
+        
+        self.omitted_keys = set(["esc", "shift", "ctrl", "alt", "cmd", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
+        "page up", "page down", "home", "end", "delete", "insert", "up", "down", "left", "right", "backspace", "print screen", "scroll lock", "pause",
+        "space", "caps lock", "tab", "enter", "num lock", "right ctrl", "left ctrl", "left shift", "right shift"])
 
         self.resetting_keys = set(["space"])
 
+    
+    ###################################################################### FUNCTIONS
+    #TO DO - newline must be configurable in the GUI
+    
+    def format_article(self, article, newlines=2):
+        # Replacing other delimiters
+        delimiters = ["*", "#", "%", "@", "$"]
+        for delimiter in delimiters:
+            article = article.replace(delimiter, "\n" * newlines)
+
+        # Handling "++" delimiter
+        plus_sections = article.split("++")
+        new_article = plus_sections[0]  # Keep the first section as it is
+
+        if len(plus_sections) > 1:  # Only proceed if "++" exists in the article
+            counter = 0  # Counter to keep track of "++" occurrences after the first one
+            for section in plus_sections[1:]:
+                # If counter is zero, simply remove the "++"
+                if counter == 0:
+                    new_article += section
+                # If counter is more than zero, add newline before "Art."
+                else:
+                    art_split = section.split("Art.", 1)  # Split by the first occurrence of "Art."
+                    if len(art_split) > 1:
+                        new_article += "\n" * newlines + "Art.".join(art_split)
+                        counter = 0  # Reset the counter
+                    else:
+                        new_article += "\n" * newlines + section
+
+                # Increment the counter after the first "++"
+                counter += 1
+
+            # Add a newline before the first occurrence of "Art." if "++" exists
+            first_art_index = new_article.find("Art.")
+            if first_art_index != -1:
+                new_article = new_article[:first_art_index] + "\n" * newlines + new_article[first_art_index:]
+
+        return new_article
+
+    
     def stop_listener(self):
         print("Stopping Listener from Listerner.py")
         try:
@@ -359,9 +228,8 @@ class KeyListener:
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
-        print(
-            f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}"
-        )
+        print(f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}")
+        
         self.programmatically_typing = True  # Set the flag
 
         # Clear previously typed keys
@@ -373,13 +241,16 @@ class KeyListener:
         keyboard.press_and_release("backspace")
 
         if expansion is not None:
+            # Format the expansion before pasting (This is the new line)
+            formatted_expansion = self.format_article(expansion, newlines=2) 
+            
             format_value = int(format_value)
 
             if format_value == 0:
-                pyperclip.copy(expansion)
+                pyperclip.copy(formatted_expansion)  # Modified to use formatted_expansion
                 print("Debug: Using REGULAR clipboard.")
             else:
-                dirty_HTML = expansion  # Your variable
+                dirty_HTML = formatted_expansion  # Modified to use formatted_expansion
                 html_clipboard.PutHtml(dirty_HTML)  # Your logic
                 print("Debug: Using HTML clipboard.")
 
@@ -392,10 +263,11 @@ class KeyListener:
         self.typed_keys = self.typed_keys.rstrip(self.last_word)
 
         # Add the corrected word
-        self.typed_keys += expansion + " "
+        self.typed_keys += formatted_expansion + " "  # Modified to use formatted_expansion
 
-        self.last_word = expansion  # Update the last word to the new expanded word
-        self.word_buffer.append(expansion)  # Add the expanded word to the buffer
+        self.last_word = formatted_expansion  # Modified to use formatted_expansion
+        self.word_buffer.append(formatted_expansion)  # Modified to use formatted_expansion
+
 
     # ----------------------------------------------------------------Handle Accents
 
@@ -545,11 +417,11 @@ class KeyListener:
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list  # Store the expansions list
 
-            ######################################### VERY IMPORTANT
+         
 
             self.create_popup()  # Call the create_popup function to create a Tkinter window
 
-            ##########################################################
+           
 
         ###############################################################     ONE EXPANSION
         elif len(expansions_list) == 1:  # Handling single expansion

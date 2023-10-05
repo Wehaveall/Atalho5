@@ -10,25 +10,12 @@ window.addEventListener('load', function () {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Editor oculto para as formatações
 tinymce.init({
     selector: '#hiddenEditor',
     height: '100%',
     plugins:
-    "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
+        "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
     toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough',
     toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     paste_as_text: false,
@@ -69,10 +56,6 @@ tinymce.init({
  });
 
 
-
-
-
-
  
 function reinitializeEditor(choice) {
     const visibleEditor = (document.getElementById('editor').style.display === 'none') ? '#editor-buffer' : '#editor';
@@ -87,7 +70,6 @@ function reinitializeEditor(choice) {
 
     initializeEditor(hiddenEditor, choice === "1", onEditorInit);
 }
-
 
 
 var saveTimeout = null;
@@ -168,8 +150,6 @@ function getTinyMCEConfig(selector, isAdvanced, onEditorInit) {
 
 
 
-
-
 function getBasicTinyMCEConfig() {
     return getTinyMCEConfig(false);
 }
@@ -179,11 +159,9 @@ function getAdvancedTinyMCEConfig() {
 }
 
 
-
 function initializeEditor(selector, isAdvanced) {
     tinymce.init(getTinyMCEConfig(selector, isAdvanced));
 }
-
 
 function initializeEditorBasedOnDropdown() {
     var choice = document.getElementById('escolha').value;
@@ -192,16 +170,12 @@ function initializeEditorBasedOnDropdown() {
 }
 
 
-
-
 function swapEditors() {
     const editor1 = document.getElementById('editor');
     const editor2 = document.getElementById('editor-buffer');
     editor1.style.display = (editor1.style.display === 'none') ? '' : 'none';
     editor2.style.display = (editor2.style.display === 'none') ? '' : 'none';
 }
-
-
 
 function decodeHtml(html) {
     var txt = document.createElement("textarea");

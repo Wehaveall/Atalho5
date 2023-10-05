@@ -1,12 +1,10 @@
 import ctypes
 from queue import Empty
 import tkinter as tk
-import customtkinter as ctk
 from tkinter import Button
 from functools import partial
 import pyautogui
 import pygetwindow as gw
-from tkinter import ttk
 import re
 
 # Load necessary DLLs
