@@ -79,7 +79,7 @@
       </div>
 
 
-    
+    <div class="tab-container">
     
       <div id="Tab1" class="tabcontent">
       <!-- Your existing div "content" goes here -->
@@ -238,7 +238,11 @@
         </div>
 
 
-      </div>
+    </div>
+
+
+
+  </div>
 
 
 
@@ -246,49 +250,32 @@
 
 
 
+        <!-- Tab 2 Container -->
+        <div class="tab-container">
 
-
-
-
-
-
-    <div id="Tab2" class="tabcontent">
-
-      <div id="content">
-
-        <div class="flex-container">
-          
-          
-            <div class="left-column">
-              <div class="dropdown">
-                <button class="dropbtn" onclick="toggleDropdown('general')">Geral</button>
-                    <div class="dropdown-content" id="general">
-                      <a href="#" onclick="showContent('appearance')">Appearance</a>
-                      <a href="#" onclick="showContent('popup')">Popup</a>
-                      <a href="#" onclick="showContent('shortcuts')">Shortcuts</a>
-                      <a href="#" onclick="showContent('folders')">Folders</a>
-                      <a href="#" onclick="showContent('sounds')">Sounds</a>
-                      <a href="#" onclick="showContent('language')">Language</a>
-                    </div>
-
-                <button class="dropbtn" onclick="toggleDropdown('text_expander')">Expansão de Texto</button>
-                
-                <div class="dropdown-content" id="text_expander">
-                  <a href="#" onclick="showContent('text_expander')">Avançado</a>
-                </div>
-                <!-- Other menu items can go here -->
-              </div>
-
+          <div id="Tab2" class="tabcontent-tab2">
+            <div class="left-column-tab2 flex-column" >
+              <div class="left-column-content"></div>
+              <ul class="menu-list">
+                <li>
+                  <span class="menu-item" onclick="showContent('general')">Geral</span>
+                  <ul class="submenu-list">
+                    <li><a href="#" onclick="showContent('appearance')">Appearance</a></li>
+                    <li><a href="#" onclick="showContent('popup')">Popup</a></li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="menu-item" onclick="showContent('text_expander')">Expansão de Texto</span>
+                  <ul class="submenu-list">
+                    <li><a href="#" onclick="showContent('text_expander_advanced')">Avançado</a></li>
+                  </ul>
+                </li>
+              </ul>
             </div>
-              
-
-
-          <div class="right-column">
-
-            <div id="languageSection">
-              
-              <div id="language_choice">Escolha seu idioma:</div>
-
+            <div class="right-column-tab2">
+              <div class="right-column-tab2 flex-column">
+              <div id="languageSection">
+                <div id="language_choice">Escolha seu idioma:</div>
                 <div>
                   <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
                     title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
@@ -303,17 +290,10 @@
                   <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
                     onclick="changeLanguage('fr')">
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
-
-        </div>
-
-    </div>
+        </div> 
 
 
 
@@ -358,12 +338,12 @@
     <!-- end of content-wrapper -->
 
     
-
+     <div id=bottomPanel class="mainContainer"></div>
 
 
   </div>
 
-  <div id=bottomPanel class="mainContainer"></div>
+  
 
 
   <script>

@@ -248,21 +248,29 @@ function formatArticle(article, tableName) {
 //----------------------------------------------------------------
 //----------------------------------------------------------------
 
-
-
 function openTab(evt, tabName) {
   var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
+
+  tabcontent = document.querySelectorAll(".tabcontent, .tabcontent-tab2"); // Added .tabcontent-tab2
+
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
   }
+
   tablinks = document.getElementsByClassName("tablinks");
   for (i = 0; i < tablinks.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
-  document.getElementById(tabName).style.display = "block";
+
+  if (tabName === 'Tab2') {
+    document.getElementById(tabName).style.display = "flex";
+  } else {
+    document.getElementById(tabName).style.display = "block";
+  }
+
   evt.currentTarget.className += " active";
 }
+
 
 
 ////////////////////////////////////////////////////////////////Esconder tela de caregamento

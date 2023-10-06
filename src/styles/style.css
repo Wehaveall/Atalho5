@@ -1,10 +1,19 @@
+
+/* Add this to apply 'box-sizing: border-box;' to all elements */
+* {
+  box-sizing: border-box;
+}
+
+
+
+
 body,
 
 html {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background-color: green;
@@ -60,20 +69,15 @@ html {
   overflow: visible;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 50px);
+    /* Adjust for bottomPanel */
   width: 100vw;
   background-color:  deeppink;
   align-self: flex-start;
 }
 
 
-.contentWrapper {
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-  background-color: blue;
-  height: 100%;
-}
+
 
 
 
@@ -97,23 +101,25 @@ html {
 
 
 
-
-
 #bottomPanel {
+  position: fixed;
+  /* Added this line */
+  bottom: 0;
+  /* Added this line */
+  left: 0;
+  /* Added this line */
+  width: 100%;
+  /* Added this line */
   margin: 0;
   padding: 0;
-  overflow: visible;
   height: 50px;
   background-color: #fbb347;
-
 }
 
 
-
-
- .flag {
+/* .flag {
   width: 40px;
-  height: auto;
+  height: 100%;
   margin-right: 10px;
 } 
 
