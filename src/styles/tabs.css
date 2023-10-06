@@ -3,21 +3,17 @@
     display: flex;
     /* Add this line */
     border: 1px solid #ccc;
-    background-color: #f1f1f1;
-   
-    
+    background-color: #f1f1f1; 
 }
 
 
 .tablinks {
-
     height: 30px;
 }
 
 
 .tab button {
     padding: 6, 3;
-
     font-family: 'Work Sans', sans-serif;
     background-color: inherit;
     display: inline-block;
@@ -53,20 +49,16 @@
 
 
 
-
 #Tab1 {
     flex-grow: 1;
     overflow: hidden;
 }
 
 
-/*  CONFIG MENU------------------------------------------  */
 /* Tab 2 */
 
-#Tab2 {
-    
+#Tab4 {
     height: calc(100% - 50px);
-    /* 100% of parent height minus 50px for bottomPanel */
     overflow: hidden;
     flex-grow: 1;
 }
@@ -74,37 +66,28 @@
 .flex-container {
     display: flex;
     height: 100%;
-    /* Changed from 100vh to 100% */
 }
 
-/* New styles specific to Tab2 */
-.tabcontent-tab2 {
+
+.tabcontent_4 {
     flex-grow: 1;
-    /* Add this line, fills remaining vertical space */
     display: flex;
     flex-direction: row;
     overflow-y: hidden;
-    /* Add if you need scroll */
 }
 
 
-.left-column-tab2 {
-   
+.left-column-tab4 {
     width: 200px;
-    /* Fixed width */
-
     background-color: #72e884;
     overflow-y: auto;
-    /* Scroll if content overflows */
 }
 
-.right-column-tab2 {
+.right-column-tab4 {
     height: 100%;
     flex-grow: 1;
-    /* Take remaining width */
     background-color: #a0b920;
     overflow-y: auto;
-    /* Scroll if content overflows */
 }
 
 #language_choice{
@@ -117,5 +100,4 @@ height: 50px
     margin: 10px;
     width: 40px;
     height: 40px;
-   
 }

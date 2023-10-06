@@ -1,18 +1,20 @@
 {
   "en": {
-    "Tab1": "Home",
-    "Tab2": "Settings",
+    "Tab1": "Text Expander",
+    "Tab2": "Macros",
     "Tab3": "Draft",
-    "Tab4": "Macros",
+    "Tab4": "Setup",
     "Tab5": "Help",
     "language_choice": "Choose you language:"
   },
   "pt-BR": {
-    "Tab1": "Início",
-    "Tab2": "Configurações",
+    "Tab1": "Expansão de Texto",
+    "Tab2": "Macros",
     "Tab3": "Rascunho",
-    "Tab4": "Macros",
+    "Tab4": "Configurações",
     "Tab5": "Ajuda",
+   
+
     "language_choice": "Escolha seu idioma:"
   },
   "de": {

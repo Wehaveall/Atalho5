@@ -251,7 +251,7 @@ function formatArticle(article, tableName) {
 function openTab(evt, tabName) {
   var i, tabcontent, tablinks;
 
-  tabcontent = document.querySelectorAll(".tabcontent, .tabcontent-tab2"); // Added .tabcontent-tab2
+  tabcontent = document.querySelectorAll(".tabcontent, .tabcontent_2, .tabcontent_3, .tabcontent_4, .tabcontent_5" ); 
 
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
@@ -262,7 +262,7 @@ function openTab(evt, tabName) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
 
-  if (tabName === 'Tab2') {
+  if (tabName === 'Tab4') {
     document.getElementById(tabName).style.display = "flex";
   } else {
     document.getElementById(tabName).style.display = "block";
