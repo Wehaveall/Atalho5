@@ -79,7 +79,6 @@
 
 /* New styles specific to Tab2 */
 .tabcontent-tab2 {
-    
     flex-grow: 1;
     /* Add this line, fills remaining vertical space */
     display: flex;
@@ -88,17 +87,19 @@
     /* Add if you need scroll */
 }
 
+
 .left-column-tab2 {
-    width: 300px;
+   
+    width: 200px;
     /* Fixed width */
-    flex-shrink: 0;
-    /* Prevent shrinking */
+
     background-color: #72e884;
     overflow-y: auto;
     /* Scroll if content overflows */
 }
 
 .right-column-tab2 {
+    height: 100%;
     flex-grow: 1;
     /* Take remaining width */
     background-color: #a0b920;
@@ -106,3 +107,15 @@
     /* Scroll if content overflows */
 }
 
+#language_choice{
+width: 100%;
+height: 50px
+}
+
+
+.flag {
+    margin: 10px;
+    width: 40px;
+    height: 40px;
+   
+}
