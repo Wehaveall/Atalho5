@@ -304,9 +304,19 @@ class Api:
             directory_name = os.path.basename(subdirectory)
             all_db_files[directory_name] = db_files
 
+            # Type checking and logging
+            if not all(isinstance(item, (int, float, str)) for item in db_files):
+                logging.error(f"db_files contains non-serializable types: {db_files}")
+            if not isinstance(directory_name, (int, float, str)):
+                logging.error(f"directory_name is of non-serializable type: {directory_name}")
+
             # Encode the directory name and .db files as JSON
-            encoded_directory = json.dumps(directory_name)
-            encoded_db_files = json.dumps(db_files)
+            try:
+                encoded_directory = json.dumps(directory_name)
+                encoded_db_files = json.dumps(db_files)
+            except TypeError as e:
+                logging.error(f"JSON serialization error: {e}")
+                continue  # Skip this iteration if serialization fails
 
             # Call createCollapsible in JavaScript for this directory and its .db files
             self.window.evaluate_js(
@@ -314,7 +324,6 @@ class Api:
             )
 
         return all_db_files
-
     # ----------------------------------------------------------------EXCLUIR - SQLITE_SEQUENCY AND CONFIG TABLE
 
     # Get the target table name from the database
@@ -439,30 +448,59 @@ class Api:
 
     def save_all_states(self, states):
         with state_lock:
-            with open("state.json", "w") as file:
-                json.dump(states, file)
+            try:
+                with open("state.json", "w") as file:
+                    json.dump(states, file)
+            except TypeError as e:
+                logging.error(f"JSON serialization error in save_all_states: {e}")
 
     # Save checkbox states to the checkBox_states.json file
     # Used in: main.py and invoked from JavaScript
 
     def save_checkBox_states(self, checkBoxStates):
-        with open("checkBox_states.json", "w", encoding="utf-8") as f:
-            json.dump(checkBoxStates, f, ensure_ascii=False)
-        # print("Saved checkbox states.")
+        try:
+            with open("checkBox_states.json", "w", encoding="utf-8") as f:
+                json.dump(checkBoxStates, f, ensure_ascii=False)
+        except TypeError as e:
+            logging.error(f"JSON serialization error in save_checkBox_states: {e}")
 
     # Load checkbox states from the checkBox_states.json file
     # Used in: main.py
     def load_checkBox_states(self):
         filePath = "checkBox_states.json"
-        if os.path.exists(filePath):
-            with open(filePath, "r", encoding="utf-8") as f:
-                checkBoxStates = json.load(f)
-            # print(f"Loaded checkbox states from {filePath}")
-        else:
-            print(f"{filePath} not found. Initializing empty checkbox states.")
+        try:
+            if os.path.exists(filePath):
+
+
+
+               with open(filePath, "rb") as f:
+                    file_content = f.read()
+
+                    # Decode the bytes to string
+                    decoded_str = file_content.decode('utf-8')
+
+                    # Parse the string as JSON
+                    import json
+                    checkBoxStates = json.loads(decoded_str)
+           
+           
+           
+           
+            else:
+                print(f"{filePath} not found. Initializing empty checkbox states.")
+                checkBoxStates = {}
+        except json.JSONDecodeError as e:
+            logging.error(f"JSON decoding error in load_checkBox_states: {e}")
             checkBoxStates = {}
 
         return checkBoxStates
+
+
+
+
+
+
+
 
     # -------------------------------------------------------------------------CREATE WINDOW
 

@@ -74,7 +74,7 @@
             <div id="content" class="content">
 
             
-                <div id="leftPanel" class="content">
+                <div id="leftPanel" class="left-panel-content">
                   <div id="topLeftContent">
                     <input type="text" placeholder="Pesquisar...">
                     <button id="folderAdd" onclick=""><img src="/src/images/addFolder.png"></button>
@@ -237,42 +237,66 @@
 
         <div id="Tab4" class="tabcontent_4">
           
-            <div class="left-column-tab4">
-              <ul class="menu-list">
-                <li>
-                  <span class="menu-item" onclick="showContent('general')">Geral</span>
-                  <ul class="submenu-list">
+          <div class="left-column-tab4">
+            <ul class="menu-list">
+               
+              <li>
+                  <span class="menu-item toggle" onclick="toggleMenu('submenu1')"><span class="arrow">&#9654;</span> Geral</span>
+                  <ul class="submenu-list" id="submenu1">
                     <li><a href="#" onclick="showContent('appearance')">Appearance</a></li>
                     <li><a href="#" onclick="showContent('popup')">Popup</a></li>
                   </ul>
                 </li>
-                <li>
-                  <span class="menu-item" onclick="showContent('text_expander')">Expansão de Texto</span>
-                  <ul class="submenu-list">
-                    <li><a href="#" onclick="showContent('text_expander_advanced')">Avançado</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-           
+             
+             
+       
+              <li>
+                <span class="menu-item toggle" onclick="toggleMenu('submenu2')"><span class="arrow">&#9654;</span> Expansão de
+                  Texto</span>
+                <ul class="submenu-list" id="submenu2">
+                  <li><a href="#" onclick="showContent('text_expander_advanced')">Avançado</a></li>
+                </ul>
+              </li>
+              
+
+              <li>
+                <span class="menu-item toggle" onclick="toggleMenu('submenu3')"><span class="arrow">&#9654;</span> Linguagem</span>
+                <ul class="submenu-list" id="submenu3">
+                  <li><a href="#" onclick="showContent('language_general')">Opções Gerais</a></li>
+                  <li><a href="#" onclick="showContent('language_advanced')">Opções Específicas</a></li>
+
+                </ul>
+              </li>
+          <!-- ... other parts of the code ... -->
+
+
+            </ul>
+          </div>
+
            
             <div class="right-column-tab4">
       
                   <div id="language_choice">Escolha seu idioma:</div>
-                    
-                      <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
-                        title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
-                      <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
-                        onclick="changeLanguage('en')">
-                      <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
-                        onclick="changeLanguage('es')">
-                      <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
-                        onclick="changeLanguage('it')">
-                      <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
-                        onclick="changeLanguage('de')">
-                      <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
-                        onclick="changeLanguage('fr')">
+                     
+                      <div class="flag-wrapper">
+
+                          <img class="flag" id="pt-BR" src="src/images/flags/pt-BR.png" alt="Portuguese (Brazil)"
+                            title="Portuguese (Brazil)" onclick="changeLanguage('pt-BR')">
+                          <img class="flag" id="en" src="src/images/flags/en.png" alt="English" title="English"
+                            onclick="changeLanguage('en')">
+                          <img class="flag" id="es" src="src/images/flags/es.png" alt="Spanish" title="Spanish"
+                            onclick="changeLanguage('es')">
+                          <img class="flag" id="it" src="src/images/flags/it.png" alt="Italian" title="Italian"
+                            onclick="changeLanguage('it')">
+                          <img class="flag" id="de" src="src/images/flags/de.png" alt="German" title="German"
+                            onclick="changeLanguage('de')">
+                          <img class="flag" id="fr" src="src/images/flags/fr.png" alt="French" title="French"
+                            onclick="changeLanguage('fr')">
+
+                      </div>
             </div>
+
+
                 <!-- End right-column-tab2 -->
          </div>
          <!-- End TAB2-->
@@ -317,6 +341,7 @@
   <script src="/src/classes/class_Select.js" type="module"></script>
   <script src="src/classes/class_Select_change.js" type="module"></script>
   <script src="src/classes/class_config_Menu.js"></script>
+  
 
 
 

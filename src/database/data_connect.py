@@ -205,14 +205,14 @@ def lookup_word_in_all_databases(word):
                 for result in results:
                     format_value = int(result.format)
                     expansion_data = {
-                        "expansion": result.expansion,
+                        # Change is made here
+                        "expansion": result.expansion.decode('utf-8') if isinstance(result.expansion, bytes) else result.expansion,
                         "format_value": format_value,
                         "requires_delimiter": requires_delimiter,
                         "delimiters": delimiters
                     }
                     all_expansions.append(expansion_data)
-
-    
+                    
     
     
     return all_expansions

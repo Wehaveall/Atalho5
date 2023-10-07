@@ -1,6 +1,3 @@
-
-
-
 var checkBoxStates = {};  // Object to hold checkbox states
 
 var appState = {
@@ -12,72 +9,8 @@ var buttonStates = appState.buttonStates;
 var allDbFiles = {};
 
 
-
 var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
 //preciso que seja global, para ajustar a quantidade de enters!!
-
-
-
-/////////////////////////////////////////////////////////////////////CACHE////////////////////////////////
-
-// Nesta implementação:
-
-// O cache é armazenado em dataCache.
-// Cada entrada de cache tem um timestamp indicando quando foi armazenada.
-// Ao obter uma entrada do cache com getFromCache(), verificamos se o TTL expirou.
-//  Se sim, excluímos a entrada e retornamos null.
-// fetchData() primeiro verifica o cache. Se os dados estiverem no cache e ainda forem válidos,
-//  ele retorna imediatamente. Caso contrário, busca os dados e os armazena no cache.
-// Quando você atualizar os dados em algum lugar no seu aplicativo,
-//  você deve chamar dataCache.delete(cacheKey) para invalidar a entrada de cache relevante.
-
-
-// Dada a forma como o seu cache está estruturado e como você recupera dados do cache, 
-// o que está acontecendo é que, quando você salva as alterações com save_changes,
-//  está invalidando mais do que o necessário. O que você precisa fazer é simplesmente
-//   invalidar a chave do cache que corresponde aos dados que foram alterados.
-
-// Veja, a chave do cache é composta por groupName|databaseName|tableName. 
-// Quando você modifica dados em uma tabela específica, você não está alterando
-//  o nome do grupo, nome do banco de dados ou nome da tabela.
-//   O que está mudando são os valores dentro dessa tabela. 
-//   Portanto, a chave do cache não precisa incluir os valores de expansion, 
-//   shortcut ou format, porque esses valores não fazem parte da chave do cache.
-
-// A função invalidateCacheEntry que você tem agora é quase correta, 
-// mas tem um pequeno erro: está referenciando cache em vez de dataCache. Vamos corrigir isso:
-
-// javascript
-// Copy code
-// function invalidateCacheEntry(...args) {
-//   const cacheKey = args.join('|');
-//   if (dataCache.has(cacheKey)) {
-//     dataCache.delete(cacheKey);
-//   }
-// }
-// Agora, na sua função save_changes, você só precisa chamar invalidateCacheEntry
-//  com os três argumentos: groupName, databaseName, e tableName.
-
-// python
-// Copy code
-// self.window.evaluate_js(
-//   'invalidateCacheEntry("{groupName}", "{databaseName}", "{tableName}")'.format(
-//     groupName=groupName,
-//     databaseName=databaseName,
-//     tableName=tableName
-//   )
-// )
-// O que isso faz é simplesmente remover a entrada do cache para essa tabela específica.
-//  Da próxima vez que você tentar recuperar dados dessa tabela usando a função fetchData, 
-//  o cache não terá esses dados e a função buscará no banco de dados e recolocará os dados atualizados no cache.
-
-// Em resumo, a chave é entender que a chave do cache é baseada em identificadores 
-// que descrevem "onde" os dados estão (ou seja, em qual grupo, banco de dados, tabela),
-//  e não "o que" os dados são (ou seja, os valores de expansion, shortcut, etc.). 
-//  Ao modificar os dados, você simplesmente invalida a entrada do cache
-//   para essa localização e os dados são buscados novamente na próxima vez que você os solicitar.
-
-
 
 
 
@@ -288,319 +221,128 @@ function salvar_Label(event) {
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-///CREATE COLLAPSIBLE
-
-let databaseChildSelected = false;
-
 function createCollapsible(directory, db_files) {
-  console.log('createCollapsible called for directory:', directory);
+  const leftPanel = document.getElementById('leftPanel');
 
-  var leftPanel = document.getElementById('leftPanel');
-  var docFrag = document.createDocumentFragment();
-
+  // Remove existing collapsibleParent if it exists
+  const existingCollapsible = document.getElementById(directory + '-parent');
+  if (existingCollapsible) {
+    existingCollapsible.remove();
+  }
 
   // Create a parent div for the collapsible and its content
-  var collapsibleParent = document.createElement('div');
+  const collapsibleParent = document.createElement('div');
+  collapsibleParent.id = directory + '-parent';
+  collapsibleParent.style.width = '90%';
 
-  collapsibleParent.style.width = '90%'; // Garantir que ocupe a largura total
+  // Create the button
+  const collapsibleButton = document.createElement('button');
+  collapsibleButton.id = directory;
+  collapsibleButton.className = 'collapsible';
+  collapsibleButton.innerHTML = `▶ ${directory}`;
+  collapsibleButton.addEventListener('click', toggleCollapsible);
 
-  // Check if the button and the content div already exist
-  var collapsibleButton = document.getElementById(directory);
-  var contentDiv = document.getElementById(directory + '-content');
+  // Create the content div
 
-  // If the button doesn't exist, create it
-  if (!collapsibleButton) {
-    collapsibleButton = document.createElement('button');
-    collapsibleButton.id = directory;
-    collapsibleButton.className = 'collapsible';
+  const contentDiv = document.createElement('div');
+  contentDiv.id = directory + '-content';
+  contentDiv.className = 'left-panel-content'; // Added this class for animation
 
-    // Create span for the arrow
-    var arrowSpan = document.createElement('div');
-    arrowSpan.className = 'arrow-right';
-    arrowSpan.innerHTML = "▶ ";
+  // Create database files list with checkboxes
+  db_files.forEach((databaseFile) => {
+    const filenameWithoutExtension = databaseFile.replace('.db', '');
 
-    // Create span for the directory name
-    var directorySpan = document.createElement('div');
-    directorySpan.textContent = directory;
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'db-file-checkbox';
 
-    // Append the spans to the button
-    collapsibleButton.appendChild(arrowSpan);
-    collapsibleButton.appendChild(directorySpan);
+    const dbFileElem = document.createElement('div');
+    dbFileElem.className = 'child-elem';
+    dbFileElem.textContent = filenameWithoutExtension;
 
-    collapsibleButton.style.width = "100%";
+    // Add click event listener here
+    const tableName = "someTableName";  // replace with the actual table name
+    dbFileElem.addEventListener('click', handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile, tableName));
 
-    collapsibleButton.style.fontFamily = "'Work Sans', sans-serif";
+    const wrapper = document.createElement('div');
+    wrapper.className = 'wrapper';
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(dbFileElem);
 
-    // Set the color of the collapsible button text to dark gray
-    collapsibleButton.style.color = "#333";
-
-    // Set the background color of the button to light gray
-    collapsibleButton.style.backgroundColor = "#f1f1f1";
-
-    // Use Flexbox to vertically center the arrow and the directory name
-    collapsibleButton.style.display = 'flex';
-    collapsibleButton.style.alignItems = 'center';
-
-    // Add a transparent border to the button
-    collapsibleButton.style.border = '2px solid transparent';
-    collapsibleButton.style.borderRadius = '5px';
-
-    // Add an event listener to the button
-    collapsibleButton.addEventListener('click', function () {
-      // If there's an active button and it's not the current button, make its border transparent
-      if (activeCollapsibleButton && activeCollapsibleButton !== this) {
-        activeCollapsibleButton.style.borderColor = 'transparent';
-      }
-
-      // Toggle this button's active state
-      this.classList.toggle('active');
-
-      var arrowSpan = this.children[0];  // get the arrow span
-
-      if (contentDiv.style.display === "block") {
-        contentDiv.style.display = "none";
-        buttonStates[directory] = 'none';
-        arrowSpan.innerHTML = "▶ ";
-        var groupManage = document.getElementById('groupManage');
-        groupManage.style.display = 'none';
-
-        // When collapsing the group, deselect any selected database
-        // When collapsing the group or expanding, deselect any selected database in any group
-        let allChildElements = document.getElementsByClassName('child-elem');
-        for (let i = 0; i < allChildElements.length; i++) {
-          allChildElements[i].classList.remove('focused');
-        }
-        databaseChildSelected = false;
-
-        // Hide the table and table headers when a group is collapsed
-        document.getElementById('myTable').style.display = 'none';
-        document.getElementById("header").style.display = "none";
-
-      } else {
-        contentDiv.style.display = "block";
-        buttonStates[directory] = 'block';
-        arrowSpan.innerHTML = "▼ ";
-
-        // When expanding the group, deselect any selected child
-        let allChildElements = contentDiv.getElementsByClassName('child-elem');
-        for (let i = 0; i < allChildElements.length; i++) {
-          allChildElements[i].classList.remove('focused');
-        }
-      }
-
-      // Change the border color to orange
-      this.style.borderColor = '#f5b57f';
-
-      // Set this button as the active button
-      activeCollapsibleButton = this;
-
-      window.pywebview.api.save_all_states(buttonStates);  // Save the states whenever a button is clicked
-    });
-
-    // Append the button to the new parent div
-    collapsibleParent.appendChild(collapsibleButton);
-  }
-
-  // If the content div doesn't exist, create it
-  // If the content div doesn't exist, create it
-  if (!contentDiv) {
-    contentDiv = document.createElement('div');
-    contentDiv.id = directory + '-content';
-    contentDiv.className = 'content';
-
-    // Add CSS rules to ensure the div behaves as a block-level element
-    contentDiv.style.width = "100%";
-
-    // Set the display state of the content div based on the saved state
-    if (buttonStates[directory] === 'block') {
-      contentDiv.style.display = "block";
-      arrowSpan.innerHTML = "▼ ";
-    } else {
-      contentDiv.style.display = "none";
-      arrowSpan.innerHTML = "▶ ";
-    }
-
-    // Append the content div to the new parent div
-    collapsibleParent.appendChild(contentDiv);
-  }
-
-  // Clear the content div before appending new database file names
-  contentDiv.innerHTML = '';
-
-
-  db_files.forEach(function (databaseFile) {
-    var db_file_elem = document.createElement('div'); // Alterando para 'div'
-    var filenameWithoutExtension = databaseFile.replace('.db', '');
-    db_file_elem.textContent = filenameWithoutExtension;
-  
-    // Add a class to child elements
-    db_file_elem.className = 'child-elem';
-  
-    // Add left padding to align with the title
-    db_file_elem.style.paddingLeft = "5px";
-    db_file_elem.style.marginLeft = "10px"; // Adicionar margem esquerda negativa
-    db_file_elem.style.fontFamily = "'Work Sans', sans-serif";
-    db_file_elem.style.fontSize = "14px";
-    db_file_elem.style.marginTop = "10px";
-    db_file_elem.style.width = '90%'; // Garantindo que ocupe a largura total
-    db_file_elem.style.height = '1.5em'; // Definindo a altura da linha
-    db_file_elem.style.display = 'block'; // Definindo como bloco
-   
-    db_file_elem.style.marginTop = "0px";  // <-- Set to 0 to remove any top margin
-    db_file_elem.style.marginLeft = "2px"; // <-- Reduce margin to bring closer to the checkbox
-    db_file_elem.style.alignSelf = 'center'; // <-- Changed from alignItems to alignSelf
-
-  
-     // Adicionando um checkbox
-     var checkbox = document.createElement('input');
-     checkbox.type = 'checkbox';
-     checkbox.className = 'db-file-checkbox';
-     checkbox.style.margin = '0';  // <-- Add this line to remove default margins
-     checkbox.style.alignSelf = 'center';  // <-- Add this line for vertical alignment
-   
-     // Wrapper to contain the checkbox and the text
-     var wrapper = document.createElement('div');
-     wrapper.style.display = 'flex';
-     wrapper.style.marginLeft = '25px';
-     wrapper.style.alignItems = 'center'; 
-     wrapper.style.gap = '2px';  // <-- Reduced gap to 2p
-  
-  // Adicionando o checkbox e o texto ao wrapper
-  wrapper.appendChild(checkbox);
-  wrapper.appendChild(db_file_elem);
-    
-
-//CHECKBOX INITIALIZATION 
-  // Inside your createCollapsible function
-  var key = `${directory}|${filenameWithoutExtension}`;
-  checkbox.checked = checkBoxStates[key] || false;
-
-
-  checkbox.addEventListener('change', function() {
-    // Update the state of this checkbox in checkBoxStates
-    let key = `${directory}|${filenameWithoutExtension}`;
-    checkBoxStates[key] = this.checked;
-    // Save it
-    saveCheckBoxStates();
-  });
-  
-
-
-
-
-
-
-
-    //----------------------------------------------------------------CLIQUE
-    //----------------------------------------------------------------
-
-    db_file_elem.addEventListener('click', function () {
-
-      hideDataSettingsPanel();
- 
-    // Hide the #rightPanel
-    document.getElementById('rightPanel').style.display = 'none';
-      
-    // Show the #middlePanel without modifying its width
-    document.getElementById('middlePanel').style.display = 'flex';
-    // No need to modify flex-grow here
-
-      //------------------------------------------------------------------CLIQUE
-
-
-      console.log("Database clicked!");
-      // Remove 'focused' class from all children across all sections
-      let allChildElements = document.getElementsByClassName('child-elem');
-      for (let i = 0; i < allChildElements.length; i++) {
-        allChildElements[i].classList.remove('focused');
-      }
-
-      // Deselect the active collapsible button
-      if (activeCollapsibleButton) {
-        activeCollapsibleButton.classList.remove('active');
-        activeCollapsibleButton.style.borderColor = 'transparent';
-        activeCollapsibleButton = null;
-      }
-
-      // Add 'focused' class to the clicked child
-      this.classList.add('focused');
-
-      databaseChildSelected = true;
-
-      // Get reference to the header element
-      var headerElem = document.getElementById('header');
-
-      //Group Manager State
-      var groupManage = document.getElementById('groupManage');
-      groupManage.style.display = 'flex';
-
-      // Get reference to the name of database
-      var selectedDbNameElem = document.getElementById('selectedDbName');
-      selectedDbNameElem.textContent = filenameWithoutExtension;
-
-      // Split the full path into components to get the groupName and databaseName
-      var groupName = directory;  // directory is passed into createCollapsible function
-      var databaseName = databaseFile.replace('.db', '');  // remove the .db extension
-
-
-      //--------------------------------------------------Aqui entra o cache----------------------------------------
-
-      window.pywebview.api.get_tables(directory, databaseFile)
-        .then(function (tableNames) {
-          tableNames.forEach(function (tableName) {
-            //aqui entra o cache
-            fetchData(groupName, databaseName, tableName)
-              .then(data => {
-                console.log(data);
-                if (databaseChildSelected) {
-                  document.getElementById('myTable').style.display = 'table';
-                  headerElem.style.display = 'table';
-                  headerElem.classList.add('showing');
-                  populateTable(data, groupName, databaseName, tableName);
-                } else {
-                  document.getElementById('myTable').innerHTML = "";
-                  document.getElementById('myTable').style.display = 'none';
-                  headerElem.style.display = 'none';
-                  headerElem.classList.remove('showing');
-                }
-              })
-              .catch(error => console.error('Error:', error));
-          });
-        })
-        .catch(function (error) {
-          console.log('Error in get_tables:', error);
-        });
-    });
-
-
-    // Append the p element to the content div
-    //contentDiv.appendChild(db_file_elem);
     contentDiv.appendChild(wrapper);
   });
 
-
-  // Append the main DocumentFragment to the left panel
+  // Append elements
+  collapsibleParent.appendChild(collapsibleButton);
+  collapsibleParent.appendChild(contentDiv);
   leftPanel.appendChild(collapsibleParent);
+}
+
+
+
+// This function will be used as the event listener for dbFileElem click events
+function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile, tableName) {
+  return async function () {  // Make the function async
+ 
+    hideDataSettingsPanel();
+    // Hide the #rightPanel
+    document.getElementById('rightPanel').style.display = 'none';
+    // Show the #middlePanel without modifying its width
+    document.getElementById('middlePanel').style.display = 'flex';
+    // No need to modify flex-grow here
+    // Remove 'child-focused' class from all children
+ 
+    let allChildElements = document.getElementsByClassName('child-elem');
+    for (let i = 0; i < allChildElements.length; i++) {
+      allChildElements[i].classList.remove('child-focused');
+    }
+
+
+    //Group Manager State
+    var groupManage = document.getElementById('groupManage');
+    groupManage.style.display = 'flex';
+
+    // Get reference to the name of database
+    var selectedDbNameElem = document.getElementById('selectedDbName');
+    selectedDbNameElem.textContent = filenameWithoutExtension;
+
+    // Get the table names dynamically
+    try {
+      const tableNames = await window.pywebview.api.get_tables(directory, databaseFile);
+
+      // Assuming you want to use the first table name returned
+      const tableName = tableNames[0] || "defaultTableName";  // replace defaultTableName with a sensible default
+
+      // Populate middle panel with respective database data
+      const data = await fetchData(directory, filenameWithoutExtension, tableName);
+
+      // Now, populate the table
+      populateTable(data, directory, filenameWithoutExtension, tableName);
+    } catch (error) {
+      console.error('Error in get_tables:', error);
+    }
+  
+
+  }
 
 }
 
 
 
 
-//----------------------------------------------------------------POPULATE TABLE----------------------------------------------------------------
-// Aqui tive que adicionar a função os parametros groupName, databaseName e tableName
-//pois, a função da API save_changes chama a função get_database_path que requer estes parâmetros:
-//I need groupName and databaseName because, inside my save_changes function, im my api,  :
-//def save_changes(self, groupName, databaseName, tableName, shortcut, newContent):
-////Yes, we can simplify the process and find a way to ensure that groupName and databaseName are available when needed. Here's a plan of action:
-//Storing groupName and databaseName in populateTable:
-//Instead of extracting the values of groupName and databaseName each time inside the loop, you can pass them as arguments to the populateTable function.
-// This ensures that the function always has access to the required values. 
-//This is especially useful since populateTable is already being called with data specific to a particular database.
-//So, modify the function definition to:
-//function populateTable(data, groupName, databaseName){}}
+// Function to toggle collapsible content
+function toggleCollapsible() {
+  this.classList.toggle('active');
+  const content = this.nextElementSibling;
 
-// Por fim, dentro de createCollapsible, eu chamo a pupulateTable já modificada, com os novos parâmetros
+  if (content.style.maxHeight) {
+    content.style.maxHeight = null;
+    this.innerHTML = `▶ ${this.id}`;
+  } else {
+    content.style.maxHeight = content.scrollHeight + 'px';
+    this.innerHTML = `▼ ${this.id}`;
+  }
+}
 
 
 
@@ -617,7 +359,7 @@ function populateTable(data, groupName, databaseName, tableName) {
 
   // Iterate over data and add new rows
   data.forEach((item, index) => {
-
+ 
     var rowClass = index % 2 === 0 ? 'tr-even' : 'tr-odd';
     // Extract the values from the item
     const { expansion, label, shortcut, format, case: caseChoice } = item;
@@ -627,10 +369,7 @@ function populateTable(data, groupName, databaseName, tableName) {
     row.className = rowClass; // Apply the class to the row
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
-
-
-    // Determine the row class based on the index (even or odd)
-
+    row.dataset.index = index;  // <-- Add this line
 
 
 
@@ -687,21 +426,12 @@ var isSaving = false;
 var jsOperationCompleted = false; // Global variable
 
 async function copyHtmlToClipboard(html) {
-  alert("copyHtmlToClipboard is called with:", html); 
   const item = new ClipboardItem({
     "text/html": new Blob([html], {type: "text/html"})
   });
   await navigator.clipboard.write([item]);
   jsOperationCompleted = true;  // Set the global variable to true
 }
-
-
-//-----------------------------------------------------------------
-//-------------------------------------------------------------------
-//------------------------------------------------------------------
-
-
-
 
 
 
@@ -711,7 +441,6 @@ function handleRowClick() {
 
 // Show the #rightPanel without modifying the width of #middlePanel
 document.getElementById('rightPanel').style.display = 'flex';
-
 
 
   // Deselect the previously selected row, if any
@@ -728,11 +457,13 @@ document.getElementById('rightPanel').style.display = 'flex';
 
 
 
+  const index = this.dataset.index;  // <-- Add this line to get the index
 
+  
   // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
     .then(data => {
-      const rowData = data.find(item => item.shortcut === shortcut);
+      const rowData = data[index];  // Use the index to get the specific row
 
       isEditorUpdate = true;  // Set before updating the editor
       if (rowData) {
@@ -742,23 +473,6 @@ document.getElementById('rightPanel').style.display = 'flex';
         let formattedExpansion = formatArticle(decodedExpansion, tableName);
 
         tinyMCE.get('editor').setContent(formattedExpansion);
-
-
-
-        // Obter o conteúdo renderizado do editor
-        let renderedContent = tinyMCE.get('editor').getContent();
-
-        // Obter o conteúdo renderizado do editor
-
-
-        // Copiar o conteúdo HTML para a área de transferência
-        copyHtmlToClipboard(renderedContent);
-
-
-
-
-
-
 
 
 
@@ -810,16 +524,6 @@ document.getElementById('rightPanel').style.display = 'flex';
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-//--------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------  
 
 function saveLabelValue(newValue) {
@@ -843,6 +547,9 @@ function saveLabelValue(newValue) {
       console.error('Error saving label value:', error);
     });
 }
+
+
+
 
 function initializePyWebView() {
   if (!window.pywebview || !window.pywebview.api) {
