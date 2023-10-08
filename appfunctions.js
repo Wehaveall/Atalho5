@@ -400,17 +400,13 @@ async function populateTable(data, groupName, databaseName, tableName) {
       // Hide progress bar when table is populated
       document.getElementById('progress-container').style.display = 'none';
       document.getElementById('tableContainer').style.overflow = 'auto';
-      progressMessage.textContent = "";  // Set the message
-      
+    
     }
     
    
-    else {
-      
+    else {  
     // Show progress bar
       document.getElementById('progress-container').style.display = 'block';
-      document.getElementById('progress-message');
-      progressMessage.textContent = "Carregando...";  // Set the message
     }
 
   }, false);
