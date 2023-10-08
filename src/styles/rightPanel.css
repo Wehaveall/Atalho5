@@ -1,21 +1,15 @@
 #rightPanel {
     display: none;
-    flex: 2;
+    flex-grow: 1;
     background-color: #f1f1f1;
     flex-direction: column;
-    /* Definir como 100% para ocupar toda a altura disponível */
     align-items: stretch;
-
     padding: 10px;
     justify-content: space-between;
-    /* This will push the elements apart */
     overflow: visible;
     position: relative;
     max-height: calc(100% - 33px);
-    /* Ajuste conforme necessário */
     align-self: flex-start;
-    /* Alinha os painéis no topo */
-
 
 
 }
