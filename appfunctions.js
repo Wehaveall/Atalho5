@@ -1,8 +1,6 @@
-var checkBoxStates = {};  // Object to hold checkbox states
+let left_Panel_Collapsible_States = {};
 
-var appState = {
-  buttonStates: {}
-};
+var appState = {buttonStates: {}};
 
 var activeCollapsibleButton = null;
 var buttonStates = appState.buttonStates;
@@ -64,6 +62,8 @@ function decodeHtml(html) {
   txt.innerHTML = html;
   return txt.value;
 }
+
+
 
 //----------------------------------------------------------------
 //Clique do botão de configuração dos Grupos
@@ -335,23 +335,76 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
 
 
 
+/////////////////////////////////////////////////////////////////    LOAD COLLAPSIBLE STATES   /////////////////////////////////
+// Function to initialize the states of collapsibles based on saved states
+function initializeCollapsibleStates(savedStates) {
+  for (const [collapsibleId, state] of Object.entries(savedStates)) {
+    const collapsibleElement = document.getElementById(collapsibleId);
+    const content = collapsibleElement.nextElementSibling;
 
+    if (state === 'block') {
+      collapsibleElement.classList.add('active');
+      content.style.maxHeight = content.scrollHeight + 'px';
+      collapsibleElement.innerHTML = `▼ ${collapsibleElement.id}`;
+    } else {
+      collapsibleElement.classList.remove('active');
+      content.style.maxHeight = null;
+      collapsibleElement.innerHTML = `▶ ${collapsibleElement.id}`;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////  TOGGLE COLLAPSIBLE    ////////////////////////////////////////////////////////
 // Function to toggle collapsible content
 function toggleCollapsible() {
-  this.classList.toggle('active');
+  
   const content = this.nextElementSibling;
 
+  // Initialize state as 'none'
+  let newState = 'none';
+
+  // Toggle active class
+  this.classList.toggle('active');
+
+  // Existing collapsible toggle logic
   if (content.style.maxHeight) {
     content.style.maxHeight = null;
     this.innerHTML = `▶ ${this.id}`;
   } else {
     content.style.maxHeight = content.scrollHeight + 'px';
     this.innerHTML = `▼ ${this.id}`;
+    newState = 'block';  // Update state to 'block'
   }
+
+  // Capture current state
+  const collapsibleId = this.id;  // Assuming the id is set on the clicked element
+ 
+  left_Panel_Collapsible_States[collapsibleId] = newState;
+
+  pywebview.api.save_all_states(left_Panel_Collapsible_States).then(response => {
+    if (response.status === 'success') {
+      console.log('State updated successfully.');
+    } else {
+      console.log('Failed to update state:', response.message);
+    }
+  });
+
   // Hide the middle and right panels
   document.getElementById('middlePanel').style.display = 'none';
   document.getElementById('rightPanel').style.display = 'none';
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -371,20 +424,18 @@ async function populateTable(data, groupName, databaseName, tableName) {
   progressBar.value = 0;
 
 
-
   // Reference to the table
   var table = document.getElementById('myTable');
   // Clear existing rows (except for the header)
+  
   // Create a new Worker
   const worker = new Worker('worker.js');
- 
  
   while (table.rows.length > 1) {
     table.deleteRow(1);
   }
 
- 
- 
+
   // Listen for messages from the Worker (for progress updates)
   worker.addEventListener('message', function (e) {
     const progress = e.data;
@@ -403,7 +454,6 @@ async function populateTable(data, groupName, databaseName, tableName) {
     
     }
     
-   
     else {  
     // Show progress bar
       document.getElementById('progress-container').style.display = 'block';
@@ -607,7 +657,7 @@ function saveLabelValue(newValue) {
 }
 
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function initializePyWebView() {
   if (!window.pywebview || !window.pywebview.api) {
@@ -615,21 +665,18 @@ function initializePyWebView() {
     return;
   }
 
-
-
+  // Load checkbox states
   window.pywebview.api.load_checkBox_states()
-  .then(states => {
-    checkBoxStates = states;
-    // Initialize checkboxes based on these states
-  });
+    .then(states => {
+      checkBoxStates = states;
+      // Initialize checkboxes based on these states
+    });
 
-
-
-
-
+  // Load all states including button states for collapsibles
   window.pywebview.api.load_all_states()
     .then(states => {
       appState.buttonStates = states;
+      left_Panel_Collapsible_States = states;  // Initialize the left panel states
       return window.pywebview.api.get_all_db_files();
     })
     .then(allDbFiles => {
@@ -637,16 +684,20 @@ function initializePyWebView() {
         let db_files = allDbFiles[directory];
         createCollapsible(directory, db_files);
       }
+      initializeCollapsibleStates(left_Panel_Collapsible_States);  // Initialize collapsibles based on saved states
     })
     .catch(console.error);
 }
-
 document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('pywebviewready', function () {
     if (window.pywebview && window.pywebview.api) {
       console.log("pywebview API is ready");
       initializePyWebView();
 
+
+      pywebview.api.get_initial_states().then(response => {
+        initializeCollapsibleStates(response);
+    });
 
       // Adicione este código em um lugar onde o DOM esteja carregado
 

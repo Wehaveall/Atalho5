@@ -156,6 +156,11 @@ class Api:
         self.events = []
         self.last_event_time = None
 
+    
+    
+    def get_initial_states(self):
+       return self.load_all_states()
+    
     # Triggered when the window is closed
     # Used in: main.py
     def on_closed(self):
@@ -451,6 +456,7 @@ class Api:
             try:
                 with open("state.json", "w") as file:
                     json.dump(states, file)
+                    print("Updated")
             except TypeError as e:
                 logging.error(f"JSON serialization error in save_all_states: {e}")
 
@@ -521,14 +527,19 @@ class Api:
         )
 
         time.sleep(1)
-
         window = get_window()
-
+       
         if window:
             window.moveTo(pos_x, pos_y)
-
         threading.Thread(target=self.call_load_handler_after_delay).start()
         return self.window
+    
+
+
+
+
+
+
 
     # Call the load_handler after a short delay
     # Used in: This API class (self.create_and_position_window)
