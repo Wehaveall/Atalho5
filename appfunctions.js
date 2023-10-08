@@ -285,12 +285,20 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
   return async function () {  // Make the function async
  
     hideDataSettingsPanel();
-    // Hide the #rightPanel
     document.getElementById('rightPanel').style.display = 'none';
-    // Show the #middlePanel without modifying its width
     document.getElementById('middlePanel').style.display = 'flex';
-    // No need to modify flex-grow here
-    // Remove 'child-focused' class from all children
+ 
+
+    //Reset Progress Bar Value here
+    // Reset the progress bar to 0 here TOOOOOOO
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.value = 0;
+    document.getElementById('progress-container').style.display = 'block';
+
+
+    // Hide the table initially
+    document.getElementById('myTable').style.visibility = 'hidden';
+    document.getElementById('tableContainer').style.overflow = 'hidden';
  
     // Remove 'child-focused' class from all children
     let allChildElements = document.getElementsByClassName('child-elem');
@@ -300,13 +308,6 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
 
     // Add 'child-focused' class to the clicked element
     this.classList.add('child-focused');
-
-
-    // Show progress bar
-    const progressBar = document.getElementById('progress-bar');
-    const progressContainer = document.getElementById('progress-container');
-    progressContainer.style.display = 'block';
-    progressBar.value = 0;
 
 
     //Group Manager State
@@ -354,31 +355,64 @@ function toggleCollapsible() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 
 //////////////////////////////////////////////////////////////////    /POPULATE   /////////////////////////////////
 
+
 async function populateTable(data, groupName, databaseName, tableName) {
-  console.log("populateTable called with data:", data);
+  
+  //Reset Progress Bar Value here
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.value = 0;
+
+
+
   // Reference to the table
   var table = document.getElementById('myTable');
   // Clear existing rows (except for the header)
+  // Create a new Worker
+  const worker = new Worker('worker.js');
+ 
+ 
   while (table.rows.length > 1) {
     table.deleteRow(1);
   }
 
  
-
-  // Progress Bar
-  const progressBar = document.getElementById('progress-bar');
-
-  // Create a new Worker
-  const worker = new Worker('worker.js');
-
+ 
   // Listen for messages from the Worker (for progress updates)
   worker.addEventListener('message', function (e) {
     const progress = e.data;
-    progressBar.value = progress;
+    
+    
+    requestAnimationFrame(() => {
+      progressBar.value = progress;  // Update the progress bar within requestAnimationFrame
+    });
+
+ // Make the table visible when progress reaches 100%
+    if (progress >= 100) {
+      table.style.visibility = 'visible';
+      // Hide progress bar when table is populated
+      document.getElementById('progress-container').style.display = 'none';
+      document.getElementById('tableContainer').style.overflow = 'auto';
+      progressMessage.textContent = "";  // Set the message
+      
+    }
+    
+   
+    else {
+      
+    // Show progress bar
+      document.getElementById('progress-container').style.display = 'block';
+      document.getElementById('progress-message');
+      progressMessage.textContent = "Carregando...";  // Set the message
+    }
+
   }, false);
 
   // Start the Worker

@@ -344,20 +344,26 @@
     padding-bottom: 5px;
 }
 
-
-
 #progress-container {
+    display: none;
     text-align: center;
-    margin: 10px;
+    font-size: small;
+    font-family: 'Work Sans', sans-serif;
+     
+}
+
+#progress-bar::not([value="100"]) {
+    display: block;
 }
 
 progress {
     width: 100%;
 }
 
-
-
-
+#progress-message {
+    margin-top: 10px;
+    /* Add some space between the progress bar and the message */
+}
 
 
 
