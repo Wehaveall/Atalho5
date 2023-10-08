@@ -1,4 +1,5 @@
 #middlePanel {
+    
     flex-basis: calc(100% - 500px);  /* Adjust as needed */
     flex-grow: 0;
     margin: 0;
@@ -15,9 +16,6 @@
 
 
 }
-
-
-
 
 
 
@@ -209,14 +207,11 @@
 
 }
 
-
 .settings-item {
     display: block;
     /* Cada item é um bloco separado */
 
 }
-
-
 
 
 #configTitle {
@@ -335,9 +330,6 @@
 }
 
 
-
-
-
 #prefixo {
     height: 40px;
     /* Define a altura como 60 pixels */
@@ -350,6 +342,17 @@
     /* Centraliza o texto horizontalmente */
     padding-top: 10px;
     padding-bottom: 5px;
+}
+
+
+
+#progress-container {
+    text-align: center;
+    margin: 10px;
+}
+
+progress {
+    width: 100%;
 }
 
 

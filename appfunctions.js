@@ -292,10 +292,21 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
     // No need to modify flex-grow here
     // Remove 'child-focused' class from all children
  
+    // Remove 'child-focused' class from all children
     let allChildElements = document.getElementsByClassName('child-elem');
     for (let i = 0; i < allChildElements.length; i++) {
       allChildElements[i].classList.remove('child-focused');
     }
+
+    // Add 'child-focused' class to the clicked element
+    this.classList.add('child-focused');
+
+
+    // Show progress bar
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('progress-container');
+    progressContainer.style.display = 'block';
+    progressBar.value = 0;
 
 
     //Group Manager State
@@ -309,22 +320,16 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
     // Get the table names dynamically
     try {
       const tableNames = await window.pywebview.api.get_tables(directory, databaseFile);
-
       // Assuming you want to use the first table name returned
       const tableName = tableNames[0] || "defaultTableName";  // replace defaultTableName with a sensible default
-
       // Populate middle panel with respective database data
       const data = await fetchData(directory, filenameWithoutExtension, tableName);
-
       // Now, populate the table
       populateTable(data, directory, filenameWithoutExtension, tableName);
     } catch (error) {
       console.error('Error in get_tables:', error);
     }
-  
-
   }
-
 }
 
 
@@ -342,23 +347,49 @@ function toggleCollapsible() {
     content.style.maxHeight = content.scrollHeight + 'px';
     this.innerHTML = `▼ ${this.id}`;
   }
+  // Hide the middle and right panels
+  document.getElementById('middlePanel').style.display = 'none';
+  document.getElementById('rightPanel').style.display = 'none';
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-function populateTable(data, groupName, databaseName, tableName) {
+
+//////////////////////////////////////////////////////////////////    /POPULATE   /////////////////////////////////
+
+async function populateTable(data, groupName, databaseName, tableName) {
   console.log("populateTable called with data:", data);
-
   // Reference to the table
   var table = document.getElementById('myTable');
-
   // Clear existing rows (except for the header)
   while (table.rows.length > 1) {
     table.deleteRow(1);
   }
 
+ 
+
+  // Progress Bar
+  const progressBar = document.getElementById('progress-bar');
+
+  // Create a new Worker
+  const worker = new Worker('worker.js');
+
+  // Listen for messages from the Worker (for progress updates)
+  worker.addEventListener('message', function (e) {
+    const progress = e.data;
+    progressBar.value = progress;
+  }, false);
+
+  // Start the Worker
+  worker.postMessage(data.length);  // Send only the length of data to worker
+
+
+
+
   // Iterate over data and add new rows
-  data.forEach((item, index) => {
+  for (let index = 0; index < data.length; index++) {
+    const item = data[index];
  
     var rowClass = index % 2 === 0 ? 'tr-even' : 'tr-odd';
     // Extract the values from the item
@@ -370,8 +401,6 @@ function populateTable(data, groupName, databaseName, tableName) {
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
     row.dataset.index = index;  // <-- Add this line
-
-
 
     // Convert the HTML expansion to plain text
     var plainExpansion = decodeHtml(expansion.replace(/<[^>]*>/g, ''));
@@ -388,10 +417,8 @@ function populateTable(data, groupName, databaseName, tableName) {
       caseChoice
     });
 
-
     // Formata a expansão das tabelas Jurídicas (tableName "aTable")
     var formattedExpansion = formatExpansion(plainExpansion, tableName);
-
 
     // Populate the cells with content
     cell1.appendChild(createCellContent('truncate', expansion === "" ? label : formattedExpansion));
@@ -399,7 +426,8 @@ function populateTable(data, groupName, databaseName, tableName) {
 
     // Add the row click event
     row.addEventListener('click', handleRowClick);
-  });
+   
+  };
 }
 
 // Helper function to create cell content

@@ -127,42 +127,47 @@
 
 
 
-                  <div id="middlePanel" class="content">
+                  <div id="middlePanel" class="content" style="display: none">
 
-                    <div id="groupManage">
-                      <p id="selectedDbName"></p>
-                      <div id="iconContainer">
-                        <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
-                        <button id="dataSettings" onclick="showDataSettingsPanel()"><img
-                            src="/src/images/data_Settings.png"></button>
+                        <div id="groupManage">
+                          <p id="selectedDbName"></p>
+                          <div id="iconContainer">
+                            <button id="dataAdd" onclick=""><img src="/src/images/data_Add.png"></button>
+                            <button id="dataSettings" onclick="showDataSettingsPanel()"><img
+                                src="/src/images/data_Settings.png"></button>
 
-                      </div>
-                    </div>
-
-
-                    <table id="header" class="content">
-                      <tr>
-                        <td>Descrição/Expansão</td>
-                        <td>Atalho</td>
-                      </tr>
-                    </table>
+                          </div>
+                        </div>
 
 
-
-                    <div id="tableContainer" class="content">
-
-                      <table id="myTable">
-
-                        <thead>
-                          <tr id="nomeDatabase"></tr>
-                        </thead>
+                        <table id="header" class="content">
+                          <tr>
+                            <td>Descrição/Expansão</td>
+                            <td>Atalho</td>
+                          </tr>
+                        </table>
 
 
-                        <tbody>
-                        </tbody>
 
-                        <!-- Table content goes here -->
-                      </table>
+                        <div id="tableContainer" class="content">
+
+                          <table id="myTable">
+
+                            <thead>
+                              <tr id="nomeDatabase"></tr>
+                            </thead>
+
+
+                            <tbody>
+                            </tbody>
+
+                            <!-- Table content goes here -->
+                          </table>
+                        
+                        </div>
+
+                    <div id="progress-container" style="display: none;">
+                      <progress id="progress-bar" max="100" value="0"></progress>
                     </div>
 
 
@@ -337,6 +342,7 @@
 
   </script>
   <script src="macros.js"></script>
+  <script src="worker.js"></script>
   <script src="richTextEditor.js"></script>
   <script src="/src/classes/class_Select.js" type="module"></script>
   <script src="src/classes/class_Select_change.js" type="module"></script>
