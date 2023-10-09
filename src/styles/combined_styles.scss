@@ -1,26 +1,33 @@
 // SCSS - Compilar sempre que salvar
 // Common Variables
-$primary-color: #000;
-$secondary-color: #fff;
-///////////////////////////////////////////////////
-$light-theme-window-bgcolor: #f1f1f1;
-$light-theme-input-bgcolor: white;
-$light-theme-text-color: black;
-///////////////////////////////////////////////////
-$dark-theme-window-bgcolor: rgb(40, 41, 43);
-$dark-theme-input-bgcolor: rgb(75, 76, 82);
-$dark-theme-text-color: white;
-//////////////////////////////////////////////////
+
 
 $font-family: 'Work Sans',sans-serif;
-$focused-orange-color: #fbb347;
+$focused-bg-color: #fbb347;
+
+
+.light-theme {
+    --window-bgcolor: #f1f1f1;
+    --input-bgcolor: white;
+    --text-color: black;
+}
+
+
+.dark-theme {
+    --window-bgcolor: rgb(40, 41, 43);
+    --input-bgcolor: rgb(75, 76, 82);
+    --text-color: white;
+}
+
+
+
 
 
 // Styles from leftPanel.css
 #leftPanel {
     
     max-height: calc(100vh - 50px);
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     flex: 0.2;
     min-width: 215px;
     flex-direction: column;
@@ -36,9 +43,8 @@ $focused-orange-color: #fbb347;
     font-size: 16px;
     width: 100%;
     font-family: $font-family;
-    color: $light-theme-text-color;
-    /* Set text color to black */
-    background-color: $light-theme-window-bgcolor;
+    color: var(--window-textcolor);
+    background-color: var(--window-bgcolor);
     display: flex;
     align-items: center;
     border: 2px solid transparent;
@@ -47,7 +53,7 @@ $focused-orange-color: #fbb347;
 }
 
 .focused {
-    background-color: $focused-orange-color;
+    background-color: $focused-bg-color;
 }
 
 
@@ -56,7 +62,7 @@ $focused-orange-color: #fbb347;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
 }
 
 .arrow-right,
@@ -66,7 +72,7 @@ $focused-orange-color: #fbb347;
 
 
 input[type=text] {
-    background-color: $light-theme-input-bgcolor;
+    background-color:var(--input-bgcolor);
     padding: 5px;
     border-radius: 10px;
     font-size: 12px;
@@ -75,7 +81,7 @@ input[type=text] {
 }
 
 input[type="text"]:focus {
-    border: 2px solid $focused-orange-color;
+    border: 2px solid $focused-bg-color;
     outline: none;
 }
 
@@ -142,7 +148,7 @@ input[type=text] {
 
 
 .child-focused {
-    border-color: $focused-orange-color;
+    border-color: $focused-bg-color;
 }
 
 .db-file-checkbox {
@@ -226,7 +232,7 @@ input[type=text] {
     font-family: $font-family;
     font-size: small;
     display: none;
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     width: 100%;
     table-layout: fixed;
 }
@@ -272,7 +278,7 @@ input[type=text] {
 
 
 #myTable tr.selected {
-    background-color: $focused-orange-color;
+    background-color: $focused-bg-color;
 }
 
 .tr-even {
@@ -295,7 +301,7 @@ input[type=text] {
 .data-settings-panel {
     display: none;
     flex-grow: 1;
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     flex-direction: column;
 }
 
@@ -426,7 +432,7 @@ progress {
 #rightPanel {
     display: none;
     flex-grow: 1;
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     flex-direction: column;
     align-items: stretch;
     padding: 10px;
@@ -493,7 +499,7 @@ progress {
 
 #duplicate:hover,
 #delete:hover {
-    background-color: $focused-orange-color
+    background-color: $focused-bg-color
 }
 
 #contentType {
@@ -556,7 +562,7 @@ progress {
 }
 
 #labelRight input:focus {
-    border: 2px solid $focused-orange-color;
+    border: 2px solid $focused-bg-color;
 }
 
 
@@ -584,7 +590,7 @@ progress {
 }
 
 #atalhoRight input:focus {
-    border: 2px solid $focused-orange-color;
+    border: 2px solid $focused-bg-color;
 }
 
 
@@ -641,7 +647,7 @@ progress {
 }
 
 .custom-select-options {
-  background-color: $light-theme-window-bgcolor;
+  background-color: var(--window-bgcolor);
   display: none;
   position: absolute;
   padding: 0;
@@ -702,7 +708,7 @@ html {
 }
 #loadingScreen .loader {
   border: 5px solid #f3f3f3;
-  border-top: 5px solid $focused-orange-color;
+  border-top: 5px solid $focused-bg-color;
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -733,7 +739,7 @@ html {
 
 .content {
   overflow: visible;
-  background-color: $light-theme-window-bgcolor;
+  background-color: var(--window-bgcolor);
   display: flex;
   height: 100%;
   width: 100%;
@@ -750,7 +756,7 @@ html {
   margin: 0;
   padding: 0;
   height: 50px;
-  background-color: $focused-orange-color;
+  background-color: $focused-bg-color ;
 }/*# sourceMappingURL=style.css.map */
 
 // Styles from style.scss
@@ -761,7 +767,7 @@ $loader-border-top: #fbb347;
 $main-bg: green;
 $main-container-bg: deeppink;
 $content-bg: #f1f1f1;
-$bottom-panel-bg: #fbb347;
+
 
 // Global settings
 * {
@@ -855,12 +861,12 @@ html {
   margin: 0;
   padding: 0;
   height: 50px;
-  background-color: $bottom-panel-bg;
+  background-color: $focused-bg-color;
 }
 
 // Styles from tabMacros.css
 #eventos {
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     max-height: 300px;
     overflow: auto;
 }
@@ -869,9 +875,9 @@ html {
 .tab {
     overflow: visible;
     display: flex;
-    /* Add this line */
     border: 1px solid #ccc;
-    background-color: $light-theme-window-bgcolor; 
+    background-color: var(--window-bgcolor, #f1f1f1);
+    justify-content: space-between;
 }
 
 
@@ -897,7 +903,7 @@ html {
 }
 
 .tab button.active {
-    background-color: $focused-orange-color;
+    background-color: $focused-bg-color;
 }
 
 .tabcontent {
@@ -947,7 +953,7 @@ html {
 .left-column-tab4 {
     font-family: $font-family;
     width: 230px;
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     margin-left: 0;
 }
 
@@ -986,7 +992,7 @@ html {
 
 .right-column-tab4 {
     display: none;
-    background-color: $light-theme-window-bgcolor;
+    background-color: var(--window-bgcolor);
     height: 100%;
     flex-grow: 1;
     font-family: $font-family;
@@ -1010,4 +1016,70 @@ height: 50px
     margin: 10px;
     width: 40px;
     height: 40px;
+}
+
+
+
+
+/////////////////////////////       DARK MODE TOGGLE      //////////////////////////////////////
+
+
+.darkmode-container {
+    margin-right: 100px;
+    display: flex;
+    align-items: center;
+}
+
+label {
+    top: 1px;
+    width: 40px;
+    height: 20px;
+    position: relative;
+    display: block;
+    background: #ebebeb;
+    border-radius: 10px;
+    box-shadow: inset 0px 5px 15px rgba(0, 0, 0, 0.4), inset 0px -5px 15px rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+}
+
+label:after {
+    top: 1px;
+        /* Adjusts the position to center it vertically */
+        left: 1px;
+        /* Adjusts the position to center it horizontally */
+    content: "";
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    background: linear-gradient(180deg, #ffcc89, #d8860b);
+    border-radius: 18px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+#darkmode-toggle {
+    width: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+input:checked+label {
+    background: #242424;
+}
+
+input:checked+label:after {
+   
+    left: 39px;
+    transform: translateX(-100%);
+    background: linear-gradient(180deg, #777, #3a3a3a);
+}
+
+label,
+label:after {
+    transition: 0.3s
+}
+
+label:active:after {
+    width: 26px;
 }

@@ -1,7 +1,19 @@
 @charset "UTF-8";
+.light-theme {
+  --window-bgcolor: #f1f1f1;
+  --input-bgcolor: white;
+  --text-color: black;
+}
+
+.dark-theme {
+  --window-bgcolor: rgb(40, 41, 43);
+  --input-bgcolor: rgb(75, 76, 82);
+  --text-color: white;
+}
+
 #leftPanel {
   max-height: calc(100vh - 50px);
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   flex: 0.2;
   min-width: 215px;
   flex-direction: column;
@@ -16,9 +28,8 @@
   font-size: 16px;
   width: 100%;
   font-family: "Work Sans", sans-serif;
-  color: black;
-  /* Set text color to black */
-  background-color: #f1f1f1;
+  color: var(--window-textcolor);
+  background-color: var(--window-bgcolor);
   display: flex;
   align-items: center;
   border: 2px solid transparent;
@@ -35,7 +46,7 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
 }
 
 .arrow-right,
@@ -44,7 +55,7 @@
 }
 
 input[type=text] {
-  background-color: white;
+  background-color: var(--input-bgcolor);
   padding: 5px;
   border-radius: 10px;
   font-size: 12px;
@@ -194,7 +205,7 @@ input[type=text] {
   font-family: "Work Sans", sans-serif;
   font-size: small;
   display: none;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   width: 100%;
   table-layout: fixed;
 }
@@ -261,7 +272,7 @@ input[type=text] {
 .data-settings-panel {
   display: none;
   flex-grow: 1;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   flex-direction: column;
 }
 
@@ -385,7 +396,7 @@ progress {
 #rightPanel {
   display: none;
   flex-grow: 1;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   flex-direction: column;
   align-items: stretch;
   padding: 10px;
@@ -589,7 +600,7 @@ progress {
 }
 
 .custom-select-options {
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   display: none;
   position: absolute;
   padding: 0;
@@ -685,7 +696,7 @@ html {
 
 .content {
   overflow: visible;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   display: flex;
   height: 100%;
   width: 100%;
@@ -789,7 +800,7 @@ html {
 }
 
 #eventos {
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   max-height: 300px;
   overflow: auto;
 }
@@ -797,9 +808,9 @@ html {
 .tab {
   overflow: visible;
   display: flex;
-  /* Add this line */
   border: 1px solid #ccc;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor, #f1f1f1);
+  justify-content: space-between;
 }
 
 .tablinks {
@@ -867,7 +878,7 @@ html {
 .left-column-tab4 {
   font-family: "Work Sans", sans-serif;
   width: 230px;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   margin-left: 0;
 }
 
@@ -904,7 +915,7 @@ html {
 
 .right-column-tab4 {
   display: none;
-  background-color: #f1f1f1;
+  background-color: var(--window-bgcolor);
   height: 100%;
   flex-grow: 1;
   font-family: "Work Sans", sans-serif;
@@ -928,4 +939,63 @@ html {
   margin: 10px;
   width: 40px;
   height: 40px;
+}
+
+.darkmode-container {
+  margin-right: 100px;
+  display: flex;
+  align-items: center;
+}
+
+label {
+  top: 1px;
+  width: 40px;
+  height: 20px;
+  position: relative;
+  display: block;
+  background: #ebebeb;
+  border-radius: 10px;
+  box-shadow: inset 0px 5px 15px rgba(0, 0, 0, 0.4), inset 0px -5px 15px rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+label:after {
+  top: 1px;
+  /* Adjusts the position to center it vertically */
+  left: 1px;
+  /* Adjusts the position to center it horizontally */
+  content: "";
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  background: linear-gradient(180deg, #ffcc89, #d8860b);
+  border-radius: 18px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+#darkmode-toggle {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
+input:checked + label {
+  background: #242424;
+}
+
+input:checked + label:after {
+  left: 39px;
+  transform: translateX(-100%);
+  background: linear-gradient(180deg, #777, #3a3a3a);
+}
+
+label,
+label:after {
+  transition: 0.3s;
+}
+
+label:active:after {
+  width: 26px;
 }/*# sourceMappingURL=combined_styles.css.map */
