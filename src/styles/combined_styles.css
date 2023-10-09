@@ -36,11 +36,6 @@
   background-color: #fbb347;
 }
 
-.active,
-.collapsible:hover {
-  background-color: #d2c8c8;
-}
-
 .listing {
   padding: 0 18px;
   max-height: 0;

@@ -355,20 +355,25 @@ function initializeCollapsibleStates(savedStates) {
 }
 
 
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////  TOGGLE COLLAPSIBLE    ////////////////////////////////////////////////////////
 // Function to toggle collapsible content
+// Keep track of the last clicked collapsible
+let lastClickedCollapsible = null;
+
 function toggleCollapsible() {
-  
+
   const content = this.nextElementSibling;
+
+  // Remove 'focused' class from the last clicked collapsible
+  if (lastClickedCollapsible) {
+    lastClickedCollapsible.classList.remove('focused');
+  }
+
+  // Add 'focused' class to the currently clicked collapsible
+  this.classList.add('focused');
+
+  // Update the last clicked collapsible
+  lastClickedCollapsible = this;
 
   // Initialize state as 'none'
   let newState = 'none';
@@ -388,7 +393,7 @@ function toggleCollapsible() {
 
   // Capture current state
   const collapsibleId = this.id;  // Assuming the id is set on the clicked element
- 
+
   left_Panel_Collapsible_States[collapsibleId] = newState;
 
   pywebview.api.save_all_states(left_Panel_Collapsible_States).then(response => {
@@ -403,6 +408,7 @@ function toggleCollapsible() {
   document.getElementById('middlePanel').style.display = 'none';
   document.getElementById('rightPanel').style.display = 'none';
 }
+
 
 
 
