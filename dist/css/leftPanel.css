@@ -1,0 +1,154 @@
+@charset "UTF-8";
+#leftPanel {
+  max-height: calc(100vh - 50px);
+  background-color: #f1f1f1;
+  flex: 0.2;
+  /* Adjust the flex value as needed */
+  min-width: 215px;
+  /* Keep the width as needed */
+  flex-direction: column;
+  /* Exibir em coluna */
+  overflow-y: auto;
+  /* Add this if you want to push the button to the right */
+  display: flex;
+  align-items: flex-start;
+  /* Alinhar os itens à esquerda */
+  justify-content: flex-start;
+  /* Alinhar os itens ao topo */
+  flex-shrink: 0; /* Prevents shrinking */
+}
+
+.collapsible {
+  font-size: 16px;
+  width: 100%;
+  font-family: "Work Sans", sans-serif;
+  color: #000;
+  /* Set text color to black */
+  background-color: #f1f1f1;
+  display: flex;
+  align-items: center;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.focused {
+  background-color: #fbb347;
+}
+
+.active,
+.collapsible:hover {
+  background-color: #d2c8c8;
+}
+
+.listing {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+
+.arrow-right,
+.arrow-down {
+  margin-right: 5px;
+}
+
+input[type=text] {
+  background-color: white;
+  padding: 5px;
+  border-radius: 10px;
+  font-size: 12px;
+  border: 2px solid #ccc;
+  /* border color when not in focus */
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
+  /* Horizontal, vertical, blur, color */
+}
+
+input[type=text]:focus {
+  border: 2px solid rgb(232, 159, 15);
+  /* outline:remover a borda padrão preta, senão não adianta setar cor */
+  outline: none;
+}
+
+/*-------------------------------------------------- Botão de Adicionar novo grupo */
+#topLeftContent {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  /* To align items vertically centered */
+  padding: 10px;
+  /* Add some padding around the items inside the div */
+}
+
+input[type=text] {
+  flex-grow: 1;
+  /* This will allow the input field to take up the remaining space */
+  margin-right: 10px;
+  /* Add some space to the right of the input field */
+}
+
+#folderAdd {
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  appearance: none;
+}
+
+#folderAdd img {
+  height: 25px;
+  width: 25px;
+  background: none;
+}
+
+.left-panel-content {
+  transition: max-height 0.3s ease-in-out;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.collapsible.active + .left-panel-content {
+  max-height: 500px;
+  /* Adjust the height as per your requirement */
+}
+
+/* Wrapper styles */
+.wrapper {
+  display: flex;
+  /* Ensures elements within wrapper are inline */
+  align-items: center;
+  /* Vertically aligns items in the center */
+}
+
+.child-elem {
+  border: 2px solid transparent;
+  /* Add a transparent border */
+  border-radius: 10px;
+  /* Add rounded corners */
+  padding-left: 4px;
+  /* Horizontal padding */
+  padding-top: 2px;
+  /* Vertical padding */
+  padding-bottom: 2px;
+  /* Vertical padding */
+  padding-left: 4px;
+  margin-left: 5px;
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  margin-top: 5px;
+  width: 100%;
+  height: 1.9em;
+}
+
+.child-focused {
+  border-color: orange;
+}
+
+.db-file-checkbox {
+  margin-top: 6px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/*# sourceMappingURL=leftPanel.css.map */

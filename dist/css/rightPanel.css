@@ -1,0 +1,184 @@
+@charset "UTF-8";
+#rightPanel {
+  display: none;
+  flex-grow: 1;
+  background-color: #f1f1f1;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 10px;
+  justify-content: space-between;
+  overflow: visible;
+  position: relative;
+  max-height: calc(100% - 33px);
+  align-self: flex-start;
+}
+
+#shortcutName {
+  margin: 3px;
+  font-family: "Work Sans", sans-serif;
+  flex-grow: 1;
+  height: 25px;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+
+#shortcutName button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#shortcutName .buttons-container {
+  display: flex;
+}
+
+#duplicate {
+  margin-right: 10px;
+  /* Add this line to create space on the right side of the duplicate button */
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  border: none;
+  background: none;
+  align-content: center;
+}
+
+#delete {
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  border: none;
+  background: none;
+  align-content: center;
+}
+
+#duplicate img,
+#delete img {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  align-content: center;
+}
+
+#duplicate:hover,
+#delete:hover {
+  background-color: #fbb347;
+}
+
+#contentType {
+  overflow: visible;
+  margin-left: -2px;
+  margin-right: -2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  box-sizing: border-box;
+  font-family: "Work Sans", sans-serif;
+  font-size: small;
+  height: 30px;
+  position: relative;
+  z-index: 10;
+}
+
+#contentType select {
+  font-family: inherit;
+  /* Isso garante que o <select> use a mesma fonte do div pai */
+  font-size: inherit;
+  /* Isso garante que o <select> use o mesmo tamanho de fonte do div pai */
+}
+
+#editor {
+  -ms-overflow-style: none;
+  overflow: auto;
+  flex-grow: 1;
+  /* Permitir que o editor cresça para ocupar o espaço disponível */
+  flex-shrink: 1;
+  flex-basis: 0;
+  overflow-y: auto;
+  min-height: 400px;
+  z-index: 5;
+  /* Animate all properties over 0.3 seconds with ease timing */
+}
+
+#inputContainer {
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  /* Stack children vertically */
+  flex-grow: 0;
+  /* Prevent it from growing */
+  flex-shrink: 0;
+  /* Prevent it from shrinking */
+}
+
+#labelRight {
+  padding-bottom: 7px;
+  padding-top: 7px;
+  display: flex;
+  width: 100%;
+  margin: 0;
+  /* Reset margin */
+  /* Reset padding */
+  /* Make this a flex container */
+  /* Take up all available horizontal space */
+}
+
+#labelRight input {
+  width: 100%;
+  box-sizing: border-box;
+  /* Include padding and border in the width */
+  margin: 0;
+  /* Reset margin */
+  padding: 5px;
+}
+
+#labelRight input:focus {
+  border: 2px solid rgb(232, 159, 15);
+}
+
+#rightInputs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Center-align vertically */
+  overflow: visible;
+  flex-grow: 1;
+}
+
+#atalhoRight {
+  flex-grow: 1;
+}
+
+#atalhoRight input {
+  font-family: "Work Sans", sans-serif;
+  border: none;
+  height: 30px;
+  width: 175px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  width: 70%;
+  border: 2px solid #ccc;
+}
+
+#atalhoRight input:focus {
+  border: 2px solid rgb(232, 159, 15);
+}
+
+/* Mudança nos select customizados - Tamanho e fonte*/
+.escolha .custom-select-container .custom-select-value {
+  width: 250px;
+  /* Adjust to your desired width */
+  font-size: 14px;
+}
+
+.case .custom-select-container .custom-select-value {
+  width: 290px;
+  /* Adjust to your desired width */
+  font-size: 14px;
+}
+
+/*# sourceMappingURL=rightPanel.css.map */

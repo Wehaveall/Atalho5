@@ -1,0 +1,1085 @@
+// SCSS - Compilar sempre que salvar
+// Common Variables
+$primary-color: #000;
+$secondary-color: #fff;
+$font-family: 'Work Sans',sans-serif;
+$focused-orange-color: #fbb347;
+
+
+// Styles from leftPanel.css
+#leftPanel {
+    
+    max-height: calc(100vh - 50px);
+    background-color: #f1f1f1;
+    flex: 0.2;
+    /* Adjust the flex value as needed */
+    min-width: 215px;
+    /* Keep the width as needed */
+    flex-direction: column;
+    /* Exibir em coluna */
+    overflow-y: auto;
+
+    /* Add this if you want to push the button to the right */
+    display: flex;
+    align-items: flex-start;
+    /* Alinhar os itens à esquerda */
+    justify-content: flex-start;
+    /* Alinhar os itens ao topo */
+
+    flex-shrink: 0; /* Prevents shrinking */
+
+}
+
+.collapsible {
+    font-size: 16px;
+    width: 100%;
+    font-family: $font-family;
+    color: #000;
+    /* Set text color to black */
+    background-color: #f1f1f1;
+    display: flex;
+    align-items: center;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.focused {
+    background-color: $focused-orange-color;
+}
+
+
+.active,
+.collapsible:hover {
+    background-color: #d2c8c8;
+}
+
+.listing {
+
+
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: #f1f1f1;
+}
+
+.arrow-right,
+.arrow-down {
+
+    margin-right: 5px;
+}
+
+
+input[type=text] {
+
+    background-color: white;
+    padding: 5px;
+
+    border-radius: 10px;
+    font-size: 12px;
+    border: 2px solid #ccc;
+    /* border color when not in focus */
+    box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
+    /* Horizontal, vertical, blur, color */
+
+}
+
+input[type="text"]:focus {
+
+    border: 2px solid $focused-orange-color;
+    /* outline:remover a borda padrão preta, senão não adianta setar cor */
+    outline: none;
+
+}
+
+/*-------------------------------------------------- Botão de Adicionar novo grupo */
+
+#topLeftContent {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    /* To align items vertically centered */
+    padding: 10px;
+    /* Add some padding around the items inside the div */
+}
+
+input[type=text] {
+    flex-grow: 1;
+    /* This will allow the input field to take up the remaining space */
+    margin-right: 10px;
+    /* Add some space to the right of the input field */
+}
+
+#folderAdd {
+    border: none;
+    margin: 0;
+    padding: 0;
+    background: none;
+    appearance: none;
+}
+
+#folderAdd img {
+    height: 25px;
+    width: 25px;
+    background: none;
+}
+
+
+.left-panel-content {
+    transition: max-height 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.collapsible.active+.left-panel-content {
+    max-height: 500px;
+    /* Adjust the height as per your requirement */
+}
+/* Wrapper styles */
+.wrapper {
+    display: flex;
+    /* Ensures elements within wrapper are inline */
+    align-items: center;
+    /* Vertically aligns items in the center */
+}
+
+.child-elem {
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 4px;
+    margin-left: 5px;
+    font-family: $font-family;
+    font-size: 14px;
+    margin-top: 5px;
+    width: 100%;
+    height: 1.9em;
+}
+
+
+.child-focused {
+    border-color: $focused-orange-color;
+}
+
+.db-file-checkbox {
+    margin-top: 6px;
+    margin-left: 10px;
+    vertical-align: middle; 
+}
+
+// Styles from middlePanel.css
+#middlePanel {
+    flex-basis: calc(100% - 500px);  /* Adjust as needed */
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
+    height: calc(100vh - 78px);
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+    max-height: calc(100% - 15px);
+    align-self: flex-start;
+}
+
+
+
+
+#groupManage {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    font-family: $font-family;
+    border-bottom: 1px solid #777777;
+    line-height: 8px;
+}
+
+
+
+#iconContainer {
+    display: flex;
+    align-items: center;
+
+}
+
+
+
+
+#dataSettings,
+#dataAdd {
+
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+#dataSettings img,
+#dataAdd img {
+    height: 25px;
+    width: auto;
+}
+
+#dataSettings:hover,
+#dataAdd:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#dataSettings {
+    right: 0;
+}
+
+#dataAdd {
+    right: 30px;
+}
+
+
+#tableContainer {
+    flex: 1;
+    overflow-y: auto;
+}
+
+
+#header {
+    flex: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-family: $font-family;
+    font-size: small;
+    display: none;
+    background-color: #f1f1f1;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#header.showing {
+    display: table;
+}
+
+#header td:first-child {
+    width: 70%;
+}
+
+#header td:last-child {
+    width: 30%;
+    text-align: right;
+}
+
+
+#myTable {
+    flex: 1;
+    padding: 0;
+    font-size: small;
+    font-family: $font-family;
+    background-color: white;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    table-layout: fixed;
+    /* Add this line */
+
+}
+
+
+#myTable th,
+#myTable td {
+    padding: 2px;
+    line-height: 1.2;
+}
+
+#myTable tr {
+    margin: 0;
+    padding: 2px;
+    line-height: 1.2;
+    /* Adjust line height as needed */
+}
+
+
+#myTable tr.selected {
+    background-color: $focused-orange-color;
+}
+
+.tr-even {
+    background-color: #ffffff;
+    /* branco */
+}
+
+.tr-odd {
+    background-color: #fafafa;
+    /* cinza claro */
+}
+
+
+
+/* Middle Panel text space management */
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*-------------------------------------------------------------------      
+
+/* Painel de Configurações do Grupo */
+.data-settings-panel {
+    display: none;
+    /* Inicialmente oculto */
+    flex-grow: 1;
+    /* Permitir que ele ocupe todo o espaço disponível */
+    background-color: #f1f1f1;
+    /* Cor vermelha */
+    flex-direction: column;
+    /* Organizar os itens verticalmente */
+
+}
+
+.settings-item {
+    display: block;
+    /* Cada item é um bloco separado */
+
+}
+
+
+#configTitle {
+    height: 45px;
+    /* Define a altura como 60 pixels */
+    border: 2px solid #000;
+    /* Define uma borda sólida com 2 pixels de espessura e cor preta */
+    display: flex;
+    /* Utiliza o flex para centralizar o conteúdo */
+    align-items: center;
+    /* Centraliza o texto verticalmente */
+    justify-content: left;
+    /* Centraliza o texto horizontalmente */
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+/*-------------------------------------------------------------------      
+/* NOMEGRUPO*/
+
+
+#nomeGrupo {
+    font-family: $font-family;
+    height: 40px;
+    margin-left: 50px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: left;
+    padding-top: 25px;
+    padding-bottom: 5px;
+}
+
+
+#nomeGrupoInput {
+    margin-left: 10px;
+    /* Adiciona uma margem à esquerda para separar o input do texto */
+}
+
+/*-------------------------------------------------------------------      
+/* NOTASGRUPO*/
+
+#notasGrupo {
+    height: 40px;
+    margin-left: 50px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: left;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+#notasGrupoInput {
+    margin-left: 10px;
+    margin-right: 10px;
+    flex-grow: 1;
+    border-radius: 10px;
+}
+
+
+#em_Grupo {
+    height: 40px;
+    margin-left: 50px;
+    margin-right: 10px;
+    display: flex;
+    padding-top: 100px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#quando_Grupo {
+    height: 40px;
+    margin-left: 50px;
+    margin-right: 10px;
+    display: flex;
+    padding-top: 100px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quando .custom-select-container .custom-select-value {
+    width: 470px;
+    font-size: 14px;
+}
+
+
+.quem .custom-select-container .custom-select-value {
+    width: 470px;
+    font-size: 14px;
+}
+
+
+#prefixo {
+    height: 40px;
+    margin-left: 50px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: left;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+#progress-container {
+    display: none;
+    text-align: center;
+    font-size: small;
+    font-family: $font-family;
+     
+}
+
+#progress-bar::not([value="100"]) {
+    display: block;
+}
+
+progress {
+    width: 100%;
+}
+
+#progress-message {
+    margin-top: 10px;
+    /* Add some space between the progress bar and the message */
+}
+
+
+
+#middleAndRightContainer {
+    display: flex;
+    flex: 1;
+    align-self: flex-start;
+}
+
+// Styles from rightPanel.css
+#rightPanel {
+    display: none;
+    flex-grow: 1;
+    background-color: #f1f1f1;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    justify-content: space-between;
+    overflow: visible;
+    position: relative;
+    max-height: calc(100% - 33px);
+    align-self: flex-start;
+}
+
+
+#shortcutName {
+    margin: 3px;
+    font-family: $font-family;
+    flex-grow: 1;
+    height: 25px;
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+
+}
+
+#shortcutName button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+#shortcutName .buttons-container {
+    display: flex;
+}
+
+#duplicate {
+    margin-right: 10px;
+    /* Add this line to create space on the right side of the duplicate button */
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    border: none;
+    background: none;
+    align-content: center;
+}
+
+#delete {
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    border: none;
+    background: none;
+    align-content: center;
+}
+
+#duplicate img,
+#delete img {
+
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    align-content: center;
+
+
+}
+
+
+
+#duplicate:hover,
+#delete:hover {
+
+    background-color: $focused-orange-color
+}
+
+
+#contentType {
+    overflow: visible;
+    margin-left: -2px;
+    margin-right: -2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    box-sizing: border-box;
+    font-family: $font-family;
+    font-size: small;
+    height: 30px;
+    position: relative;
+    z-index: 10;
+
+
+}
+
+
+
+#contentType select {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+
+
+
+#editor {
+    -ms-overflow-style: none;
+    overflow: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow-y: auto;
+    min-height: 400px;
+    z-index: 5;
+}
+
+
+
+
+#inputContainer {
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+
+#labelRight {
+    padding-bottom: 7px;
+    padding-top: 7px;
+    display: flex;
+    width: 100%;
+    margin: 0;
+}
+
+#labelRight input {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 5px;
+}
+
+#labelRight input:focus {
+    border: 2px solid $focused-orange-color;
+}
+
+
+#rightInputs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: visible;
+    flex-grow: 1;
+
+}
+
+#atalhoRight {
+    flex-grow: 1;
+}
+
+#atalhoRight input {
+    font-family: $font-family;
+    border: none;
+    height: 30px;
+    width: 175px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    width: 70%;
+    border: 2px solid #ccc;
+}
+
+#atalhoRight input:focus {
+    border: 2px solid $focused-orange-color;
+}
+
+
+.escolha .custom-select-container .custom-select-value {
+    width: 250px;
+    font-size: 14px;
+}
+
+
+.case .custom-select-container .custom-select-value {
+    width: 290px;
+    font-size: 14px;
+}
+
+// Styles from select.css
+.custom-select-container,
+.custom-select-value,
+.custom-select-options,
+.custom-select-option {
+  box-sizing: border-box;
+}
+
+.custom-select-container {
+  display: inline-block;
+  position: relative;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
+
+}
+
+.custom-select-value {
+  display: flex;
+  align-items: center;
+  width: 250px;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+  padding: .25rem .5rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.15rem 0.5rem;
+  /* reduced padding */
+  font-size: 12px;
+  /* adjusted font size */
+}
+
+.custom-select-container:focus>.custom-select-value {
+  border-width: 2px;
+  outline: none;
+}
+
+.custom-select-value::after {
+  content: '';
+  display: inline-block;
+  border: 4px solid transparent;
+  border-top-color: #ccc;
+  margin-left: 12px;
+  margin-top: 4px;
+}
+
+.custom-select-options {
+  background-color: #f1f1f1;
+  display: none;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: 2px solid #ccc;
+  width: 100%;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+
+}
+
+.custom-select-options.show {
+  display: block;
+}
+
+.custom-select-option {
+  padding: 0.15rem 0.5rem;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.custom-select-option:hover {
+  background-color: #fce3be;
+}
+
+.custom-select-option.selected {
+  background-color: #ccc;
+}
+
+//////////////////////////////////////////////////////////////////// Styles from style.css
+* {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: green;
+}
+
+#loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#loadingScreen .loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid $focused-orange-color;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+}
+#loadingScreen #loadingText {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+@keyframes spin {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
+}
+.mainContainer {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 50px);
+  width: 100vw;
+  background-color: deeppink;
+  align-self: flex-start;
+}
+
+.content {
+  overflow: visible;
+  background-color: #f1f1f1;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  font-family: $font-family;
+  margin-right: 5px;
+  align-self: flex-start;
+}
+
+#bottomPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 50px;
+  background-color: $focused-orange-color;
+}/*# sourceMappingURL=style.css.map */
+
+// Styles from style.scss
+// Define commonly used variables
+$loading-screen-bg: rgba(255, 255, 255, 0.9);
+$loader-border: #f3f3f3;
+$loader-border-top: #fbb347;
+$main-bg: green;
+$main-container-bg: deeppink;
+$content-bg: #f1f1f1;
+$bottom-panel-bg: #fbb347;
+
+// Global settings
+* {
+  box-sizing: border-box;
+}
+
+// Body and HTML settings
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: $main-bg;
+}
+
+// Loading screen
+#loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $loading-screen-bg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .loader {
+    border: 5px solid $loader-border;
+    border-top: 5px solid $loader-border-top;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+  }
+
+  #loadingText {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+// Spin animation
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Main container
+.mainContainer {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 50px); // Adjust for bottomPanel
+  width: 100vw;
+  background-color: $main-container-bg;
+  align-self: flex-start;
+}
+
+// Content
+.content {
+  overflow: visible;
+  background-color: $content-bg;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  font-family: $font-family;
+  margin-right: 5px; // add this line
+  align-self: flex-start;
+}
+
+// Bottom panel
+#bottomPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 50px;
+  background-color: $bottom-panel-bg;
+}
+
+// Styles from tabMacros.css
+#eventos {
+    background-color: #f1f1f1;
+    max-height: 300px;
+    overflow: auto;
+}
+
+// Styles from tabs.css
+.tab {
+    overflow: visible;
+    display: flex;
+    /* Add this line */
+    border: 1px solid #ccc;
+    background-color: #f1f1f1; 
+}
+
+
+.tablinks {
+    height: 30px;
+}
+
+
+.tab button {
+    padding: 6, 3;
+    font-family: $font-family;
+    background-color: inherit;
+    display: inline-block;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 12px;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tab button.active {
+    background-color: $focused-orange-color;
+}
+
+.tabcontent {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+.tab-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px);
+    width: 100%;
+    flex-grow: 1;
+}
+
+
+
+#Tab1 {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+
+/* Tab 4 - CONFIG */
+
+#Tab4 {
+    height: calc(100% - 50px);
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.flex-container {
+    display: flex;
+    height: 100%;
+}
+
+
+.tabcontent_4 {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden;
+}
+
+.left-column-tab4 {
+    font-family: $font-family;
+    width: 230px;
+    background-color: #f1f1f1;
+    margin-left: 0;
+}
+
+.menu-list {
+    font-family: $font-family;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-left: -20px;
+    list-style-type: none;
+}
+
+.menu-item {
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.submenu-list {
+    list-style-type: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.submenu-list li {
+    margin-bottom: 10px;
+    margin-left: -20px;
+    text-align: left;
+}
+
+.submenu-list.open {
+    max-height: 100px;
+
+}
+
+
+.right-column-tab4 {
+    display: none;
+    background-color: #e4e3e3;
+    height: 100%;
+    flex-grow: 1;
+    font-family: $font-family;
+    overflow-y: auto;
+}
+
+#language_choice{
+margin-top: 15px;
+text-align: center;
+width: 100%;
+height: 50px
+}
+
+.flag-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.flag {
+    margin: 10px;
+    width: 40px;
+    height: 40px;
+}

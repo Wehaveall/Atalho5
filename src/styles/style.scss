@@ -1,0 +1,103 @@
+// Define commonly used variables
+$loading-screen-bg: rgba(255, 255, 255, 0.9);
+$loader-border: #f3f3f3;
+$loader-border-top: #fbb347;
+$main-bg: green;
+$main-container-bg: deeppink;
+$content-bg: #f1f1f1;
+$bottom-panel-bg: #fbb347;
+
+// Global settings
+* {
+  box-sizing: border-box;
+}
+
+// Body and HTML settings
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: $main-bg;
+}
+
+// Loading screen
+#loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $loading-screen-bg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .loader {
+    border: 5px solid $loader-border;
+    border-top: 5px solid $loader-border-top;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+  }
+
+  #loadingText {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+// Spin animation
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Main container
+.mainContainer {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 50px); // Adjust for bottomPanel
+  width: 100vw;
+  background-color: $main-container-bg;
+  align-self: flex-start;
+}
+
+// Content
+.content {
+  overflow: visible;
+  background-color: $content-bg;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  font-family: 'Work Sans', sans-serif;
+  margin-right: 5px; // add this line
+  align-self: flex-start;
+}
+
+// Bottom panel
+#bottomPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 50px;
+  background-color: $bottom-panel-bg;
+}

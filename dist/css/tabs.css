@@ -1,0 +1,142 @@
+.tab {
+  overflow: visible;
+  display: flex;
+  /* Add this line */
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+.tablinks {
+  height: 30px;
+}
+
+.tab button {
+  padding: 6, 3;
+  font-family: "Work Sans", sans-serif;
+  background-color: inherit;
+  display: inline-block;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 12px;
+}
+
+.tab button:hover {
+  background-color: #ddd;
+}
+
+.tab button.active {
+  background-color: #fbb347;
+}
+
+.tabcontent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tab-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 50px);
+  width: 100%;
+  flex-grow: 1;
+}
+
+#Tab1 {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+/* Tab 2 */
+#Tab4 {
+  height: calc(100% - 50px);
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.flex-container {
+  display: flex;
+  height: 100%;
+}
+
+.tabcontent_4 {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  overflow-y: hidden;
+}
+
+.left-column-tab4 {
+  font-family: "Work Sans", sans-serif;
+  width: 230px;
+  background-color: #f1f1f1;
+  margin-left: 0;
+}
+
+.menu-list {
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-left: -20px;
+  list-style-type: none;
+}
+
+.menu-item {
+  cursor: pointer;
+  display: inline-block;
+  /* Convert to inline-block */
+  margin-bottom: 10px;
+  /* Add margin to the bottom */
+}
+
+.submenu-list {
+  list-style-type: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.submenu-list li {
+  margin-bottom: 10px;
+  margin-left: -20px;
+  text-align: left;
+  /* Added this to align text to the left */
+}
+
+.submenu-list.open {
+  max-height: 100px;
+}
+
+.right-column-tab4 {
+  display: none;
+  background-color: #e4e3e3;
+  height: 100%;
+  flex-grow: 1;
+  font-family: "Work Sans", sans-serif;
+  overflow-y: auto;
+}
+
+#language_choice {
+  margin-top: 15px;
+  text-align: center;
+  width: 100%;
+  height: 50px;
+}
+
+.flag-wrapper {
+  display: flex;
+  justify-content: center;
+  /* Centers children horizontally */
+  flex-wrap: wrap;
+  /* Allows flags to wrap to the next line if there are too many */
+}
+
+.flag {
+  margin: 10px;
+  width: 40px;
+  height: 40px;
+}
+
+/*# sourceMappingURL=tabs.css.map */
