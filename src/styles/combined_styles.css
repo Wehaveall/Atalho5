@@ -3,18 +3,12 @@
   max-height: calc(100vh - 50px);
   background-color: #f1f1f1;
   flex: 0.2;
-  /* Adjust the flex value as needed */
   min-width: 215px;
-  /* Keep the width as needed */
   flex-direction: column;
-  /* Exibir em coluna */
   overflow-y: auto;
-  /* Add this if you want to push the button to the right */
   display: flex;
   align-items: flex-start;
-  /* Alinhar os itens à esquerda */
   justify-content: flex-start;
-  /* Alinhar os itens ao topo */
   flex-shrink: 0; /* Prevents shrinking */
 }
 
@@ -22,7 +16,7 @@
   font-size: 16px;
   width: 100%;
   font-family: "Work Sans", sans-serif;
-  color: #000;
+  color: black;
   /* Set text color to black */
   background-color: #f1f1f1;
   display: flex;
@@ -55,14 +49,11 @@ input[type=text] {
   border-radius: 10px;
   font-size: 12px;
   border: 2px solid #ccc;
-  /* border color when not in focus */
   box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
-  /* Horizontal, vertical, blur, color */
 }
 
 input[type=text]:focus {
   border: 2px solid #fbb347;
-  /* outline:remover a borda padrão preta, senão não adianta setar cor */
   outline: none;
 }
 
@@ -71,16 +62,12 @@ input[type=text]:focus {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  /* To align items vertically centered */
   padding: 10px;
-  /* Add some padding around the items inside the div */
 }
 
 input[type=text] {
   flex-grow: 1;
-  /* This will allow the input field to take up the remaining space */
   margin-right: 10px;
-  /* Add some space to the right of the input field */
 }
 
 #folderAdd {
@@ -107,15 +94,12 @@ input[type=text] {
 
 .collapsible.active + .left-panel-content {
   max-height: 500px;
-  /* Adjust the height as per your requirement */
 }
 
 /* Wrapper styles */
 .wrapper {
   display: flex;
-  /* Ensures elements within wrapper are inline */
   align-items: center;
-  /* Vertically aligns items in the center */
 }
 
 .child-elem {
@@ -233,12 +217,11 @@ input[type=text] {
   padding: 0;
   font-size: small;
   font-family: "Work Sans", sans-serif;
-  background-color: white;
+  background-color: rgb(233, 233, 233);
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 10px;
   table-layout: fixed;
-  /* Add this line */
 }
 
 #myTable th,
@@ -251,7 +234,6 @@ input[type=text] {
   margin: 0;
   padding: 2px;
   line-height: 1.2;
-  /* Adjust line height as needed */
 }
 
 #myTable tr.selected {
@@ -259,13 +241,11 @@ input[type=text] {
 }
 
 .tr-even {
-  background-color: #ffffff;
-  /* branco */
+  background-color: #f3f3f3;
 }
 
 .tr-odd {
-  background-color: #fafafa;
-  /* cinza claro */
+  background-color: #f8f5f5;
 }
 
 /* Middle Panel text space management */
@@ -280,37 +260,25 @@ input[type=text] {
 /* Painel de Configurações do Grupo */
 .data-settings-panel {
   display: none;
-  /* Inicialmente oculto */
   flex-grow: 1;
-  /* Permitir que ele ocupe todo o espaço disponível */
   background-color: #f1f1f1;
-  /* Cor vermelha */
   flex-direction: column;
-  /* Organizar os itens verticalmente */
 }
 
 .settings-item {
   display: block;
-  /* Cada item é um bloco separado */
 }
 
 #configTitle {
   height: 45px;
-  /* Define a altura como 60 pixels */
   border: 2px solid #000;
-  /* Define uma borda sólida com 2 pixels de espessura e cor preta */
   display: flex;
-  /* Utiliza o flex para centralizar o conteúdo */
   align-items: center;
-  /* Centraliza o texto verticalmente */
   justify-content: left;
-  /* Centraliza o texto horizontalmente */
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-/*-------------------------------------------------------------------      
-/* NOMEGRUPO*/
 #nomeGrupo {
   font-family: "Work Sans", sans-serif;
   height: 40px;
@@ -324,7 +292,6 @@ input[type=text] {
 
 #nomeGrupoInput {
   margin-left: 10px;
-  /* Adiciona uma margem à esquerda para separar o input do texto */
 }
 
 /*-------------------------------------------------------------------      
@@ -407,7 +374,6 @@ progress {
 
 #progress-message {
   margin-top: 10px;
-  /* Add some space between the progress bar and the message */
 }
 
 #middleAndRightContainer {
@@ -452,7 +418,6 @@ progress {
 
 #duplicate {
   margin-right: 10px;
-  /* Add this line to create space on the right side of the duplicate button */
   width: 30px;
   height: 30px;
   padding: 0px;
@@ -606,9 +571,7 @@ progress {
      -moz-user-select: none;
           user-select: none;
   padding: 0.15rem 0.5rem;
-  /* reduced padding */
   font-size: 12px;
-  /* adjusted font size */
 }
 
 .custom-select-container:focus > .custom-select-value {
@@ -941,7 +904,7 @@ html {
 
 .right-column-tab4 {
   display: none;
-  background-color: #e4e3e3;
+  background-color: #f1f1f1;
   height: 100%;
   flex-grow: 1;
   font-family: "Work Sans", sans-serif;

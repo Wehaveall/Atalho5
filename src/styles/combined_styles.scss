@@ -2,6 +2,16 @@
 // Common Variables
 $primary-color: #000;
 $secondary-color: #fff;
+///////////////////////////////////////////////////
+$light-theme-window-bgcolor: #f1f1f1;
+$light-theme-input-bgcolor: white;
+$light-theme-text-color: black;
+///////////////////////////////////////////////////
+$dark-theme-window-bgcolor: rgb(40, 41, 43);
+$dark-theme-input-bgcolor: rgb(75, 76, 82);
+$dark-theme-text-color: white;
+//////////////////////////////////////////////////
+
 $font-family: 'Work Sans',sans-serif;
 $focused-orange-color: #fbb347;
 
@@ -10,22 +20,14 @@ $focused-orange-color: #fbb347;
 #leftPanel {
     
     max-height: calc(100vh - 50px);
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
     flex: 0.2;
-    /* Adjust the flex value as needed */
     min-width: 215px;
-    /* Keep the width as needed */
     flex-direction: column;
-    /* Exibir em coluna */
     overflow-y: auto;
-
-    /* Add this if you want to push the button to the right */
     display: flex;
     align-items: flex-start;
-    /* Alinhar os itens à esquerda */
     justify-content: flex-start;
-    /* Alinhar os itens ao topo */
-
     flex-shrink: 0; /* Prevents shrinking */
 
 }
@@ -34,9 +36,9 @@ $focused-orange-color: #fbb347;
     font-size: 16px;
     width: 100%;
     font-family: $font-family;
-    color: #000;
+    color: $light-theme-text-color;
     /* Set text color to black */
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
     display: flex;
     align-items: center;
     border: 2px solid transparent;
@@ -50,42 +52,31 @@ $focused-orange-color: #fbb347;
 
 
 .listing {
-
-
     padding: 0 18px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
 }
 
 .arrow-right,
 .arrow-down {
-
     margin-right: 5px;
 }
 
 
 input[type=text] {
-
-    background-color: white;
+    background-color: $light-theme-input-bgcolor;
     padding: 5px;
-
     border-radius: 10px;
     font-size: 12px;
     border: 2px solid #ccc;
-    /* border color when not in focus */
     box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
-    /* Horizontal, vertical, blur, color */
-
 }
 
 input[type="text"]:focus {
-
     border: 2px solid $focused-orange-color;
-    /* outline:remover a borda padrão preta, senão não adianta setar cor */
     outline: none;
-
 }
 
 /*-------------------------------------------------- Botão de Adicionar novo grupo */
@@ -94,16 +85,12 @@ input[type="text"]:focus {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    /* To align items vertically centered */
     padding: 10px;
-    /* Add some padding around the items inside the div */
 }
 
 input[type=text] {
     flex-grow: 1;
-    /* This will allow the input field to take up the remaining space */
     margin-right: 10px;
-    /* Add some space to the right of the input field */
 }
 
 #folderAdd {
@@ -129,14 +116,13 @@ input[type=text] {
 
 .collapsible.active+.left-panel-content {
     max-height: 500px;
-    /* Adjust the height as per your requirement */
 }
+
+
 /* Wrapper styles */
 .wrapper {
     display: flex;
-    /* Ensures elements within wrapper are inline */
     align-items: center;
-    /* Vertically aligns items in the center */
 }
 
 .child-elem {
@@ -192,19 +178,14 @@ input[type=text] {
 }
 
 
-
 #iconContainer {
     display: flex;
     align-items: center;
-
 }
-
-
 
 
 #dataSettings,
 #dataAdd {
-
     width: 25px;
     height: 25px;
     padding: 0;
@@ -245,7 +226,7 @@ input[type=text] {
     font-family: $font-family;
     font-size: small;
     display: none;
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
     width: 100%;
     table-layout: fixed;
 }
@@ -263,19 +244,17 @@ input[type=text] {
     text-align: right;
 }
 
-
+/////////////////////////////////////////////////////////////////////   TABELA   //////////////////////////////////////////////
 #myTable {
     flex: 1;
     padding: 0;
     font-size: small;
     font-family: $font-family;
-    background-color: white;
+    background-color: rgb(233, 233, 233);
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
     table-layout: fixed;
-    /* Add this line */
-
 }
 
 
@@ -289,7 +268,6 @@ input[type=text] {
     margin: 0;
     padding: 2px;
     line-height: 1.2;
-    /* Adjust line height as needed */
 }
 
 
@@ -298,16 +276,12 @@ input[type=text] {
 }
 
 .tr-even {
-    background-color: #ffffff;
-    /* branco */
+    background-color: #f3f3f3;
 }
 
 .tr-odd {
-    background-color: #fafafa;
-    /* cinza claro */
+    background-color: #f8f5f5;
 }
-
-
 
 /* Middle Panel text space management */
 .truncate {
@@ -315,49 +289,32 @@ input[type=text] {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 /*-------------------------------------------------------------------      
 
 /* Painel de Configurações do Grupo */
 .data-settings-panel {
     display: none;
-    /* Inicialmente oculto */
     flex-grow: 1;
-    /* Permitir que ele ocupe todo o espaço disponível */
-    background-color: #f1f1f1;
-    /* Cor vermelha */
+    background-color: $light-theme-window-bgcolor;
     flex-direction: column;
-    /* Organizar os itens verticalmente */
-
 }
 
 .settings-item {
     display: block;
-    /* Cada item é um bloco separado */
-
 }
-
 
 #configTitle {
     height: 45px;
-    /* Define a altura como 60 pixels */
     border: 2px solid #000;
-    /* Define uma borda sólida com 2 pixels de espessura e cor preta */
     display: flex;
-    /* Utiliza o flex para centralizar o conteúdo */
     align-items: center;
-    /* Centraliza o texto verticalmente */
     justify-content: left;
-    /* Centraliza o texto horizontalmente */
     padding-top: 5px;
     padding-bottom: 5px;
 }
+  
 
-
-/*-------------------------------------------------------------------      
-/* NOMEGRUPO*/
-
-
+//////////////////////// NOMEGRUPO*/
 #nomeGrupo {
     font-family: $font-family;
     height: 40px;
@@ -369,10 +326,8 @@ input[type=text] {
     padding-bottom: 5px;
 }
 
-
 #nomeGrupoInput {
     margin-left: 10px;
-    /* Adiciona uma margem à esquerda para separar o input do texto */
 }
 
 /*-------------------------------------------------------------------      
@@ -388,14 +343,12 @@ input[type=text] {
     padding-bottom: 5px;
 }
 
-
 #notasGrupoInput {
     margin-left: 10px;
     margin-right: 10px;
     flex-grow: 1;
     border-radius: 10px;
 }
-
 
 #em_Grupo {
     height: 40px;
@@ -461,22 +414,19 @@ progress {
 
 #progress-message {
     margin-top: 10px;
-    /* Add some space between the progress bar and the message */
 }
-
-
 
 #middleAndRightContainer {
     display: flex;
     flex: 1;
     align-self: flex-start;
 }
-
+/////////////////////////////////////////////////////////////////////// RIGHT PANEL ///////////////////////////
 // Styles from rightPanel.css
 #rightPanel {
     display: none;
     flex-grow: 1;
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
     flex-direction: column;
     align-items: stretch;
     padding: 10px;
@@ -505,14 +455,12 @@ progress {
     cursor: pointer;
 }
 
-
 #shortcutName .buttons-container {
     display: flex;
 }
 
 #duplicate {
     margin-right: 10px;
-    /* Add this line to create space on the right side of the duplicate button */
     width: 30px;
     height: 30px;
     padding: 0px;
@@ -543,14 +491,10 @@ progress {
 
 }
 
-
-
 #duplicate:hover,
 #delete:hover {
-
     background-color: $focused-orange-color
 }
-
 
 #contentType {
     overflow: visible;
@@ -566,19 +510,12 @@ progress {
     height: 30px;
     position: relative;
     z-index: 10;
-
-
 }
-
-
 
 #contentType select {
     font-family: inherit;
     font-size: inherit;
 }
-
-
-
 
 #editor {
     -ms-overflow-style: none;
@@ -629,7 +566,6 @@ progress {
     align-items: center;
     overflow: visible;
     flex-grow: 1;
-
 }
 
 #atalhoRight {
@@ -675,7 +611,6 @@ progress {
   display: inline-block;
   position: relative;
   box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
-
 }
 
 .custom-select-value {
@@ -688,9 +623,7 @@ progress {
   cursor: pointer;
   user-select: none;
   padding: 0.15rem 0.5rem;
-  /* reduced padding */
   font-size: 12px;
-  /* adjusted font size */
 }
 
 .custom-select-container:focus>.custom-select-value {
@@ -708,7 +641,7 @@ progress {
 }
 
 .custom-select-options {
-  background-color: #f1f1f1;
+  background-color: $light-theme-window-bgcolor;
   display: none;
   position: absolute;
   padding: 0;
@@ -800,7 +733,7 @@ html {
 
 .content {
   overflow: visible;
-  background-color: #f1f1f1;
+  background-color: $light-theme-window-bgcolor;
   display: flex;
   height: 100%;
   width: 100%;
@@ -927,7 +860,7 @@ html {
 
 // Styles from tabMacros.css
 #eventos {
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
     max-height: 300px;
     overflow: auto;
 }
@@ -938,7 +871,7 @@ html {
     display: flex;
     /* Add this line */
     border: 1px solid #ccc;
-    background-color: #f1f1f1; 
+    background-color: $light-theme-window-bgcolor; 
 }
 
 
@@ -1014,7 +947,7 @@ html {
 .left-column-tab4 {
     font-family: $font-family;
     width: 230px;
-    background-color: #f1f1f1;
+    background-color: $light-theme-window-bgcolor;
     margin-left: 0;
 }
 
@@ -1053,7 +986,7 @@ html {
 
 .right-column-tab4 {
     display: none;
-    background-color: #e4e3e3;
+    background-color: $light-theme-window-bgcolor;
     height: 100%;
     flex-grow: 1;
     font-family: $font-family;
