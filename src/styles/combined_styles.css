@@ -4,6 +4,7 @@
   --input-bgcolor: white;
   --text-color: black;
   --myTable-bgcolor:rgb(233, 233, 233);
+  --button-color: rgb(128, 128, 128);
 }
 
 .dark-theme {
@@ -11,6 +12,7 @@
   --input-bgcolor: rgb(75, 76, 82);
   --text-color: white;
   --myTable-bgcolor: rgb(40, 41, 43);
+  --button-color: rgb(221, 221, 221);
 }
 
 .light-theme .db-file-checkbox {
@@ -87,6 +89,12 @@ input[type=text]:focus {
 }
 
 /*-------------------------------------------------- Botão de Adicionar novo grupo */
+.left-panel-align-items {
+  display: flex;
+  align-items: center;
+  /* vertically align items */
+}
+
 #topLeftContent {
   color: var(--text-color);
   display: flex;
@@ -102,7 +110,7 @@ input[type=text] {
 
 #folderAdd {
   border: none;
-  margin: 0;
+  margin-top: 6px;
   padding: 0;
   background: none;
   -webkit-appearance: none;
@@ -110,10 +118,9 @@ input[type=text] {
           appearance: none;
 }
 
-#folderAdd img {
-  height: 25px;
-  width: 25px;
-  background: none;
+#folderAdd svg {
+  stroke: var(--button-color);
+  fill: var(--button-color);
 }
 
 .left-panel-content {
