@@ -13,6 +13,19 @@
   --myTable-bgcolor: rgb(40, 41, 43);
 }
 
+.light-theme .db-file-checkbox {
+  background-color: #721717;
+  /* Change as needed */
+  /* Other styles for light theme */
+}
+
+/* Dark Theme */
+.dark-theme .db-file-checkbox {
+  background-color: #333;
+  /* Change as needed */
+  /* Other styles for dark theme */
+}
+
 #leftPanel {
   color: var(--text-color);
   max-height: calc(100vh - 50px);
@@ -264,6 +277,13 @@ div::-webkit-scrollbar-thumb {
   background-color: #f79d44;
   border-radius: 30px;
   height: 30px;
+}
+
+/* Dark Theme */
+.dark-theme .db-file-checkbox {
+  background-color: #333;
+  /* Change as needed */
+  /* Other styles for dark theme */
 }
 
 #myTable th,
@@ -686,7 +706,7 @@ progress {
 }
 
 .custom-select-option.selected {
-  background-color: #ccc;
+  background-color: #959595;
 }
 
 * {
@@ -1061,4 +1081,38 @@ label:after {
 
 label:active:after {
   width: 26px;
+}
+
+label svg {
+  position: absolute;
+  width: 27px;
+  top: 0px;
+  z-index: 100;
+}
+
+/* Changes here: Updated positioning for sun and moon SVGs */
+label svg.sun {
+  left: -3px;
+  /* Move to the left */
+  top: 0px;
+  /* Move up */
+  fill: #dda816;
+  transition: 0.3s;
+}
+
+label svg.moon {
+  right: -5px;
+  /* Move to the right */
+  top: 0px;
+  /* Move up */
+  fill: #7e7e7e;
+  transition: 0.3s;
+}
+
+input:checked + label svg.sun {
+  fill: #7e7e7e;
+}
+
+input:checked + label svg.moon {
+  fill: #fff;
 }/*# sourceMappingURL=combined_styles.css.map */
