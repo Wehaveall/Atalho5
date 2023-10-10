@@ -1094,7 +1094,7 @@ label svg {
 label svg.sun {
   left: -3px;
   /* Move to the left */
-  top: 0px;
+  top: 1px;
   /* Move up */
   fill: #dda816;
   transition: 0.3s;
