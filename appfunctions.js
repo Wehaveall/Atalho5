@@ -556,7 +556,6 @@ function handleRowClick() {
 // Show the #rightPanel without modifying the width of #middlePanel
 document.getElementById('rightPanel').style.display = 'flex';
 
-
   // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
     window.currentRow.className = '';  // Deselect the previous row
@@ -568,7 +567,6 @@ document.getElementById('rightPanel').style.display = 'flex';
 
   // Extract the relevant data from the clicked row
   const { groupName, databaseName, tableName, shortcut, label, format, caseChoice } = this.dataset;
-
 
 
   const index = this.dataset.index;  // <-- Add this line to get the index
@@ -661,6 +659,36 @@ function saveLabelValue(newValue) {
       console.error('Error saving label value:', error);
     });
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const themeToggle = document.getElementById("darkmode-toggle");
+  const body = document.body;
+
+  themeToggle.addEventListener("click", function () {
+    if (body.classList.contains("dark-theme")) {
+      body.classList.remove("dark-theme");
+      body.classList.add("light-theme");
+
+    } else {
+      body.classList.remove("light-theme");
+      body.classList.add("dark-theme");
+    }
+  });
+});
+
+
+
+
+
+
+
+
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
