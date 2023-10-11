@@ -437,7 +437,7 @@ class KeyListener:
                 # # Update multi-line string
                 # lines = self.multi_line_string.split("\n")
                 # current_line = lines[self.cursor_row]
-                # new_line = current_line[:self.cursor_col - len(last_word)-1] + expansion + current_line[self.cursor_col:]
+                # new_line = current_line[:self.cursor_col - len(last_word)] + expansion + current_line[self.cursor_col:]
                 # lines[self.cursor_row] = new_line
                 # self.multi_line_string = "\n".join(lines)
 
