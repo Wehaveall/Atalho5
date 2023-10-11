@@ -49,7 +49,7 @@ class KeyListener:
     
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
        
-       
+        self.just_suffix = False
         self.tk_queue = tk_queue  # Assign it to an instance variable
         # self.popup_done_event = threading.Event()
         self.expansions_list = []  # Define the expansions_list
@@ -233,6 +233,9 @@ class KeyListener:
         print(f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}")
         
         self.programmatically_typing = True  # Set the flag
+          # Debug: Print before changes
+        print(f"Before paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
+
 
         # Clear previously typed keys
         keyboard.press("ctrl")
@@ -271,10 +274,17 @@ class KeyListener:
         self.typed_keys = self.typed_keys.rstrip(self.last_word)
 
         # Add the corrected word
-        self.typed_keys += formatted_expansion + " "  # Modified to use formatted_expansion
+        self.typed_keys += formatted_expansion   # Modified to use formatted_expansion
 
         self.last_word = formatted_expansion  # Modified to use formatted_expansion
         self.word_buffer.append(formatted_expansion)  # Modified to use formatted_expansion
+        print(f"After paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
+ 
+ 
+       
+
+
+
 
 
     # ----------------------------------------------------------------Handle Accents
@@ -304,6 +314,7 @@ class KeyListener:
     # -------------------------------------------------------------------------
 
     def make_selection(self, index, popup):  # Added popup as an argument
+        
         popup.destroy()  # Destroy the popup
 
         time.sleep(0.05)  # Add a small delay here
@@ -317,6 +328,9 @@ class KeyListener:
             format_value=selected_expansion_data["format_value"],
         )
 
+        self.just_pasted_expansion = True
+
+
         # Split the multi_line_string into lines
         lines = self.multi_line_string.split("\n")
 
@@ -327,10 +341,7 @@ class KeyListener:
         current_line = current_line[: self.cursor_col - len(self.typed_keys)]
 
         # Add the selected expansion to the current line
-        new_current_line = (
-            current_line
-            + expansion_to_paste
-        )
+        new_current_line = (current_line + expansion_to_paste)
         lines[self.cursor_row] = new_current_line
 
         # Update the multi_line_string
@@ -343,7 +354,7 @@ class KeyListener:
         self.typed_keys = expansion_to_paste
         self.last_sequence = expansion_to_paste
 
-        print(f"LAST SEQ - AFTER Paste: {self.last_sequence}")  # Debugging
+       
 
         self.start_listener()
         return
@@ -360,7 +371,10 @@ class KeyListener:
         else:
             print("tk_queue is None")  # Debugging line
 
+   
+   
     # ------------------------------------------------------------------------#
+   
     def handle_hardcoded_suffixes(self, last_word):
         hardcoded_suffixes = {
             "çao": ("ção", r"(?<![ã])\bçao\b"),
@@ -382,16 +396,70 @@ class KeyListener:
                     lines[self.cursor_row] = current_line[:self.cursor_col - len(last_word)]
                     self.multi_line_string = "\n".join(lines)
 
-                    return expansion
-        return None
+                    return (expansion, True)  # Return expansion and flag as True
+        return (None, False)  # Return None and flag as False if no match
+
+
 
     def lookup_and_expand(self, sequence):
         words = word_tokenize(sequence)
         last_word = words[-1] if words else ""
 
-        expansion = self.handle_hardcoded_suffixes(last_word)
+        
+        # Suffix Function
+        expansion, suffix_used = self.handle_hardcoded_suffixes(last_word)  # Get both expansion and flag
+        #####################################################################
+       
+
+
+
         if expansion:
-            # Remove the last word from typed_keys
+
+            # Add these debug prints to investigate
+            print(f"Initial State: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
+            print(f"Is suffix_used flag set? : {suffix_used}")
+
+            if suffix_used:
+                print("Expansion came from hardcoded suffixes")
+                
+                # Debug print before changes
+                print(f"Before Update: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
+
+                # Remove the last word from typed_keys
+                if self.typed_keys.endswith(last_word + " "):
+                    self.typed_keys = self.typed_keys[:-len(last_word) - 1]
+                elif self.typed_keys.endswith(last_word):
+                    self.typed_keys = self.typed_keys[:-len(last_word)]
+
+                # Paste the new expansion
+                self.paste_expansion(expansion, format_value=0)
+
+                # # Update multi-line string
+                # lines = self.multi_line_string.split("\n")
+                # current_line = lines[self.cursor_row]
+                # new_line = current_line[:self.cursor_col - len(last_word)-1] + expansion + current_line[self.cursor_col:]
+                # lines[self.cursor_row] = new_line
+                # self.multi_line_string = "\n".join(lines)
+
+                ### FALTA RECUPERAR O CONTEÚDO ANTERIOR AO SUFIXO. ERRO, CURSOR E CHARS DUPLICADOS.
+
+
+                # Update last_sequence
+                self.last_sequence = expansion
+
+                # Remove the last character from multi_line_string and append the expansion
+                self.multi_line_string = expansion
+
+
+                # Update cursor position to the last position of the multi_line_string
+                self.cursor_col = len(self.multi_line_string)
+    
+                return
+       
+       
+       
+       
+        # Remove the last word from typed_keys
             if self.typed_keys.endswith(last_word + " "):
                 self.typed_keys = self.typed_keys[:-len(last_word) - 1]
             elif self.typed_keys.endswith(last_word):
@@ -486,6 +554,8 @@ class KeyListener:
         next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
 
+      
+        
         if (self.programmatically_typing):  # Skip if we are programmatically typing or popup is open
             return
 
@@ -540,9 +610,7 @@ class KeyListener:
             else:
                 char = key
 
-            processed_char = self.handle_accents(
-                char
-            )  # Call handle_accents and save the returned character
+            processed_char = self.handle_accents(char)  # Call handle_accents and save the returned character
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
             print(f"Last Sequence:__1 {self.last_sequence}")
@@ -555,6 +623,7 @@ class KeyListener:
             elif key == "space":
                 self.typed_keys += " "
                 self.last_sequence = ""  # Clear last_sequence
+                
 
             elif key == "enter":  # Handling the "Enter" key
                 # self.typed_keys += '\n' # Add newline to last_typed_keys
@@ -686,6 +755,9 @@ class KeyListener:
             self.cursor_col += 1  # Move the cursor to the right by 1 position
             # Join the lines back into a single string
             self.multi_line_string = "\n".join(lines)
+            
+        
+            
 
         elif key == "enter":  # Highlighted Changes: Start
             lines = self.multi_line_string.split("\n")
@@ -715,16 +787,20 @@ class KeyListener:
             self.last_key = key
 
             if key not in self.omitted_keys:
-                if (
-                    key != "backspace"
-                ):  # Highlighted Change: Add condition to skip "backspace"
+                   
+                if (key != "backspace"):  # Highlighted Change: Add condition to skip "backspace" triggering shortcuts
                     self.lookup_and_expand(self.last_sequence)
 
             else:
+                
                 if key == "space":
-                    if (
-                        key != "backspace"
-                    ):  # Highlighted Change: Add condition to skip "backspace"
+
+                    if self.just_suffix == True:
+                        self.just_suffix= False
+                        return
+                   
+                    if (key != "backspace"):  # Highlighted Change: Add condition to skip "backspace" triggering shortcuts
+                        
                         self.lookup_and_expand(last_word)
                         # Tokenize the sentence into words
                         words = word_tokenize(self.multi_line_string)
