@@ -312,11 +312,10 @@ class KeyListener:
             return key_char  # Return the original character
 
     # -------------------------------------------------------------------------
-
+    # Is deleting multiline previous content after expansion
     def make_selection(self, index, popup):  # Added popup as an argument
-        
+    
         popup.destroy()  # Destroy the popup
-
         time.sleep(0.05)  # Add a small delay here
 
         selected_expansion_data = self.expansions_list[index]
@@ -330,35 +329,36 @@ class KeyListener:
 
         self.just_pasted_expansion = True
 
-
         # Split the multi_line_string into lines
         lines = self.multi_line_string.split("\n")
 
         # Get the current line
         current_line = lines[self.cursor_row]
 
+       # Find the last occurrence of the typed shortcut in the current line-----------------LAST SEQUENCEE _ NOT LAST WORD---------------------------------------------
+        last_occurrence = current_line.rfind(self.last_sequence)
+
         # Remove the last typed shortcut from the current line
-        current_line = current_line[: self.cursor_col - len(self.typed_keys)]
+        if last_occurrence != -1:
+            current_line = current_line[:last_occurrence] + current_line[last_occurrence + len(self.last_sequence):]
+
 
         # Add the selected expansion to the current line
-        new_current_line = (current_line + expansion_to_paste)
+        new_current_line = current_line + expansion_to_paste
         lines[self.cursor_row] = new_current_line
 
         # Update the multi_line_string
         self.multi_line_string = "\n".join(lines)
 
-        # Update the cursor position
-        self.cursor_col = len(new_current_line)  # Set cursor position to the end of the new line
+        # Update the cursor position to the end of the new line
+        self.cursor_col = len(new_current_line)
 
         # Reset self.typed_keys and self.last_sequence to the selected expansion
         self.typed_keys = expansion_to_paste
         self.last_sequence = expansion_to_paste
 
-       
-
         self.start_listener()
         return
-
 
 
     ############################################################################################################
@@ -411,19 +411,13 @@ class KeyListener:
         #####################################################################
        
 
-
-
         if expansion:
 
-            # Add these debug prints to investigate
-            print(f"Initial State: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
-            print(f"Is suffix_used flag set? : {suffix_used}")
-
+         
             if suffix_used:
-                print("Expansion came from hardcoded suffixes")
-                
-                # Debug print before changes
-                print(f"Before Update: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
+                self.just_suffix = True
+                print("Expansion came from hardcoded suffixes###################################")
+              
 
                 # Remove the last word from typed_keys
                 if self.typed_keys.endswith(last_word + " "):
@@ -434,12 +428,12 @@ class KeyListener:
                 # Paste the new expansion
                 self.paste_expansion(expansion, format_value=0)
 
-                # # Update multi-line string
-                # lines = self.multi_line_string.split("\n")
-                # current_line = lines[self.cursor_row]
-                # new_line = current_line[:self.cursor_col - len(last_word)] + expansion + current_line[self.cursor_col:]
-                # lines[self.cursor_row] = new_line
-                # self.multi_line_string = "\n".join(lines)
+                # Update multi-line string
+                lines = self.multi_line_string.split("\n")
+                current_line = lines[self.cursor_row]
+                new_line = current_line[:self.cursor_col - len(last_word)] + expansion + current_line[self.cursor_col:]
+                lines[self.cursor_row] = new_line
+                self.multi_line_string = "\n".join(lines)
 
                 ### FALTA RECUPERAR O CONTEÚDO ANTERIOR AO SUFIXO. ERRO, CURSOR E CHARS DUPLICADOS.
 
@@ -448,8 +442,7 @@ class KeyListener:
                 self.last_sequence = expansion
 
                 # Remove the last character from multi_line_string and append the expansion
-                self.multi_line_string = expansion
-
+                #self.multi_line_string = expansion
 
                 # Update cursor position to the last position of the multi_line_string
                 self.cursor_col = len(self.multi_line_string)
@@ -623,6 +616,7 @@ class KeyListener:
             elif key == "space":
                 self.typed_keys += " "
                 self.last_sequence = ""  # Clear last_sequence
+              
                 
 
             elif key == "enter":  # Handling the "Enter" key
@@ -746,6 +740,7 @@ class KeyListener:
 
         
         elif key == "space":
+            
             # Update the line at the cursor position within the specific line
             lines = self.multi_line_string.split("\n")
             current_line = lines[self.cursor_row]
@@ -756,8 +751,8 @@ class KeyListener:
             # Join the lines back into a single string
             self.multi_line_string = "\n".join(lines)
             
-        
-            
+           
+             
 
         elif key == "enter":  # Highlighted Changes: Start
             lines = self.multi_line_string.split("\n")
@@ -795,9 +790,8 @@ class KeyListener:
                 
                 if key == "space":
 
-                    if self.just_suffix == True:
-                        self.just_suffix= False
-                        return
+
+                 
                    
                     if (key != "backspace"):  # Highlighted Change: Add condition to skip "backspace" triggering shortcuts
                         
