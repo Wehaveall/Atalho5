@@ -48,6 +48,8 @@ class KeyListener:
     
     
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
+       
+       
         self.tk_queue = tk_queue  # Assign it to an instance variable
         # self.popup_done_event = threading.Event()
         self.expansions_list = []  # Define the expansions_list
@@ -302,14 +304,14 @@ class KeyListener:
     # -------------------------------------------------------------------------
 
     def make_selection(self, index, popup):  # Added popup as an argument
-        popup.destroy()  # Destroy the
+        popup.destroy()  # Destroy the popup
 
         time.sleep(0.05)  # Add a small delay here
 
         selected_expansion_data = self.expansions_list[index]
-        expansion_to_paste = selected_expansion_data[
-            "expansion"
-        ]  # Define the variable here
+        expansion_to_paste = selected_expansion_data["expansion"]
+
+        # Call the paste_expansion method
         self.paste_expansion(
             expansion_to_paste,
             format_value=selected_expansion_data["format_value"],
@@ -318,40 +320,33 @@ class KeyListener:
         # Update the multi_line_string
         lines = self.multi_line_string.split("\n")
         current_line = lines[self.cursor_row]
+
+        # Remove the last typed shortcut from the current line
+        current_line = current_line[: self.cursor_col - len(self.typed_keys)]
+
+        # Add the selected expansion to the current line
         lines[self.cursor_row] = (
-            current_line[: self.cursor_col]
+            current_line
             + expansion_to_paste
-            + current_line[self.cursor_col :]
+            + current_line[self.cursor_col - len(self.typed_keys) :]
         )
         self.multi_line_string = "\n".join(lines)
 
         # Update the cursor position
-        self.cursor_col += len(
-            expansion_to_paste
-        )  # Move the cursor to the end of the expansion
+        self.cursor_col += len(expansion_to_paste) - len(self.typed_keys)
 
-        # Update last_sequence with the selected expansion
-        self.last_sequence = selected_expansion_data["expansion"]
-        print(
-            f"LAST SEQ - AFTER PAste: {self.last_sequence}"
-        )  # Debugging: Changed from Key released to Key pressed
+        # Reset self.typed_keys and self.last_sequence to the selected expansion
+        self.typed_keys = expansion_to_paste
+        self.last_sequence = expansion_to_paste
 
-        # Update last_sequence with the last word in multi_line_string
-        words_in_multi_line_string = word_tokenize(self.multi_line_string)
-
-        if words_in_multi_line_string:
-            self.last_sequence = words_in_multi_line_string[-1]  # Take the last word
-        else:
-            self.last_sequence = ""  # If no words, set to empty string
+        print(f"LAST SEQ - AFTER Paste: {self.last_sequence}")  # Debugging
 
         # Set a flag to indicate that the next key press should be skipped
         self.skip_next_key_press = True
 
-        # Clear typed_keys and last_sequence after pasting
-        self.typed_keys = selected_expansion_data["expansion"]
-
         self.start_listener()
         return
+
 
     ############################################################################################################
 
@@ -365,16 +360,12 @@ class KeyListener:
 
     # ------------------------------------------------------------------------#
 
-    def lookup_and_expand(self, sequence):
+    def handle_hardcoded_suffixes(self, last_word):
         hardcoded_suffixes = {
             "çao": ("ção", r"(?<![ã])\bçao\b"),
             "mn": ("mento", r".mn"),
             "ao": ("ão", r".ao"),
         }
-
-        words = word_tokenize(sequence)
-        if words:
-            last_word = words[-1]
 
         for i in range(len(last_word) - 1, -1, -1):
             suffix = last_word[i:]
@@ -383,37 +374,46 @@ class KeyListener:
                 if re.search(regex_pattern, last_word):
                     prefix = last_word[:i]
                     expansion = prefix + expansion
+                    return expansion
+        return None
 
-                    if self.typed_keys.endswith(last_word + " "):
-                        self.typed_keys = self.typed_keys[: -len(last_word) - 1]
-                    elif self.typed_keys.endswith(last_word):
-                        self.typed_keys = self.typed_keys[: -len(last_word)]
+    def lookup_and_expand(self, sequence):
+        words = word_tokenize(sequence)
+        last_word = words[-1] if words else ""
 
-                    if self.word_buffer and self.word_buffer[-1] == last_word:
-                        self.word_buffer.pop()
+        expansion = self.handle_hardcoded_suffixes(last_word)
+        if expansion:
+            # Remove the last word from typed_keys
+            if self.typed_keys.endswith(last_word + " "):
+                self.typed_keys = self.typed_keys[:-len(last_word) - 1]
+            elif self.typed_keys.endswith(last_word):
+                self.typed_keys = self.typed_keys[:-len(last_word)]
 
-                    self.paste_expansion(expansion, format_value=0)
+            # Update multi-line string
+            lines = self.multi_line_string.split("\n")
+            current_line = lines[self.cursor_row]
+            new_line = current_line[:self.cursor_col - len(last_word)] + expansion + current_line[self.cursor_col:]
+            lines[self.cursor_row] = new_line
+            self.multi_line_string = "\n".join(lines)
 
-                    # Simulate a space key press and update necessary variables
-                    # self.typed_keys += " "
+            # Update cursor position
+            self.cursor_col = self.cursor_col - len(last_word) + len(expansion)
 
-                    # Update the multi-line string
-                    lines = self.multi_line_string.split("\n")
-                    current_line = lines[self.cursor_row]
-                    lines[self.cursor_row] = (
-                        current_line[: self.cursor_col]
-                        + " "
-                        + current_line[self.cursor_col :]
-                    )
-                    self.cursor_col += 1  # Move the cursor to the right by 1 position
-                    self.multi_line_string = "\n".join(lines)
+            # Update last_sequence
+            self.last_sequence = expansion
 
-                    # Programmatically press the space key
-                    keyboard.press_and_release("space")
+            # Paste the new expansion
+            self.paste_expansion(expansion, format_value=0)
 
-                    return
+            # Clear the word buffer
+            if self.word_buffer and self.word_buffer[-1] == last_word:
+                self.word_buffer.pop()
 
-        expansions_list = []
+            # Set flag to skip next key press
+            self.skip_next_key_press = True
+
+            return
+
         try:
             expansions_list = lookup_word_in_all_databases(sequence)
         except ValueError:
