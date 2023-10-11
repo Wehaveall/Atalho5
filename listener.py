@@ -317,23 +317,27 @@ class KeyListener:
             format_value=selected_expansion_data["format_value"],
         )
 
-        # Update the multi_line_string
+        # Split the multi_line_string into lines
         lines = self.multi_line_string.split("\n")
+
+        # Get the current line
         current_line = lines[self.cursor_row]
 
         # Remove the last typed shortcut from the current line
         current_line = current_line[: self.cursor_col - len(self.typed_keys)]
 
         # Add the selected expansion to the current line
-        lines[self.cursor_row] = (
+        new_current_line = (
             current_line
             + expansion_to_paste
-            + current_line[self.cursor_col - len(self.typed_keys) :]
         )
+        lines[self.cursor_row] = new_current_line
+
+        # Update the multi_line_string
         self.multi_line_string = "\n".join(lines)
 
         # Update the cursor position
-        self.cursor_col += len(expansion_to_paste) - len(self.typed_keys)
+        self.cursor_col = len(new_current_line)  # Set cursor position to the end of the new line
 
         # Reset self.typed_keys and self.last_sequence to the selected expansion
         self.typed_keys = expansion_to_paste
@@ -341,11 +345,9 @@ class KeyListener:
 
         print(f"LAST SEQ - AFTER Paste: {self.last_sequence}")  # Debugging
 
-        # Set a flag to indicate that the next key press should be skipped
-        self.skip_next_key_press = True
-
         self.start_listener()
         return
+
 
 
     ############################################################################################################
@@ -359,7 +361,6 @@ class KeyListener:
             print("tk_queue is None")  # Debugging line
 
     # ------------------------------------------------------------------------#
-
     def handle_hardcoded_suffixes(self, last_word):
         hardcoded_suffixes = {
             "çao": ("ção", r"(?<![ã])\bçao\b"),
@@ -374,6 +375,13 @@ class KeyListener:
                 if re.search(regex_pattern, last_word):
                     prefix = last_word[:i]
                     expansion = prefix + expansion
+
+                    # Remove the last typed word from the current line
+                    lines = self.multi_line_string.split("\n")
+                    current_line = lines[self.cursor_row]
+                    lines[self.cursor_row] = current_line[:self.cursor_col - len(last_word)]
+                    self.multi_line_string = "\n".join(lines)
+
                     return expansion
         return None
 
