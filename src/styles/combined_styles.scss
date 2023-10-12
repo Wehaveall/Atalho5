@@ -73,8 +73,8 @@ html {
     justify-content: center;
 
     .loader {
-        border: 5px solid $loader-border;
-        border-top: 5px solid $loader-border-top;
+        border: 5px solid;
+        border-top: 5px solid;
         border-radius: 50%;
         width: 50px;
         height: 50px;
@@ -247,6 +247,7 @@ input[type=text] {
 }
 
 .child-elem {
+    cursor: pointer;
     background-color: var(--window-bgcolor);
     color: var(--text-color);
     border: 2px solid transparent;
@@ -409,18 +410,6 @@ div::-webkit-scrollbar-thumb {
 //////////////////////////////////////////////
 
 
-/* Dark Theme */
-.dark-theme .db-file-checkbox {
-    background-color: #333;
-    /* Change as needed */
-    /* Other styles for dark theme */
-}
-
-
-
-
-
-
 
 
 
@@ -431,6 +420,7 @@ div::-webkit-scrollbar-thumb {
 }
 
 #myTable tr {
+    cursor: pointer;
     margin: 0;
     padding: 2px;
     line-height: 1.2;
@@ -1031,7 +1021,7 @@ html {
 }
 
 
-/* Tab 4 - CONFIG */
+/* ---------------------------------------------------------------------Tab 4 - CONFIG */
 
 #Tab4 {
     height: calc(100% - 50px);
@@ -1073,6 +1063,8 @@ html {
     margin-bottom: 10px;
 }
 
+
+
 .submenu-list {
     list-style-type: none;
     max-height: 0;
@@ -1080,7 +1072,19 @@ html {
     transition: max-height 0.3s ease-in-out;
 }
 
+
+/* Added CSS rules to style <a> tags in .submenu-list */
+.submenu-list a {
+    text-decoration: none;
+    /* Removes underline */
+    color: inherit;
+    /* Inherit color from parent, making it not blue */
+}
+
+
 .submenu-list li {
+    text-decoration: none;
+    color: inherit;
     margin-bottom: 10px;
     margin-left: -20px;
     text-align: left;
@@ -1088,11 +1092,11 @@ html {
 
 .submenu-list.open {
     max-height: 100px;
-
+    
 }
 
 
-.right-column-tab4 {
+.right-column-tab4-lan-gen {
     display: none;
     background-color: var(--window-bgcolor);
     height: 100%;
