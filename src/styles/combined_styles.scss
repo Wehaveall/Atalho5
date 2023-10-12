@@ -1043,6 +1043,7 @@ html {
 }
 
 .left-column-tab4 {
+    color: var(--text-color);
     font-family: $font-family;
     width: 230px;
     background-color: var(--window-bgcolor);
@@ -1097,6 +1098,7 @@ html {
 
 
 .right-column-tab4-lan-gen {
+    color: var(--text-color);
     display: none;
     background-color: var(--window-bgcolor);
     height: 100%;
