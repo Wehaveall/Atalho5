@@ -97,6 +97,23 @@ class KeyListener:
         self.resetting_keys = set(["space"])
 
     
+
+        # Reading JSON file to get the suffix setting
+        try:
+            with open("config.json", "r") as f:
+                config = json.load(f)
+                self.use_auto_suffixes = config.get("use_auto_suffixes", True)  # Default to True if not present
+        except FileNotFoundError:
+            self.use_auto_suffixes = True  # Default to True if config file is not found
+
+
+
+
+
+
+
+
+
     ###################################################################### FUNCTIONS
     #TO DO - newline must be configurable in the GUI
     
@@ -362,7 +379,7 @@ class KeyListener:
         hardcoded_suffixes = {
             "çao": ("ção", r"(?<![ã])\bçao\b"),
             "mn": ("mento", r".mn"),
-            "ao": ("ão", r".ao"),
+             "ao": ("ão", r"ao(?![s])"),  # Negative lookahead for "s"
             "oes": ("ões", r".oes"),
         }
 
@@ -387,132 +404,41 @@ class KeyListener:
     ##--------------------------------------------------------------------------------------------
     
     def lookup_and_expand(self, sequence):
-        words = word_tokenize(sequence)
-        last_word = words[-1] if words else ""
-
-        
-        # Suffix Function
-        expansion, suffix_used = self.handle_hardcoded_suffixes(last_word)  # Get both expansion and flag
-        #####################################################################
-        if expansion:
-
-         
-            if suffix_used:
-                self.just_suffix = True
-                print("Expansion came from hardcoded suffixes:")
-              
-
-                # Remove the last word from typed_keys
-                if self.typed_keys.endswith(last_word + " "):
-                    self.typed_keys = self.typed_keys[:-len(last_word) - 1]
-                elif self.typed_keys.endswith(last_word):
-                    self.typed_keys = self.typed_keys[:-len(last_word)]
-
-                # Paste the new expansion
-                self.paste_expansion(expansion, format_value=0)
-
-                # Update multi-line string
-                lines = self.multi_line_string.split("\n")
-                current_line = lines[self.cursor_row]
-                new_line = current_line[:self.cursor_col - len(last_word)] + expansion + current_line[self.cursor_col:]
-                lines[self.cursor_row] = new_line
-                self.multi_line_string = "\n".join(lines)
-
-                ### FALTA RECUPERAR O CONTEÚDO ANTERIOR AO SUFIXO. ERRO, CURSOR E CHARS DUPLICADOS.
-
-
-                # Update last_sequence
-                self.last_sequence = expansion
-
-                # Remove the last character from multi_line_string and append the expansion
-                #self.multi_line_string = expansion
-
-                # Update cursor position to the last position of the multi_line_string
-                self.cursor_col = len(self.multi_line_string)
-    
-                return
-       
-       
-       
-       
-        # Remove the last word from typed_keys
-            if self.typed_keys.endswith(last_word + " "):
-                self.typed_keys = self.typed_keys[:-len(last_word) - 1]
-            elif self.typed_keys.endswith(last_word):
-                self.typed_keys = self.typed_keys[:-len(last_word)]
-
-            # Update multi-line string
-            lines = self.multi_line_string.split("\n")
-            current_line = lines[self.cursor_row]
-            new_line = current_line[:self.cursor_col - len(last_word)] + expansion + current_line[self.cursor_col:]
-            lines[self.cursor_row] = new_line
-            self.multi_line_string = "\n".join(lines)
-
-            # Update cursor position
-            self.cursor_col = self.cursor_col - len(last_word) + len(expansion)
-
-            # Update last_sequence
-            self.last_sequence = expansion
-
-            # Paste the new expansion
-            self.paste_expansion(expansion, format_value=0)
-
-            # Clear the word buffer
-            if self.word_buffer and self.word_buffer[-1] == last_word:
-                self.word_buffer.pop()
-
-            # Set flag to skip next key press
-            self.skip_next_key_press = True
-
-            return
-
         try:
             expansions_list = lookup_word_in_all_databases(sequence)
+            print(f"Debug: All expansions found: {expansions_list}")  # Debug print
         except ValueError:
-            print("Not enough values returned from lookup")
+            print("Not enough values returned from lookup1")
+            return  # Exit the function if the lookup failed
 
-        ################################################################    MULTIPLE EXPANSIONS
         if len(expansions_list) > 1:
-            self.expansions_list = expansions_list  # Store the expansions list
+            self.expansions_list = expansions_list
+            self.create_popup()
+        elif len(expansions_list) == 1:
+            print("Debug: Single expansion detected.")  # Debug print
 
-            self.create_popup()  # Call the create_popup function to create a Tkinter window
-
-        
-
-        ###############################################################     ONE EXPANSION
-        elif len(expansions_list) == 1:  # Handling single expansion
-            print("Debug: Single expansion detected.")  # Debugging line
+            # Handling the first element in the list of expansions
             expansion_data = expansions_list[0]
-            self.paste_expansion(
-                expansion_data["expansion"], format_value=expansion_data["format_value"]
-            )
+            expansion = expansion_data.get('expansion', None)
+            format_value = expansion_data.get('format_value', None)
+            self.requires_delimiter = expansion_data.get('requires_delimiter', None)
+            self.delimiters = expansion_data.get('delimiters', None)
 
-        ######
-        try:
-            (
-                expansion,
-                format_value,
-                self.requires_delimiter,
-                self.delimiters,
-            ) = lookup_word_in_all_databases(sequence)
+            print(f"Debug: Expansion found for {sequence} is {expansion} with format_value {format_value}")  # Debug print
 
-        except ValueError:
-            print("Not enough values returned from lookup")
-            expansion = format_value = self.requires_delimiter = self.delimiters = None
+        key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))
 
-        #####
         if self.requires_delimiter == "yes":
             delimiter_list = [item.strip() for item in self.delimiters.split(",")]
-            key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))
             if key_str in delimiter_list:
                 if expansion is not None:
                     self.paste_expansion(expansion, format_value=format_value)
-                    self.typed_keys = """"""
-
+                    self.typed_keys = ""
         elif self.requires_delimiter == "no":
             if expansion is not None:
                 self.paste_expansion(expansion, format_value=format_value)
-                self.typed_keys = """"""
+                self.typed_keys = ""
+
 
     # ----------------------------------------------------------------
 

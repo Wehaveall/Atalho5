@@ -214,5 +214,6 @@ def lookup_word_in_all_databases(word):
                     all_expansions.append(expansion_data)
                     
     
-    
+     # Debug: print all expansions found
+    print(f"Debug: All expansions found: {all_expansions}")
     return all_expansions
