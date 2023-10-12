@@ -322,41 +322,28 @@ class KeyListener:
         expansion_to_paste = selected_expansion_data["expansion"]
 
         # Call the paste_expansion method
-        self.paste_expansion(
-            expansion_to_paste,
-            format_value=selected_expansion_data["format_value"],
-        )
+        self.paste_expansion(expansion_to_paste,format_value=selected_expansion_data["format_value"],)
 
         self.just_pasted_expansion = True
-
         # Split the multi_line_string into lines
         lines = self.multi_line_string.split("\n")
-
         # Get the current line
         current_line = lines[self.cursor_row]
-
-       # Find the last occurrence of the typed shortcut in the current line-----------------LAST SEQUENCEE _ NOT LAST WORD---------------------------------------------
+        # Find the last occurrence of the typed shortcut in the current line-----------------LAST SEQUENCEE _ NOT LAST WORD---------------------------------------------
         last_occurrence = current_line.rfind(self.last_sequence)
-
         # Remove the last typed shortcut from the current line
         if last_occurrence != -1:
             current_line = current_line[:last_occurrence] + current_line[last_occurrence + len(self.last_sequence):]
-
-
         # Add the selected expansion to the current line
         new_current_line = current_line + expansion_to_paste
         lines[self.cursor_row] = new_current_line
-
         # Update the multi_line_string
         self.multi_line_string = "\n".join(lines)
-
         # Update the cursor position to the end of the new line
         self.cursor_col = len(new_current_line)
-
         # Reset self.typed_keys and self.last_sequence to the selected expansion
         self.typed_keys = expansion_to_paste
         self.last_sequence = expansion_to_paste
-
         self.start_listener()
         return
 
@@ -371,8 +358,6 @@ class KeyListener:
         else:
             print("tk_queue is None")  # Debugging line
 
-   
-   
     # ------------------------------------------------------------------------#
    
     def handle_hardcoded_suffixes(self, last_word):
@@ -400,7 +385,8 @@ class KeyListener:
         return (None, False)  # Return None and flag as False if no match
 
 
-
+    ##--------------------------------------------------------------------------------------------
+    
     def lookup_and_expand(self, sequence):
         words = word_tokenize(sequence)
         last_word = words[-1] if words else ""
@@ -409,14 +395,12 @@ class KeyListener:
         # Suffix Function
         expansion, suffix_used = self.handle_hardcoded_suffixes(last_word)  # Get both expansion and flag
         #####################################################################
-       
-
         if expansion:
 
          
             if suffix_used:
                 self.just_suffix = True
-                print("Expansion came from hardcoded suffixes###################################")
+                print("Expansion came from hardcoded suffixes:")
               
 
                 # Remove the last word from typed_keys
