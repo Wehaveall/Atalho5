@@ -11,13 +11,21 @@ function toggleMenu(submenuId) {
 }
 
 function showContent(contentId) {
-    const rightColumn = document.querySelector('.right-column-tab4-lan-gen');
+    const lang_general = document.querySelector('.right-column-tab4-lan-gen');
+    const lang_specific = document.querySelector('.right-column-tab4-lan-spec');
 
     if (contentId === 'language_general') {
-        rightColumn.style.display = 'block';
+        lang_general.style.display = 'block';
     } else {
-        rightColumn.style.display = 'none';
+        lang_general.style.display = 'none';
     }
+
+    if (contentId === 'language_advanced') {
+        lang_specific.style.display = 'block';
+    } else {
+        lang_specific.style.display = 'none';
+    }
+
 
     // Your existing logic for other content
 }

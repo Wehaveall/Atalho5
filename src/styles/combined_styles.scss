@@ -1096,7 +1096,7 @@ html {
     
 }
 
-
+// Configurações - Linguagem - Geral
 .right-column-tab4-lan-gen {
     color: var(--text-color);
     display: none;
@@ -1106,6 +1106,7 @@ html {
     font-family: $font-family;
     overflow-y: auto;
 }
+
 
 #language_choice{
 margin-top: 15px;
@@ -1126,7 +1127,16 @@ height: 50px
     height: 40px;
 }
 
-
+// Configurações - Linguagem - Avançado
+.right-column-tab4-lan-spec {
+    color: var(--text-color);
+    display: none;
+    background-color: var(--window-bgcolor);
+    height: 100%;
+    flex-grow: 1;
+    font-family: $font-family;
+    overflow-y: auto;
+}
 
 
 /////////////////////////////       DARK MODE TOGGLE      //////////////////////////////////////

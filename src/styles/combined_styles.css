@@ -1041,6 +1041,16 @@ html {
   height: 40px;
 }
 
+.right-column-tab4-lan-spec {
+  color: var(--text-color);
+  display: none;
+  background-color: var(--window-bgcolor);
+  height: 100%;
+  flex-grow: 1;
+  font-family: "Work Sans", sans-serif;
+  overflow-y: auto;
+}
+
 .darkmode-container {
   margin-right: 100px;
   display: flex;
