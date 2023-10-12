@@ -262,6 +262,7 @@ class KeyListener:
             # Now paste
             keyboard.press_and_release("ctrl+v")
 
+
             # Move the mouse 1 pixel to the right (This is the new line)
             # Provisional solution because paste will only appear after mouse move
             current_x, current_y = pyautogui.position()  # Get current mouse position
@@ -282,9 +283,6 @@ class KeyListener:
  
  
        
-
-
-
 
 
     # ----------------------------------------------------------------Handle Accents
@@ -365,6 +363,7 @@ class KeyListener:
             "çao": ("ção", r"(?<![ã])\bçao\b"),
             "mn": ("mento", r".mn"),
             "ao": ("ão", r".ao"),
+            "oes": ("ões", r".oes"),
         }
 
         for i in range(len(last_word) - 1, -1, -1):

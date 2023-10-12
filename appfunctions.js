@@ -668,6 +668,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const themeToggle = document.getElementById("darkmode-toggle");
   const body = document.body;
 
+  ////////////// IMPORTANT - ADD LAST THE TO THE LIST - TO DO
+  // Setting light theme as default theme when the app starts
+  if (!body.classList.contains("light-theme") && !body.classList.contains("dark-theme")) {
+    body.classList.add("light-theme");
+  }
+
   themeToggle.addEventListener("click", function () {
     if (body.classList.contains("dark-theme")) {
       body.classList.remove("dark-theme");

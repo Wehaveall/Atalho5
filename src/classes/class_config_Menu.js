@@ -13,7 +13,7 @@ function toggleMenu(submenuId) {
 function showContent(contentId) {
     const rightColumn = document.querySelector('.right-column-tab4');
 
-    if (contentId === 'language_advanced') {
+    if (contentId === 'language_general') {
         rightColumn.style.display = 'block';
     } else {
         rightColumn.style.display = 'none';
