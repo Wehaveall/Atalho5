@@ -2,6 +2,11 @@
 // Common Variables
 
 
+
+.default-checkbox {
+  
+}
+
 $font-family: 'Work Sans',sans-serif;
 $focused-bg-color: #f79d44;
 
@@ -23,20 +28,6 @@ $focused-bg-color: #f79d44;
     --button-color: rgb(221, 221, 221);
 }
 
-
-
-
-.light-theme  .db-file-checkbox {
-    background-color: #721717;
-    /* Change as needed */
-    /* Other styles for light theme */
-}
-/* Dark Theme */
-.dark-theme .db-file-checkbox {
-    background-color: #333;
-    /* Change as needed */
-    /* Other styles for dark theme */
-}
 
 
 
@@ -1148,7 +1139,7 @@ height: 50px
     align-items: center;
 }
 
-label {
+.darkmode-container label {
     top: 1px;
     width: 40px;
     height: 20px;
@@ -1160,7 +1151,7 @@ label {
     cursor: pointer;
 }
 
-label:after {
+.darkmode-container label:after {
     top: 1px;
         /* Adjusts the position to center it vertically */
         left: 1px;
@@ -1176,33 +1167,33 @@ label:after {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-#darkmode-toggle {
+.darkmode-container #darkmode-toggle {
     width: 0;
     height: 0;
     visibility: hidden;
 }
 
-input:checked+label {
+.darkmode-container input:checked+label {
     background: #242424;
 }
 
-input:checked+label:after {
+.darkmode-container input:checked+label:after {
    
     left: 39px;
     transform: translateX(-100%);
     background: linear-gradient(180deg, #777, #3a3a3a);
 }
 
-label,
-label:after {
+.darkmode-container label,
+.darkmode-container label:after {
     transition: 0.3s
 }
 
-label:active:after {
+.darkmode-container label:active:after {
     width: 26px;
 }
 
-label svg {
+.darkmode-container label svg {
     position: absolute;
     width: 27px;
     top: 0px;
@@ -1210,7 +1201,7 @@ label svg {
 }
 
 /* Changes here: Updated positioning for sun and moon SVGs */
-label svg.sun {
+.darkmode-container label svg.sun {
     left: -3px;
     /* Move to the left */
     top: 1px;
@@ -1219,7 +1210,7 @@ label svg.sun {
     transition: 0.3s;
 }
 
-label svg.moon {
+.darkmode-container label svg.moon {
     right: -5px;
     /* Move to the right */
     top: 0px;
@@ -1228,10 +1219,10 @@ label svg.moon {
     transition: 0.3s;
 }
 
-input:checked+label svg.sun {
+.darkmode-container input:checked+label svg.sun {
     fill: #7e7e7e;
 }
 
-input:checked+label svg.moon {
+.darkmode-container input:checked+label svg.moon {
     fill: #fff;
 }

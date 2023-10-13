@@ -4,10 +4,17 @@ from functools import partial
 from threading import Event
 import json
 import logging
-import platform
+import configparser
 import re
 import time
-import sqlite3
+
+
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, MetaData, Table, text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import re
+
 
 # Third-Party Libraries
 import html_clipboard
@@ -43,13 +50,20 @@ cursor_row = 0
 cursor_col = 0
 
 
+
 ######################################################    KEYLISTENER    ###############################################################
 ########################################################################################################################################
 class KeyListener:
     
     
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
-        
+    
+
+
+
+    
+
+        self.suffix_patterns = self.load_suffix_data()  # <--- Modify this line
         self.expansion_triggered_by_enter = False
         self.tk_queue = tk_queue  # Assign it to an instance variable
         self.expansions_list = []  # Define the expansions_list
@@ -109,13 +123,40 @@ class KeyListener:
 
 
 
-
-
+    
 
 
     ###################################################################### FUNCTIONS
     #TO DO - newline must be configurable in the GUI
     
+
+# Initialize an empty list to hold regex patterns
+
+    def load_suffix_data(self):
+        # Load the current language from settings.json
+        with open('settings.json', 'r') as f:
+            settings = json.load(f)
+
+        current_language = settings.get('language', 'en')
+
+        config = configparser.ConfigParser()
+        config.read('suffix.ini')
+
+        suffix_patterns = {}
+
+        if config.has_section(current_language):
+            for pattern, value in config.items(current_language):
+                replacement, status = value.split(", ")
+                if status == "enabled":
+                    suffix_patterns[pattern] = replacement
+
+        return suffix_patterns
+
+       
+
+
+
+
     def format_article(self, article, newlines=2):
         # Replacing other delimiters
         delimiters = ["*", "#", "%", "@", "$"]
@@ -385,50 +426,18 @@ class KeyListener:
         else:
             print("tk_queue is None")  # Debugging line
 
-    # ------------------------------------------------------------------------#
-   
-    def handle_hardcoded_suffixes(self, last_word):
-        hardcoded_suffixes = {
-            "çao": ("ção", r"(?<![ã])\bçao\b"),
-            "mn": ("mento", r".mn"),
-             "ao": ("ão", r"ao(?![s])"),  # Negative lookahead for "s"
-            "oes": ("ões", r".oes"),
-        }
-
-        for i in range(len(last_word) - 1, -1, -1):
-            suffix = last_word[i:]
-            if suffix in hardcoded_suffixes:
-                expansion, regex_pattern = hardcoded_suffixes[suffix]
-                if re.search(regex_pattern, last_word):
-                    prefix = last_word[:i]
-                    expansion = prefix + expansion
-
-                    # Remove the last typed word from the current line
-                    lines = self.multi_line_string.split("\n")
-                    current_line = lines[self.cursor_row]
-                    lines[self.cursor_row] = current_line[:self.cursor_col - len(last_word)]
-                    self.multi_line_string = "\n".join(lines)
-
-                    return (expansion, True)  # Return expansion and flag as True
-        return (None, False)  # Return None and flag as False if no match
-
-
+  
     ##--------------------------------------------------------------------------------------------
     
-
-
 
     def lookup_and_expand(self, sequence):
         try:
             expansions_list = lookup_word_in_all_databases(sequence)
+            print(f"Debug: Type of expansions_list: {type(expansions_list)}")  # Debug print
             print(f"Debug: All expansions found: {expansions_list}")  # Debug print
         except ValueError:
             print("Not enough values returned from lookup1")
             return  # Exit the function if the lookup failed
-
-
-       
-
 
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list
@@ -444,8 +453,12 @@ class KeyListener:
             self.requires_delimiter = expansion_data.get('requires_delimiter', None)
             self.delimiters = expansion_data.get('delimiters', None)
 
+
+
             print(f"Debug: Expansion found for {sequence} is {expansion} with format_value {format_value}")  # Debug print
 
+       
+        
         key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))
 
         if self.requires_delimiter == "yes":
@@ -468,11 +481,24 @@ class KeyListener:
 
 
    
+      
+
+        #Suffix
+        for pattern, replacement in self.suffix_patterns.items():
+            if re.search(pattern, sequence):
+                expanded_sequence = re.sub(pattern, replacement, sequence)
+                self.paste_expansion(expanded_sequence, format_value=0)
+                self.typed_keys = ""
+                self.last_sequence = ""  # Clear last_sequence after successful expansion
+                return  # Exit the function to prevent further processing
 
 
 
 
 
+
+
+    
     ################################################################
     ################################################################
 
@@ -758,3 +784,6 @@ class KeyListener:
         logging.info(f"on_key_release processing took {elapsed_time:.2f} seconds")
 
     # ----------------------------------------------------------------
+
+
+
