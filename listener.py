@@ -7,6 +7,7 @@ import logging
 import platform
 import re
 import time
+import sqlite3
 
 # Third-Party Libraries
 import html_clipboard
@@ -414,6 +415,9 @@ class KeyListener:
 
     ##--------------------------------------------------------------------------------------------
     
+
+
+
     def lookup_and_expand(self, sequence):
         try:
             expansions_list = lookup_word_in_all_databases(sequence)
@@ -422,9 +426,14 @@ class KeyListener:
             print("Not enough values returned from lookup1")
             return  # Exit the function if the lookup failed
 
+
+       
+
+
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list
             self.create_popup()
+        
         elif len(expansions_list) == 1:
             print("Debug: Single expansion detected.")  # Debug print
 
