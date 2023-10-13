@@ -282,6 +282,8 @@ class KeyListener:
 
             # Now paste
             keyboard.press_and_release("ctrl+v")
+           
+    
 
 
             # Move the mouse 1 pixel to the right (This is the new line)
@@ -290,45 +292,25 @@ class KeyListener:
             pyautogui.moveTo(current_x + 2, current_y)  # Move mouse 1 pixel to the right
 
 
+       
+
+        # Update other variables
+        self.last_sequence = ""
+        self.multi_line_string = ""
+        self.cursor_row = 0
+        self.cursor_col = 0
+        self.typed_keys = ""
+        #self.last_word = formatted_expansion
+        #self.word_buffer.append(formatted_expansion)
+        
+        #self.cursor_col += len(formatted_expansion)
+        #print(f"Debug: Updated cursor_col: {self.cursor_col}")  # Debug print
+
         self.programmatically_typing = False  # Reset the flag
-        # Remove the last incorrect word from self.typed_keys
-        self.typed_keys = self.typed_keys.rstrip(self.last_word)
-        # Add the corrected word
-        self.typed_keys += formatted_expansion   # Modified to use formatted_expansion
-        self.last_word = formatted_expansion  # Modified to use formatted_expansion
-        self.word_buffer.append(formatted_expansion)  # Modified to use formatted_expansion
-
-
-
-
-
-
-
-
-        # TO DO NEED BETTER MULTILINE
-        # Update multi_line_string by removing the shortcut and adding the expansion
-        lines = self.multi_line_string.split("\n")
-        current_line = lines[self.cursor_row]
-        last_occurrence = current_line.rfind(self.last_sequence)
-        if last_occurrence != -1:
-            current_line = current_line[:last_occurrence] + current_line[last_occurrence + len(self.last_sequence):]
-        new_current_line = current_line + formatted_expansion
-        lines[self.cursor_row] = new_current_line
-        self.multi_line_string = "\n".join(lines)
-
-        # Update the cursor position to the end of the new line
-        self.cursor_col = len(new_current_line)
-
-
-
-
-
-
 
         print(f"After paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
- 
- 
-       
+
+
 
 
     # ----------------------------------------------------------------Handle Accents
@@ -567,9 +549,10 @@ class KeyListener:
                 self.last_sequence = ""  # Clear last_sequence
 
 
-            # Highlighted Changes: Start
             elif key == "left":
                 self.cursor_col = max(0, self.cursor_col - 1)
+                if self.last_sequence:  # Check if last_sequence is not empty
+                    self.last_sequence = self.last_sequence[:-1]  # Remove last character
 
             elif key == "right":
                 next_char = (
@@ -577,11 +560,11 @@ class KeyListener:
                     if self.cursor_col < len(self.multi_line_string)
                     else None
                 )
-
                 if next_char:
                     self.cursor_col = min(
                         len(self.multi_line_string), self.cursor_col + 1
                     )
+                    self.last_sequence += next_char  # Append next character to last_sequence
 
             elif key == "up":
                 # Removed cursor movement, only reset last_sequence
@@ -593,30 +576,30 @@ class KeyListener:
 
             # ---------------------------------------WORDS--------------------------------
             # Tokenize the sentence into words
-            words = word_tokenize(self.typed_keys)
+            words_from_multi_line = word_tokenize(self.multi_line_string)
 
-            # Get the last word only if words list is not empty
-            last_word = words[-1] if words else None  # Highlighted Change
+            # Get the last word only if the list is not empty
+            self.last_word = words_from_multi_line[-1] if words_from_multi_line else None
 
             if (
-                last_word
+                self.last_word
             ):  # Highlighted Change: Only call fix_double_caps if last_word is not None
                 if (
                     key != "backspace"
                 ):  # Highlighted Change: Add condition to skip "backspace"
-                    self.fix_double_caps(last_word)  # Call fix_double_caps here
-                    self.lookup_and_expand(last_word)
+                    self.fix_double_caps(self.last_word)  # Call fix_double_caps here
+                    #self.lookup_and_expand(last_word)
 
             # --------------------------------------SENTENCES-----------------------------
             # Sentence Tokenization
-            sentences = sent_tokenize(self.typed_keys)
+            sentences = sent_tokenize(self.multi_line_string)
             last_sentence = sentences[-1] if sentences else ""
             last_sentence = sentences[-1] if sentences else None  # Highlighted Change
 
             # ---------------------------------------ENTITIES--------------------------------
             # Tokenization
             tokens = word_tokenize(
-                self.typed_keys
+                self.multi_line_string
             )  # Make sure self.typed_keys is a string
             tags = pos_tag(tokens)
             entities = ne_chunk(tags)
@@ -632,12 +615,10 @@ class KeyListener:
             print(f"Sentence List= {sentences}")
             print(f"Last Sentence = {last_sentence}")
 
-            print(f"Words List= {words}")
-            print(f"Last Word= {last_word}")
+            print(f"Words List= {words_from_multi_line}")
+            print(f"Last Word= {self.last_word}")
 
-        if (
-            processed_char is not None
-        ):  # Update multi_line_string using the returned character
+        if (processed_char is not None):  # Update multi_line_string using the returned character
             lines = self.multi_line_string.split("\n")
             current_line = lines[self.cursor_row]
             lines[self.cursor_row] = (
@@ -647,6 +628,11 @@ class KeyListener:
             )
             self.cursor_col += 1  # Move the cursor to the right by 1 position
             self.multi_line_string = "\n".join(lines)
+            self.typed_keys = self.multi_line_string
+       
+
+
+
 
         elif key == "backspace":
             if (
@@ -683,7 +669,7 @@ class KeyListener:
 
         
         elif key == "space":
-            
+        
             # Update the line at the cursor position within the specific line
             lines = self.multi_line_string.split("\n")
             current_line = lines[self.cursor_row]
@@ -693,32 +679,38 @@ class KeyListener:
             self.cursor_col += 1  # Move the cursor to the right by 1 position
             # Join the lines back into a single string
             self.multi_line_string = "\n".join(lines)
+          
+
             
            
              
 
         elif key == "enter":  # Highlighted Changes: Start
             lines = self.multi_line_string.split("\n")
+
+            # Validate cursor_row before using it
+            if self.cursor_row >= len(lines):
+                self.cursor_row = len(lines) - 1
+
             current_line = lines[self.cursor_row]
+
             # Split the current line at the cursor and create a new line
-            lines.insert(self.cursor_row + 1, current_line[self.cursor_col :])
-            lines[self.cursor_row] = current_line[: self.cursor_col]
+            lines.insert(self.cursor_row + 1, current_line[self.cursor_col:])
+            lines[self.cursor_row] = current_line[:self.cursor_col]
+            
             self.cursor_row += 1  # Move the cursor down to the new line
             self.cursor_col = 0  # Move the cursor to the beginning of the new line
             self.multi_line_string = "\n".join(lines)
             # Highlighted Changes: End
 
-        # Update last_sequence with the last word in multi_line_string
-        words_in_multi_line_string = word_tokenize(self.multi_line_string)
-        if words_in_multi_line_string:
-            self.last_sequence = words_in_multi_line_string[-1]  # Take the last word
-        else:
-            self.last_sequence = ""  # If no words, set to empty string
 
     
 
-        print("Current multi-line string-------------------------------------------:")
+        print("Current multi-line string----->:")
         print(self.multi_line_string)
+        print("Current SELF TYPED----->:")
+        print(self.typed_keys)
+
         print(f"Last Sequence:__2 {self.last_sequence}")
 
         try:
