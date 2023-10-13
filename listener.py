@@ -48,12 +48,10 @@ class KeyListener:
     
     
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
-       
-        self.just_suffix = False
+        
+        self.expansion_triggered_by_enter = False
         self.tk_queue = tk_queue  # Assign it to an instance variable
-        # self.popup_done_event = threading.Event()
         self.expansions_list = []  # Define the expansions_list
-        # keyboard.add_abbreviation("@g", "denisvaljean@gmail.com")
         self.programmatically_typing = False  # Initialize the flag here
         self.last_word = ""  # Initialize last_word
         self.word_buffer = deque([], maxlen=500)  # Initialize with an empty deque
@@ -254,6 +252,12 @@ class KeyListener:
         print(f"Before paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
 
 
+    # Handle the Enter key triggering an expansion
+        if self.expansion_triggered_by_enter:
+            keyboard.press_and_release("backspace")
+            self.expansion_triggered_by_enter = False  # Reset the flag
+
+
         # Clear previously typed keys
         keyboard.press("ctrl")
         keyboard.press("shift")
@@ -283,19 +287,44 @@ class KeyListener:
             # Move the mouse 1 pixel to the right (This is the new line)
             # Provisional solution because paste will only appear after mouse move
             current_x, current_y = pyautogui.position()  # Get current mouse position
-            pyautogui.moveTo(current_x + 1, current_y)  # Move mouse 1 pixel to the right
+            pyautogui.moveTo(current_x + 2, current_y)  # Move mouse 1 pixel to the right
 
 
         self.programmatically_typing = False  # Reset the flag
-
         # Remove the last incorrect word from self.typed_keys
         self.typed_keys = self.typed_keys.rstrip(self.last_word)
-
         # Add the corrected word
         self.typed_keys += formatted_expansion   # Modified to use formatted_expansion
-
         self.last_word = formatted_expansion  # Modified to use formatted_expansion
         self.word_buffer.append(formatted_expansion)  # Modified to use formatted_expansion
+
+
+
+
+
+
+
+
+        # TO DO NEED BETTER MULTILINE
+        # Update multi_line_string by removing the shortcut and adding the expansion
+        lines = self.multi_line_string.split("\n")
+        current_line = lines[self.cursor_row]
+        last_occurrence = current_line.rfind(self.last_sequence)
+        if last_occurrence != -1:
+            current_line = current_line[:last_occurrence] + current_line[last_occurrence + len(self.last_sequence):]
+        new_current_line = current_line + formatted_expansion
+        lines[self.cursor_row] = new_current_line
+        self.multi_line_string = "\n".join(lines)
+
+        # Update the cursor position to the end of the new line
+        self.cursor_col = len(new_current_line)
+
+
+
+
+
+
+
         print(f"After paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
  
  
@@ -430,23 +459,28 @@ class KeyListener:
 
         if self.requires_delimiter == "yes":
             delimiter_list = [item.strip() for item in self.delimiters.split(",")]
+           
             if key_str in delimiter_list:
+                
                 if expansion is not None:
+                    if key_str == 'enter':
+                        self.expansion_triggered_by_enter = True
+                    # Potentially delete the shortcut text here before pasting the expansion
                     self.paste_expansion(expansion, format_value=format_value)
                     self.typed_keys = ""
+                    self.last_sequence = ""  # Clear last_sequence after successful expansion
+            
         elif self.requires_delimiter == "no":
             if expansion is not None:
                 self.paste_expansion(expansion, format_value=format_value)
                 self.typed_keys = ""
 
 
-    # ----------------------------------------------------------------
+   
 
-    # def on_key_press(self, event):
-    #     key = event.name  # Define 'key' first before using it
-    #     print(f"Key pressed: {key}")  # Debugging
-    #     if key == "shift":
-    #         self.shift_pressed = True
+
+
+
 
     ################################################################
     ################################################################
@@ -691,31 +725,32 @@ class KeyListener:
             self.last_key = key
 
             if key not in self.omitted_keys:
-                   
-                if (key != "backspace"):  # Highlighted Change: Add condition to skip "backspace" triggering shortcuts
+                if (key != "backspace"):  # Add condition to skip "backspace" triggering shortcuts
                     self.lookup_and_expand(self.last_sequence)
 
             else:
-                
-                if key == "space":
+               
+                # Initialize delimiter_list at the start of your function
+                delimiter_list = self.delimiters.split(",") if self.delimiters else ["space", "enter"]
 
-
-                 
-                   
-                    if (key != "backspace"):  # Highlighted Change: Add condition to skip "backspace" triggering shortcuts
-                        
-                        self.lookup_and_expand(last_word)
+                if key in delimiter_list:
+                    
+                    if (key != "backspace"):  # Add condition to skip "backspace" triggering shortcuts
                         # Tokenize the sentence into words
                         words = word_tokenize(self.multi_line_string)
-
-                        # Get the last word
-
                         # Get the last word only if words list is not empty
-                        last_word = words[-1] if words else None  # Highlighted Change
-                        self.lookup_and_expand(last_word)
+                        last_word = words[-1] if words else None
+                        if last_word:
+                            self.lookup_and_expand(last_word)
+                            self.last_sequence = ""  # Clear last_sequence after successful expansion
+                        
 
+                        
         except Exception as e:
             logging.error(f"Error in on_key_release: {e}")
+
+
+    
 
         end_time = time.time()
         elapsed_time = end_time - start_time
