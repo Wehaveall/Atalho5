@@ -751,12 +751,22 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
 
+      populateSuffixList();
+
+
+
 
     } else {
       console.error("Failed to load pywebview API");
     }
   });
 
+  
+  
+  
+  
+  
+  
   document.getElementById("content").addEventListener("click", function (event) {
     event.stopPropagation();
   }, false);

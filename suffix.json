@@ -1,0 +1,42 @@
+{
+  "en": [
+    {
+      "pattern": "([a-zA-Z])ab\\b",
+      "replace": "\\1able, disabled"
+    }
+  ],
+  "pt-BR": [
+    {
+      "pattern": "([a-zA-Z])mn\\b",
+      "replace": "\\1mento, enabled"
+    },
+    {
+      "pattern": "([a-zA-Z])ex\\b",
+      "replace": "\\1exemplo, enabled"
+    }
+  ],
+  "de": [
+    {
+      "pattern": "([a-zA-Z])be\\b",
+      "replace": "\\1beispiel, disabled"
+    }
+  ],
+  "it": [
+    {
+      "pattern": "([a-zA-Z])ex\\b",
+      "replace": "\\1esempio, enabled"
+    }
+  ],
+  "fr": [
+    {
+      "pattern": "([a-zA-Z])ex\\b",
+      "replace": "\\1exemple, disabled"
+    }
+  ],
+  "es": [
+    {
+      "pattern": "([a-zA-Z])ej\\b",
+      "replace": "\\1ejemplo, enabled"
+    }
+  ]
+}
