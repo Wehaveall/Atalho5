@@ -25,6 +25,7 @@ import pyperclip  # Added for clipboard manipulation
 # Project-Specific Libraries
 from src.database.data_connect import lookup_word_in_all_databases
 from src.utils import number_utils
+from suffix_accents_utils import *
 ################################################################ - NATURAL TRAINIG LANGUAGE
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -63,7 +64,8 @@ class KeyListener:
 
     
 
-        self.suffix_patterns = self.load_suffix_data()  # <--- Modify this line
+        self.suffix_patterns = get_current_suffix_patterns()
+       
         self.expansion_triggered_by_enter = False
         self.tk_queue = tk_queue  # Assign it to an instance variable
         self.expansions_list = []  # Define the expansions_list
@@ -128,34 +130,6 @@ class KeyListener:
     
 
 # Initialize an empty list to hold regex patterns
-
-
-
- 
-
-    def load_suffix_data(self):
-        # Load the suffix data from suffix.json
-        with open('suffix.json', 'r', encoding='utf-8') as f:
-            suffix_data = json.load(f)
-
-        # Initialize an empty dictionary to store suffix patterns
-        suffix_patterns = {}
-
-        # Loop through all languages in the JSON data
-        for lang in suffix_data:
-            for entry in suffix_data[lang]:
-                pattern = entry.get("pattern")
-                replace_value = entry.get("replace")
-                
-                if replace_value:
-                    replacement, status = replace_value.split(", ")
-
-                # Only add the pattern if its status is "enabled"
-                if status == "enabled":
-                    suffix_patterns[pattern] = replacement
-
-        return suffix_patterns
-
 
 
 
@@ -437,7 +411,9 @@ class KeyListener:
     def lookup_and_expand(self, sequence):
         
         
-        # Suffix
+      # Suffix
+        print(f"Debug: Current suffix_patterns: {self.suffix_patterns}")  # Debug print
+
         for pattern, replacement in self.suffix_patterns.items():
             print(f"Debug: Trying pattern {pattern}")  # Debug print
             match = re.search(pattern, sequence)
@@ -448,7 +424,11 @@ class KeyListener:
                 self.typed_keys = ""
                 self.last_sequence = ""  # Clear last_sequence after successful expansion
                 return  # Exit the function to prevent further processing
-            
+            else:
+                print(f"Debug: Pattern {pattern} did NOT match in sequence {sequence}.")  # Debug print
+
+        print(f"Debug: No match found for any pattern in sequence {sequence}.")  # Debug print
+
         
         
         

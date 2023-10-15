@@ -35,6 +35,8 @@ from src.database.data_connect import (
 )
 from src.utils import number_utils
 
+from suffix_accents_utils import *
+
 # Global Variable Initialization
 api = None
 
@@ -158,32 +160,10 @@ class Api:
 
     
 
-
-    def update_suffix_json(self, lang, pattern, is_enabled):
-            with open('suffix.json', 'r', encoding='utf-8') as f:
-                data = json.load(f)
-
-            for entry in data.get(lang, []):
-                if entry['pattern'] == pattern:
-                    replace, _ = entry['replace'].split(", ")
-                    entry['replace'] = f"{replace}, {'enabled' if is_enabled else 'disabled'}"
-                    break
-
-            with open('suffix.json', 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def update_suffix_json_api(self, lang, pattern, is_enabled):
+        update_suffix_json(lang, pattern, is_enabled)
+        # Refresh the in-memory suffix patterns (if needed)
+        self.suffix_patterns = load_suffix_data()
     
     def get_initial_states(self):
        return self.load_all_states()

@@ -2,7 +2,7 @@
   "pt-BR": [
     {
       "pattern": "([a-zA-Z])mn\\b",
-      "replace": "\\1mente, disabled"
+      "replace": "\\1mente, enabled"
     },
     {
       "pattern": "([a-zA-Z])ao\\b",
