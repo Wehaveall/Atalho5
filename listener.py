@@ -60,9 +60,11 @@ class KeyListener:
     def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
     
 
+        #Carrega o resultado da função load_suffix_data que está dentro do arquivo suffix_accents_utils.py na self
+        #variável suffix_patterns
+        # def get_current_suffix_patterns():
+        #   return load_suffix_data()
 
-
-    
 
         self.suffix_patterns = get_current_suffix_patterns()
        
@@ -375,7 +377,7 @@ class KeyListener:
         lines = self.multi_line_string.split("\n")
         # Get the current line
         current_line = lines[self.cursor_row]
-        # Find the last occurrence of the typed shortcut in the current line-----------------LAST SEQUENCEE _ NOT LAST WORD---------------------------------------------
+        # Find the last occurrence of the typed shortcut in the current line------LAST SEQUENCEE _ NOT LAST WORD------------
         last_occurrence = current_line.rfind(self.last_sequence)
         # Remove the last typed shortcut from the current line
         if last_occurrence != -1:
@@ -412,22 +414,20 @@ class KeyListener:
         
         
       # Suffix
-        print(f"Debug: Current suffix_patterns: {self.suffix_patterns}")  # Debug print
-
+        #Aqui o dicionário já está carregado quando inicia a classe
         for pattern, replacement in self.suffix_patterns.items():
-            print(f"Debug: Trying pattern {pattern}")  # Debug print
             match = re.search(pattern, sequence)
             if match:
-                print(f"Debug: Pattern {pattern} matched in sequence {sequence}. Replacing with {replacement}.")  # Debug print
+               
                 expanded_sequence = re.sub(pattern, replacement, sequence)
                 self.paste_expansion(expanded_sequence, format_value=0)
                 self.typed_keys = ""
                 self.last_sequence = ""  # Clear last_sequence after successful expansion
                 return  # Exit the function to prevent further processing
+            
             else:
-                print(f"Debug: Pattern {pattern} did NOT match in sequence {sequence}.")  # Debug print
-
-        print(f"Debug: No match found for any pattern in sequence {sequence}.")  # Debug print
+                print("Nothing found")
+      
 
         
         

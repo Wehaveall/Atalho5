@@ -2,10 +2,10 @@
   "name": "atalho",
   "version": "4.0.0",
   "description": "",
-  "main": "__main__.py",
+  "main": "base.py",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:python": "\"C:\\Python311\\python.exe\" E:\\Atalho\\__main__.py"
+    "start:python": "\"C:\\Python311\\python.exe\" E:\\Atalho\\base.py"
   },
   "keywords": [],
   "author": "",

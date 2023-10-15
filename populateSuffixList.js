@@ -32,8 +32,15 @@ function populateSuffixList() {
                     newDiv.textContent = `Digite "${patternStart}" para o ${replacementType} "${replaceText}"`;
 
                     checkbox.addEventListener('change', function () {
+                       
+                        //Chama Função da API para recarregar os sufixos e acentos após cada clique no checkbox:
+
+                        //  def update_suffix_json_api(self, lang, pattern, is_enabled):
+                        //    update_suffix_json(lang, pattern, is_enabled)
+                        //  # Refresh the in -memory suffix patterns(if needed)
+                        //     self.suffix_patterns = load_suffix_data()
                         pywebview.api.update_suffix_json_api(lang, item.pattern, this.checked);
-                        pywebview.api.update_suffix_pattern(item.pattern, item.replace.split(",")[0], this.checked);
+                        //pywebview.api.update_suffix_pattern(item.pattern, item.replace.split(",")[0], this.checked);
                     });
 
                     const wrapperDiv = document.createElement('div');

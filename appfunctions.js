@@ -750,7 +750,7 @@ document.addEventListener('DOMContentLoaded', function () {
         saveLabelValue(this.value);
       });
 
-
+      //Populate suffix list
       populateSuffixList();
 
 
