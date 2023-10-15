@@ -134,25 +134,30 @@ class KeyListener:
 
     def load_suffix_data(self):
         # Load the current language from settings.json
-        with open('settings.json', 'r') as f:
+        with open('settings.json', 'r', encoding='utf-8') as f:
             settings = json.load(f)
 
         current_language = settings.get('language', 'en')
 
-        config = configparser.ConfigParser()
-        config.read('suffix.ini')
+        # Load the suffix data from suffix.json
+        with open('suffix.json', 'r', encoding='utf-8') as f:
+            suffix_data = json.load(f)
 
+        # Initialize an empty dictionary to store suffix patterns
         suffix_patterns = {}
 
-        if config.has_section(current_language):
-            for pattern, value in config.items(current_language):
-                replacement, status = value.split(", ")
+        # Check if the current language exists in the suffix.json
+        if current_language in suffix_data:
+            for entry in suffix_data[current_language]:
+                pattern = entry.get("pattern")
+                replace_value = entry.get("replace")
+                if replace_value:
+                    replacement, status = replace_value.split(", ")
+
                 if status == "enabled":
                     suffix_patterns[pattern] = replacement
 
         return suffix_patterns
-
-       
 
 
 
@@ -431,6 +436,25 @@ class KeyListener:
     
 
     def lookup_and_expand(self, sequence):
+        
+        
+            # Suffix
+        for pattern, replacement in self.suffix_patterns.items():
+            print(f"Debug: Trying pattern {pattern}")  # Debug print
+            match = re.search(pattern, sequence)
+            if match:
+                print(f"Debug: Pattern {pattern} matched in sequence {sequence}. Replacing with {replacement}.")  # Debug print
+                expanded_sequence = re.sub(pattern, replacement, sequence)
+                self.paste_expansion(expanded_sequence, format_value=0)
+                self.typed_keys = ""
+                self.last_sequence = ""  # Clear last_sequence after successful expansion
+                return  # Exit the function to prevent further processing
+            
+        
+        
+        
+        
+        
         try:
             expansions_list = lookup_word_in_all_databases(sequence)
             print(f"Debug: Type of expansions_list: {type(expansions_list)}")  # Debug print
@@ -483,15 +507,7 @@ class KeyListener:
    
       
 
-        #Suffix
-        for pattern, replacement in self.suffix_patterns.items():
-            if re.search(pattern, sequence):
-                expanded_sequence = re.sub(pattern, replacement, sequence)
-                self.paste_expansion(expanded_sequence, format_value=0)
-                self.typed_keys = ""
-                self.last_sequence = ""  # Clear last_sequence after successful expansion
-                return  # Exit the function to prevent further processing
-
+      
 
 
 
