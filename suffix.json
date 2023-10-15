@@ -1,40 +1,39 @@
 {
-  "en": [
-    
-      {
-      "pattern": "([a-zA-Z])ab\\b",
-      "replace": "\\1able, enabled"
-      },
-      
-      {
-        "pattern": "([a-zA-Z])ns\\b",
-        "replace": "\\1ness, enabled"
-      },
-
-      {
-        "pattern": "([a-zA-Z])ls\\b",
-        "replace": "\\1less, enabled"
-      }
-      
-  ],
-
   "pt-BR": [
     {
       "pattern": "([a-zA-Z])mn\\b",
-      "replace": "\\1mento, enabled"
+      "replace": "\\1mente, disabled"
     },
-
     {
       "pattern": "([a-zA-Z])ao\\b",
       "replace": "\\1ão, enabled"
     },
-
-
     {
       "pattern": "([a-zA-Z])çç\\b",
       "replace": "\\1ção, enabled"
+    },
+    {
+      "pattern": "([a-zA-Z])ii\\b",
+      "replace": "\\1inho, disabled"
+    },
+    {
+      "pattern": "^(aa)\\b",
+      "replace": "à, enabled"
     }
-
+  ],
+  "en": [
+    {
+      "pattern": "([a-zA-Z])ab\\b",
+      "replace": "\\1able, enabled"
+    },
+    {
+      "pattern": "([a-zA-Z])ns\\b",
+      "replace": "\\1ness, enabled"
+    },
+    {
+      "pattern": "([a-zA-Z])ls\\b",
+      "replace": "\\1less, enabled"
+    }
   ],
   "de": [
     {
@@ -44,8 +43,8 @@
   ],
   "it": [
     {
-      "pattern": "([a-zA-Z])ex\\b",
-      "replace": "\\1esempio, enabled"
+      "pattern": "([a-zA-Z])zn\\b",
+      "replace": "\\1zione, enabled"
     }
   ],
   "fr": [

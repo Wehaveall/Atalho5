@@ -22,11 +22,30 @@ function populateSuffixList() {
                     checkbox.id = `${lang}-checkbox-${index}`;
 
                     // Correctly extract the specific parts of pattern and replace
-                    const pattern = item.pattern.match(/\)([a-zA-Z]+)\\b/)?.[1] || '';
-                    const replaceText = item.replace.match(/[a-zA-Z]+/)?.[0] || '';
+                    const patternStart = item.pattern.startsWith("^") ? item.pattern.slice(1, item.pattern.indexOf("\\b")).replace(/[()]/g, '') : item.pattern.match(/\)([a-zA-Zç]+)\\b/)?.[1] || '';
+                    const replaceText = item.replace.match(/[a-zA-Zà-úç]+/)?.[0] || '';
 
-                    // Set the text to only show the specific parts of pattern and replace
-                    newDiv.textContent = `Digite "${pattern}" para o sufixo "${replaceText}"`;
+                    // Determine the type of replacement: 'sufixo' or 'acento'
+                    let replacementType = item.pattern.startsWith("^") ? 'acento' : 'sufixo';
+
+                    // Special case for "crase"
+                    if (patternStart === 'aa') {
+                        replacementType += ' crase';
+                    }
+
+                    // Set the text to show the specific parts of pattern and replace
+                    newDiv.textContent = `Digite "${patternStart}" para o ${replacementType} "${replaceText}"`;
+
+
+
+                    // Add an event listener to update the JSON file when clicked
+                    checkbox.addEventListener('change', function () {
+                        pywebview.api.update_suffix_json(lang, item.pattern, this.checked);
+                        pywebview.api.update_suffix_pattern(item.pattern, item.replace.split(",")[0], this.checked);
+
+                    });
+
+
 
                     // Create a wrapper div and use flexbox to align items horizontally
                     const wrapperDiv = document.createElement('div');

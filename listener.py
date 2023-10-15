@@ -123,22 +123,17 @@ class KeyListener:
 
 
 
-    
-
-
     ###################################################################### FUNCTIONS
     #TO DO - newline must be configurable in the GUI
     
 
 # Initialize an empty list to hold regex patterns
 
+
+
+ 
+
     def load_suffix_data(self):
-        # Load the current language from settings.json
-        with open('settings.json', 'r', encoding='utf-8') as f:
-            settings = json.load(f)
-
-        current_language = settings.get('language', 'en')
-
         # Load the suffix data from suffix.json
         with open('suffix.json', 'r', encoding='utf-8') as f:
             suffix_data = json.load(f)
@@ -146,18 +141,22 @@ class KeyListener:
         # Initialize an empty dictionary to store suffix patterns
         suffix_patterns = {}
 
-        # Check if the current language exists in the suffix.json
-        if current_language in suffix_data:
-            for entry in suffix_data[current_language]:
+        # Loop through all languages in the JSON data
+        for lang in suffix_data:
+            for entry in suffix_data[lang]:
                 pattern = entry.get("pattern")
                 replace_value = entry.get("replace")
+                
                 if replace_value:
                     replacement, status = replace_value.split(", ")
 
+                # Only add the pattern if its status is "enabled"
                 if status == "enabled":
                     suffix_patterns[pattern] = replacement
 
         return suffix_patterns
+
+
 
 
 
@@ -438,7 +437,7 @@ class KeyListener:
     def lookup_and_expand(self, sequence):
         
         
-            # Suffix
+        # Suffix
         for pattern, replacement in self.suffix_patterns.items():
             print(f"Debug: Trying pattern {pattern}")  # Debug print
             match = re.search(pattern, sequence)
@@ -450,7 +449,6 @@ class KeyListener:
                 self.last_sequence = ""  # Clear last_sequence after successful expansion
                 return  # Exit the function to prevent further processing
             
-        
         
         
         

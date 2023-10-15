@@ -157,6 +157,33 @@ class Api:
         self.last_event_time = None
 
     
+
+
+    def update_suffix_json(self, lang, pattern, is_enabled):
+            with open('suffix.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            for entry in data.get(lang, []):
+                if entry['pattern'] == pattern:
+                    replace, _ = entry['replace'].split(", ")
+                    entry['replace'] = f"{replace}, {'enabled' if is_enabled else 'disabled'}"
+                    break
+
+            with open('suffix.json', 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     def get_initial_states(self):
        return self.load_all_states()
