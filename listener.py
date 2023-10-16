@@ -79,6 +79,7 @@ class KeyListener:
         self.alt_pressed = False
         self.winkey_pressed = False
         self.api = api
+        
         self.key_to_str_map = {
             "Key.space": "space",
             "Key.enter": "enter",
@@ -134,7 +135,8 @@ class KeyListener:
 # Initialize an empty list to hold regex patterns
 
 
-
+    def update_suffix_patterns(self, new_patterns):
+        self.suffix_patterns = new_patterns
 
 
     def format_article(self, article, newlines=2):

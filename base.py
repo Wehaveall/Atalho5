@@ -37,12 +37,23 @@ from src.utils import number_utils
 
 from suffix_accents_utils import *
 
+
+################################################################################################################
+
+
 # Global Variable Initialization
-api = None
+global api  # Declare api as global
+global key_listener_instance  # Declare key_listener_instance as global
+
+
+
+#################################################################################################################
+
+
+
 
 
 state_lock = Lock()
-
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -151,7 +162,9 @@ def get_relative_path(filename):
 class Api:
     # Initialize API class variables
     # Used in: main.py
-    def __init__(self):
+    def __init__(self, key_listener_instance=None):
+      
+        self.key_listener_instance = key_listener_instance
         self.is_maximized = False
         self.is_window_open = True
         self.is_recording = False
@@ -159,11 +172,15 @@ class Api:
         self.last_event_time = None
 
     
-
     def update_suffix_json_api(self, lang, pattern, is_enabled):
         update_suffix_json(lang, pattern, is_enabled)
+        
         # Refresh the in-memory suffix patterns (if needed)
         self.suffix_patterns = load_suffix_data()
+        
+        # Update suffix_patterns in KeyListener
+        self.key_listener_instance.update_suffix_patterns(self.suffix_patterns)
+
     
     def get_initial_states(self):
        return self.load_all_states()
@@ -588,12 +605,14 @@ def keyboard_listener(key_listener_instance):
 
 def start_app(tk_queue):
     
-    global api  # Existing line
+    global api, key_listener_instance  # Refer to the global variables
     api = Api()  # Existing line
-    # api.create_and_position_window()  # Existing line
-
-    # Move this line up to initialize before starting the threads
     key_listener_instance = KeyListener(api, tk_queue)  # Moved inside start_app
+    api.key_listener_instance = key_listener_instance  # Make sure to set this
+  
+   
+
+
 
     # -------------------------------------------------------------------------------------Start Pop-Up Thread
     # Initialize Popup Thread
