@@ -57,7 +57,7 @@ cursor_col = 0
 class KeyListener:
     
     
-    def __init__(self, api, tk_queue=None):  # Add tk_queue as an optional parameter
+    def __init__(self, api_instance, tk_queue=None):  # Add tk_queue as an optional parameter
     
 
         #Carrega o resultado da função load_suffix_data que está dentro do arquivo suffix_accents_utils.py na self
@@ -78,7 +78,9 @@ class KeyListener:
         self.shift_pressed = False
         self.alt_pressed = False
         self.winkey_pressed = False
-        self.api = api
+       
+        self.api = api_instance
+        self.api.key_listener_instance = self  # Update the Api instance to point to this KeyListener instance
         
         self.key_to_str_map = {
             "Key.space": "space",

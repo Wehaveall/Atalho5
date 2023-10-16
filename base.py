@@ -42,9 +42,6 @@ from suffix_accents_utils import *
 
 
 # Global Variable Initialization
-global api  # Declare api as global
-global key_listener_instance  # Declare key_listener_instance as global
-
 
 
 #################################################################################################################
@@ -162,9 +159,9 @@ def get_relative_path(filename):
 class Api:
     # Initialize API class variables
     # Used in: main.py
-    def __init__(self, key_listener_instance=None):
+    def __init__(self):
       
-        self.key_listener_instance = key_listener_instance
+        self.key_listener_instance = None
         self.is_maximized = False
         self.is_window_open = True
         self.is_recording = False
@@ -605,11 +602,15 @@ def keyboard_listener(key_listener_instance):
 
 def start_app(tk_queue):
     
-    global api, key_listener_instance  # Refer to the global variables
-    api = Api()  # Existing line
-    key_listener_instance = KeyListener(api, tk_queue)  # Moved inside start_app
-    api.key_listener_instance = key_listener_instance  # Make sure to set this
-  
+    # Create an instance of Api class
+    api_instance = Api()
+    
+    # Create an instance of KeyListener class and pass the Api instance to it
+    key_listener_instance = KeyListener(api_instance, tk_queue)
+    
+    # Now, api_instance.key_listener_instance points to key_listener_instance
+    # and key_listener_instance.api points to api_instance
+    
    
 
 
@@ -635,8 +636,8 @@ def start_app(tk_queue):
 
     # threading.Thread(target=create_popup, args=(tk_queue, key_listener_instance)).start()
     print("Starting Listener from Main.py")  # Existing line
-    main_window = api.create_and_position_window()  # Existing line
-    main_window.events.closed += api.on_closed
+    main_window = api_instance.create_and_position_window()  # Existing line
+    main_window.events.closed += api_instance.on_closed
    
    
    
