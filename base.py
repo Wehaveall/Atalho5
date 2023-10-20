@@ -173,10 +173,11 @@ class Api:
         update_suffix_json(lang, pattern, is_enabled)
         
         # Refresh the in-memory suffix patterns (if needed)
-        self.suffix_patterns = load_suffix_data()
+        self.suffix_patterns = load_suffix_data()  
         
         # Update suffix_patterns in KeyListener
         self.key_listener_instance.update_suffix_patterns(self.suffix_patterns)
+ 
 
     
     def get_initial_states(self):
@@ -231,21 +232,19 @@ class Api:
         groupName,
         databaseName,
         tableName,
-        shortcut,
+        indexValue,  # Added indexValue
+        shortcut,  # Re-added shortcut
         newContent,
         formatValue,
         label,
         caseChoice=None,  # New parameter
-    ):
+        ):
         # Convert formatValue to 0 or 1 for SQLite storage
         format_value_for_db = 1 if formatValue else 0
-        print(
-            f"Converted format value for DB: {format_value_for_db}"
-        )  # Just for debugging
 
         # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)
-        engine = get_engine(database_path)  # Using get_engine instead of create_engine
+        engine = get_engine(database_path)
         metadata = MetaData()
 
         with Session(engine) as session:
@@ -269,34 +268,44 @@ class Api:
             update_values = {
                 "format": format_value_for_db,
                 "case": caseChoice,
-            }  # Add case field update
+                "shortcut": shortcut,  # Re-added shortcut
+                
+            }
+
+            print(f"Debug - New Content: {newContent}")
 
             # If newContent is provided, update the expansion column
             if newContent:
                 update_values["expansion"] = newContent
 
-            # If labelText is provided, update the label column
+            # If label is provided, update the label column
             if label:
                 update_values["label"] = label
 
+            # Update statement based on indexValue
             stmt = (
-                update(table)
-                .where(table.c.shortcut == shortcut)
-                .values(**update_values)
-            )
+            update(table)
+            .where(table.c.id == indexValue)  # Using indexValue for update
+            .values(**update_values)
+            );
+
+    # Debug: Print the statement and other variables
+            print(f"Executing statement: {stmt}")
+            print(f"Update values: {update_values}")
+            print(f"Index value: {indexValue}")
 
             # Execute the update statement
-            print("Saving changes to the database...")
             session.execute(stmt)
             session.commit()
-            print("Changes saved successfully!")
 
+           
             # Notify JavaScript to invalidate the cache after updating the database
             self.window.evaluate_js(
                 'invalidateCacheEntry("{groupName}", "{databaseName}", "{tableName}")'.format(
                     groupName=groupName, databaseName=databaseName, tableName=tableName
                 )
             )
+
 
     ##################################################################
 
@@ -377,7 +386,7 @@ class Api:
 
             # Se tableName é None, obtenha o nome da tabela que não é 'sqlite_sequence'
             if tableName is None:
-                tableName = api.get_target_table_name(engine)
+                tableName = self.get_target_table_name(engine)
                 if not tableName:
                     logging.error("No valid table found other than sqlite_sequence.")
                     return None
@@ -604,16 +613,11 @@ def start_app(tk_queue):
     
     # Create an instance of Api class
     api_instance = Api()
-    
     # Create an instance of KeyListener class and pass the Api instance to it
     key_listener_instance = KeyListener(api_instance, tk_queue)
-    
     # Now, api_instance.key_listener_instance points to key_listener_instance
     # and key_listener_instance.api points to api_instance
-    
-   
-
-
+       
 
     # -------------------------------------------------------------------------------------Start Pop-Up Thread
     # Initialize Popup Thread

@@ -479,7 +479,7 @@ async function populateTable(data, groupName, databaseName, tableName) {
  
     var rowClass = index % 2 === 0 ? 'tr-even' : 'tr-odd';
     // Extract the values from the item
-    const { expansion, label, shortcut, format, case: caseChoice } = item;
+    const {id, expansion, label, shortcut, format, case: caseChoice } = item;
 
     // Create a new row and cells
     var row = table.insertRow(-1);
@@ -493,6 +493,7 @@ async function populateTable(data, groupName, databaseName, tableName) {
 
     // Store the values as data attributes for the row
     Object.assign(row.dataset, {
+      indexValue: id,  // Added this line
       expansion,
       shortcut,
       format,

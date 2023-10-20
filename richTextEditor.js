@@ -23,35 +23,39 @@ tinymce.init({
 // Assuming the custom select is applied to the 'escolha' element
  const customSelectElement = document.querySelector('.custom-select-container');
 
- customSelectElement.addEventListener('valueSelected', function (event) {
-
-    const choice = event.detail.value; // Get the selected value from the event detail
+// Custom select change event
+customSelectElement.addEventListener('valueSelected', function (event) {
+    const choice = event.detail.value;
 
     if (isEditorUpdate || !window.currentRow) {
-//         // Se a atualização do editor estiver em andamento ou nenhuma linha estiver selecionada, não faça nada
-         return;
+        return;
     }
 
     const formatValue = choice === "1";
     const shortcut = window.currentRow.dataset.shortcut;
+    const indexValue = window.currentRow.dataset.indexValue;  // Added
     const groupName = window.currentRow.dataset.groupName;
     const databaseName = window.currentRow.dataset.databaseName;
+    const tableName = window.currentRow.dataset.tableName;  // Added
+    const label = window.currentRow.dataset.label;  // Added
+    const caseChoice = document.getElementById('caseChoice').value;  // Added
     const currentContent = tinyMCE.get('editor').getContent();
 
-     isSaving = true;  // Set the flag before saving
-     window.pywebview.api.save_changes(groupName, databaseName, shortcut, currentContent, formatValue)
-         .then(response => {
-             // Update the dataset of the selected row directly with the choice
-           window.currentRow.dataset.format = choice;
-             isSaving = false;  // Reset the flag after saving is done
-         })
-         .catch((error) => {
-             console.error('Error:', error);
-             isSaving = false;  // Reset the flag in case of error
-         });
-     reinitializeEditor(choice);
- });
+    isSaving = true;
 
+    // Updated the function call to match your Python function's updated signature
+    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
+        .then(response => {
+            window.currentRow.dataset.format = choice;
+            isSaving = false;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            isSaving = false;
+        });
+
+    reinitializeEditor(choice);
+});
 
  
 function reinitializeEditor(choice) {
@@ -102,15 +106,18 @@ function getTinyMCEConfig(selector, isAdvanced, onEditorInit) {
                     if (!isEditorUpdate && window.currentRow) {
                         // Conteúdo mudou, salvar as alterações
                         var shortcut = window.currentRow.dataset.shortcut;
+                        var indexValue = window.currentRow.dataset.indexValue;  // Added
                         var groupName = window.currentRow.dataset.groupName;
-                        var tableName = window.currentRow.dataset.tableName;
                         var databaseName = window.currentRow.dataset.databaseName;
-                        var label = window.currentRow.dataset.label
+                        var tableName = window.currentRow.dataset.tableName;  // Added
+                        var label = window.currentRow.dataset.label;  // Added
                         var formatValue = document.getElementById('escolha').value === "1";
-                        var caseChoice = document.getElementById('caseChoice').value;
+                        var caseChoice = document.getElementById('caseChoice').value;  // Added
+
 
                         isSaving = true;  // Set the flag before saving
-                        window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, editor.getContent(), formatValue, label, caseChoice)
+                        // Updated the function call to match your Python function's updated signature
+                        window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, editor.getContent(), formatValue, label, caseChoice)
                             .then(response => {
                                 // Atualizar o dataset e o conteúdo visual da currentRow
                                 var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
