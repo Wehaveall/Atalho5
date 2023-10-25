@@ -4,7 +4,8 @@
   --window-left-bgcolor: #fff9f4;
   --input-bgcolor: white;
   --text-color: black;
-  --myTable-bgcolor:rgb(233, 233, 233);
+  --myTable-evenbgcolor:rgb(238, 238, 238);
+  --myTable-oddbgcolor: rgb(249, 249, 249);
   --button-color: rgb(128, 128, 128);
 }
 
@@ -13,7 +14,8 @@
   --window-left-bgcolor: #292828;
   --input-bgcolor: rgb(75, 76, 82);
   --text-color: rgb(246, 246, 246);
-  --myTable-bgcolor: rgb(40, 41, 43);
+  --myTable-evenbgcolor: rgb(40, 41, 43);
+  --myTable-oddbgcolor: rgb(45, 46, 48);
   --button-color: rgb(221, 221, 221);
 }
 
@@ -370,11 +372,11 @@ div::-webkit-scrollbar-thumb {
 }
 
 .tr-even {
-  background-color: var(--myTable-bgcolor);
+  background-color: var(--myTable-evenbgcolor);
 }
 
 .tr-odd {
-  background-color: var(--myTable-bgcolor);
+  background-color: var(--myTable-oddbgcolor);
 }
 
 /* Middle Panel text space management */

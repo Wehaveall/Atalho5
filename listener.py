@@ -290,7 +290,9 @@ class KeyListener:
         keyboard.press_and_release("left arrow")
         keyboard.release("shift")
         keyboard.release("ctrl")
+        time.sleep (0.01) #Time to avoid errors
         keyboard.press_and_release("backspace")
+        time.sleep (0.01) #Time to avoid errors
 
         if expansion is not None:
             # Format the expansion before pasting (This is the new line)
@@ -309,8 +311,6 @@ class KeyListener:
             # Now paste
             keyboard.press_and_release("ctrl+v")
            
-    
-
 
             # Move the mouse 1 pixel to the right (This is the new line)
             # Provisional solution because paste will only appear after mouse move
@@ -318,8 +318,7 @@ class KeyListener:
             pyautogui.moveTo(current_x + 2, current_y)  # Move mouse 1 pixel to the right
 
 
-       
-
+    
         # Update other variables
         self.last_sequence = ""
         self.multi_line_string = ""

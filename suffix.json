@@ -24,15 +24,15 @@
   "en": [
     {
       "pattern": "([a-zA-Z])ab\\b",
-      "replace": "\\1able, enabled"
+      "replace": "\\1able, disabled"
     },
     {
       "pattern": "([a-zA-Z])ns\\b",
       "replace": "\\1ness, disabled"
     },
     {
-      "pattern": "([a-zA-Z])ls\\b",
-      "replace": "\\1less, disabled"
+      "pattern": "([a-zA-Z])ii\\b",
+      "replace": "\\1ing, disabled"
     }
   ],
   "de": [
