@@ -7,6 +7,7 @@ import logging
 import configparser
 import re
 import time
+from datetime import datetime  # New import for handling dates
 
 
 from sqlalchemy import create_engine, Column, Integer, String
@@ -277,6 +278,12 @@ class KeyListener:
           # Debug: Print before changes
         print(f"Before paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
 
+    # New code: Locate %cursor% in the expansion and record its position
+        cursor_position = None
+        if expansion and '%CURSOR%' in expansion:
+            cursor_position = expansion.index('%CURSOR%')
+            expansion = expansion.replace('%CURSOR%', '')
+
 
     # Handle the Enter key triggering an expansion
         if self.expansion_triggered_by_enter:
@@ -298,6 +305,8 @@ class KeyListener:
             # Format the expansion before pasting (This is the new line)
             formatted_expansion = self.format_article(expansion, newlines=2) 
             
+
+
             format_value = int(format_value)
 
             if format_value == 0:
@@ -310,12 +319,25 @@ class KeyListener:
 
             # Now paste
             keyboard.press_and_release("ctrl+v")
+            time.sleep (0.01)
            
 
             # Move the mouse 1 pixel to the right (This is the new line)
             # Provisional solution because paste will only appear after mouse move
             current_x, current_y = pyautogui.position()  # Get current mouse position
             pyautogui.moveTo(current_x + 2, current_y)  # Move mouse 1 pixel to the right
+            pyautogui.moveTo(current_x - 2, current_y)  # Move mouse 1 pixel to the right
+
+
+
+        # New code: Move the cursor to the cursor_position
+            if cursor_position is not None:
+                # Calculate the number of characters to move the cursor backwards
+                move_back_count = len(expansion) - cursor_position
+
+                # Move the cursor back to the recorded position
+                for _ in range(move_back_count):
+                    keyboard.press_and_release("left arrow")
 
 
     
@@ -463,6 +485,17 @@ class KeyListener:
             print(f"Debug: Expansion found for {sequence} is {expansion} with format_value {format_value}")  # Debug print
 
        
+
+        # New code: Replace %DATE% with the current date in dd-mm-yyyy format
+        if expansion and '%DATE%' in expansion:
+            current_date = datetime.now().strftime('%d/%m/%Y')
+            expansion = expansion.replace('%DATE%', current_date)
+
+
+
+
+
+
         
         key_str = self.key_to_str_map.get(str(self.last_key), str(self.last_key))
 
