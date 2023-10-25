@@ -1,6 +1,7 @@
 @charset "UTF-8";
 .light-theme {
-  --window-bgcolor: #f1f1f1;
+  --window-bgcolor: #fdfdfd;
+  --window-left-bgcolor: #fff9f4;
   --input-bgcolor: white;
   --text-color: black;
   --myTable-bgcolor:rgb(233, 233, 233);
@@ -8,9 +9,10 @@
 }
 
 .dark-theme {
-  --window-bgcolor: rgb(40, 41, 43);
+  --window-bgcolor: rgb(48, 48, 48);
+  --window-left-bgcolor: #292828;
   --input-bgcolor: rgb(75, 76, 82);
-  --text-color: white;
+  --text-color: rgb(246, 246, 246);
   --myTable-bgcolor: rgb(40, 41, 43);
   --button-color: rgb(221, 221, 221);
 }
@@ -954,7 +956,7 @@ html {
   color: var(--text-color);
   font-family: "Work Sans", sans-serif;
   width: 230px;
-  background-color: var(--window-bgcolor);
+  background-color: var(--window-left-bgcolor);
   margin-left: 0;
 }
 
@@ -1042,6 +1044,11 @@ html {
   text-align: center;
   margin-bottom: 30px;
   margin-top: 15px;
+}
+
+#enable_disable {
+  margin-bottom: 30px;
+  margin-left: 15px;
 }
 
 .darkmode-container {

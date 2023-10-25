@@ -11,7 +11,25 @@ function populateSuffixList() {
 
             for (const lang in data) {
                 const langDiv = document.createElement('div');
-                langDiv.innerHTML = `<h4>Language: ${lang}</h4>`;
+
+                // Add vertical space before each language section
+                langDiv.style.marginTop = '20px';
+
+                // Add left margin for each language title
+                langDiv.style.marginLeft = '15px';  // New line to add left margin
+
+                // Translate language codes to full names and remove bold
+                let displayName;
+                switch (lang) {
+                    case 'pt-BR': displayName = 'Português - Brasil'; break;
+                    case 'en': displayName = 'Inglês'; break;
+                    case 'de': displayName = 'Alemão'; break;
+                    case 'it': displayName = 'Italiano'; break;
+                    case 'fr': displayName = 'Francês'; break;
+                    case 'es': displayName = 'Espanhol'; break;
+                    default: displayName = lang;
+                }
+                langDiv.innerHTML = `<span>Idioma: ${displayName}</span>`;
                 suffixListDiv.appendChild(langDiv);
 
                 data[lang].forEach((item, index) => {
@@ -19,7 +37,7 @@ function populateSuffixList() {
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.id = `${lang}-checkbox-${index}`;
-                    checkbox.checked = item.replace.endsWith('enabled');  // Added line to set checked status
+                    checkbox.checked = item.replace.endsWith('enabled');
 
                     const patternStart = item.pattern.startsWith("^") ? item.pattern.slice(1, item.pattern.indexOf("\\b")).replace(/[()]/g, '') : item.pattern.match(/\)([a-zA-Zç]+)\\b/)?.[1] || '';
                     const replaceText = item.replace.match(/[a-zA-Zà-úç]+/)?.[0] || '';
@@ -32,20 +50,15 @@ function populateSuffixList() {
                     newDiv.textContent = `Digite "${patternStart}" para o ${replacementType} "${replaceText}"`;
 
                     checkbox.addEventListener('change', function () {
-                       
-                        //Chama Função da API para recarregar os sufixos e acentos após cada clique no checkbox:
-
-                        //  def update_suffix_json_api(self, lang, pattern, is_enabled):
-                        //    update_suffix_json(lang, pattern, is_enabled)
-                        //  # Refresh the in -memory suffix patterns(if needed)
-                        //     self.suffix_patterns = load_suffix_data()
                         pywebview.api.update_suffix_json_api(lang, item.pattern, this.checked);
-                        //pywebview.api.update_suffix_pattern(item.pattern, item.replace.split(",")[0], this.checked);
                     });
 
                     const wrapperDiv = document.createElement('div');
                     wrapperDiv.style.display = 'flex';
                     wrapperDiv.style.alignItems = 'center';
+
+                    // Add left margin for each language item
+                    wrapperDiv.style.marginLeft = '15px';
 
                     wrapperDiv.appendChild(checkbox);
                     wrapperDiv.appendChild(newDiv);

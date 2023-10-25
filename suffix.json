@@ -28,11 +28,11 @@
     },
     {
       "pattern": "([a-zA-Z])ns\\b",
-      "replace": "\\1ness, enabled"
+      "replace": "\\1ness, disabled"
     },
     {
       "pattern": "([a-zA-Z])ls\\b",
-      "replace": "\\1less, enabled"
+      "replace": "\\1less, disabled"
     }
   ],
   "de": [
@@ -44,7 +44,7 @@
   "it": [
     {
       "pattern": "([a-zA-Z])zn\\b",
-      "replace": "\\1zione, enabled"
+      "replace": "\\1zione, disabled"
     }
   ],
   "fr": [
@@ -56,7 +56,7 @@
   "es": [
     {
       "pattern": "([a-zA-Z])ej\\b",
-      "replace": "\\1ejemplo, enabled"
+      "replace": "\\1ejemplo, disabled"
     }
   ]
 }
