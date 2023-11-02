@@ -1,3 +1,8 @@
+
+#Identifies the current window title, the current focused window control, and the text inside it
+#--------------------
+
+
 import time
 from comtypes import CoInitializeEx, CoUninitialize
 from comtypes.client import GetModule, CreateObject

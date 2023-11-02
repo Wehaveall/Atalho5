@@ -18,7 +18,7 @@ from sqlalchemy.orm import sessionmaker
 import re
 
 
-import test
+import identifier
 
 
 
@@ -591,7 +591,7 @@ class KeyListener:
         print(window_title)
         ##       
         
-        result = test.main()  # Here we use test.main to reference the main function from test.py
+        result = identifier.main()  # Here we use test.main to reference the main function from test.py
         print("Result from test.py:", result)
 
 
