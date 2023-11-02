@@ -1,15 +1,55 @@
-import win32gui
-import win32process
-import win32api
 import time
+from comtypes import CoInitializeEx, CoUninitialize
+from comtypes.client import GetModule, CreateObject
 
+# Load the UI Automation module
+GetModule("UIAutomationCore.dll")
 
-time.sleep(5)
-fg_win = win32gui.GetForegroundWindow()
-fg_thread, fg_process = win32process.GetWindowThreadProcessId(fg_win)
-current_thread = win32api.GetCurrentThreadId()
-win32process.AttachThreadInput(current_thread, fg_thread, True)
-try:
-    print(win32gui.GetCaretPos())
-finally:
-    win32process.AttachThreadInput(current_thread, fg_thread, False)  # detach
+# Import the generated UI Automation interfaces
+from comtypes.gen.UIAutomationClient import IUIAutomation, CUIAutomation, IUIAutomationValuePattern, UIA_ValuePatternId
+
+def main():
+    # Initialize COM for the calling thread
+    CoInitializeEx()
+
+    # Create UI Automation instance
+    pClientUIA = CreateObject(CUIAutomation, interface=IUIAutomation)
+    if not pClientUIA:
+        print("Could not create UI Automation instance")
+        CoUninitialize()
+        return False
+
+    try:
+        # Get the element that currently has focus
+        focusedElement = pClientUIA.GetFocusedElement()
+        if not focusedElement:
+            print("No focused element.")
+            return False
+
+        # Get the name property of the focused element
+        name = focusedElement.CurrentName
+        print(f"The focused element is: {name}")
+
+        # Check if the focused element supports the ValuePattern and retrieve the value
+        pattern = focusedElement.GetCurrentPattern(UIA_ValuePatternId)
+        valuePattern = pattern.QueryInterface(IUIAutomationValuePattern)
+        
+        if valuePattern:
+            value = valuePattern.CurrentValue
+            print(f"The text inside the focused control is: {value}")
+        else:
+            print("Focused control does not support ValuePattern.")
+
+        # Assuming success if we get this far
+        return True
+
+    except Exception as e:
+        print(f"An exception occurred: {e}")
+        return False
+    finally:
+        # Uninitialize COM for the calling thread
+        CoUninitialize()
+
+if __name__ == '__main__':
+    result = main()
+    print("Result:", result)

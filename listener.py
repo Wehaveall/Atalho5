@@ -8,6 +8,7 @@ import configparser
 import re
 import time
 from datetime import datetime  # New import for handling dates
+from pywinauto import Desktop
 
 
 from sqlalchemy import create_engine, Column, Integer, String
@@ -15,6 +16,13 @@ from sqlalchemy import create_engine, MetaData, Table, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import re
+
+
+import test
+
+
+
+
 
 
 # Third-Party Libraries
@@ -66,7 +74,7 @@ class KeyListener:
         # def get_current_suffix_patterns():
         #   return load_suffix_data()
 
-
+        self.current_focused_element = None
         self.suffix_patterns = get_current_suffix_patterns()
        
         self.expansion_triggered_by_enter = False
@@ -138,6 +146,10 @@ class KeyListener:
 # Initialize an empty list to hold regex patterns
 
 
+    
+
+
+
     def update_suffix_patterns(self, new_patterns):
         self.suffix_patterns = new_patterns
 
@@ -178,6 +190,14 @@ class KeyListener:
         return new_article
 
     
+
+    def general_handler(self, event):
+        if event.event_type == 'down':
+            self.on_key_press(event)
+        elif event.event_type == 'up':
+            self.on_key_release(event)
+
+
     def stop_listener(self):
         print("Stopping Listener from Listerner.py")
         try:
@@ -188,13 +208,13 @@ class KeyListener:
             print(f"An error occurred while unhooking: {e}")
 
     def start_listener(self):
-        print("Starting Listener from Listerner.py")
+        print("Starting Listener from Listener.py")
         try:
-            self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
-            self.release_hook = keyboard.on_release(lambda e: self.on_key_release(e))
+            self.hook = keyboard.hook(self.general_handler)
             print("Successfully hooked the keyboard listeners.")
         except Exception as e:
             print(f"An error occurred while hooking: {e}")
+
 
     # ----------------------------------------GRAMMAR AND ORTOGRAPH ---------------
 
@@ -532,16 +552,82 @@ class KeyListener:
     ################################################################
     ################################################################
 
+
+
+
+
+    def on_key_release(self, event):
+      
+        key = event.name  # Capture the released key's name
+        print(f"Key {key} released.")
+
+        # Reset the state of the modifier keys if they are released
+        if key == "ctrl":
+            self.ctrl_pressed = False
+        elif key == "shift":
+            self.shift_pressed = False
+        elif key == "alt":
+            self.alt_pressed = False
+        elif key == "cmd":  # Assuming 'cmd' is the Windows key
+            self.winkey_pressed = False
+
+
+
+
+
+
+
     def on_key_press(self, event):
+      
+       
+    
+    # Before anything, update the state of the modifier keys
+        key = event.name  # Capture the key name first
+        print(f"Key {key} pressed.")
+       
+
+        ##    
+        window_title = pyautogui.getActiveWindowTitle()
+        print(window_title)
+        ##       
+        
+        result = test.main()  # Here we use test.main to reference the main function from test.py
+        print("Result from test.py:", result)
+
+
+        if key == "ctrl":
+            self.ctrl_pressed = True
+            
+       
+        elif key == "shift":
+            self.shift_pressed = True
+            
+       
+        elif key == "alt":
+            self.alt_pressed = True
+            
+        
+        elif key == "cmd":  # Assuming 'cmd' is the Windows key
+            self.winkey_pressed = True
+            
+
+        # Now check if any of the modifier keys are pressed
+        if self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed:
+            return
+
+        
         processed_char = None
         next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
 
-      
+       
         
         if (self.programmatically_typing):  # Skip if we are programmatically typing or popup is open
             return
 
+        
+    
+        
         print("on_key_press called" )  # Debugging: Changed from on_key_release to on_key_press
         key = event.name
         print(f"Key pressed: {key}")  # Debugging: Changed from Key released to Key pressed
@@ -558,24 +644,8 @@ class KeyListener:
         if not hasattr(self, "last_sequence"):
             self.last_sequence = ""
 
-        if (self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed):
-            return
 
-        # CTRL
-        if key == "ctrl":
-            self.ctrl_pressed = False
-
-        # Shift KEY
-        elif key == "shift":
-            self.shift_pressed = False
-
-        # ALT
-        elif key == "alt":
-            self.alt_pressed = False
-
-        # WINKEY
-        elif key == "cmd":
-            self.winkey_pressed = False
+     
 
         # Ignore 'space' when self.typed_keys is empty
         if key == "space" and not self.typed_keys:
