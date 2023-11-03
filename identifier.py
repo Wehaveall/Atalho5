@@ -14,7 +14,9 @@ from comtypes.gen.UIAutomationClient import (
     IUIAutomationTextPattern,
     UIA_TextPatternId,
     TextPatternRangeEndpoint_Start,
-    TextUnit_Character
+    TextPatternRangeEndpoint_End,
+    TextUnit_Character,
+    TextUnit_Word
 )
 
 def main():
@@ -39,6 +41,15 @@ def main():
         name = focusedElement.CurrentName
         print(f"The focused element is: {name}")
 
+        # Check if the focused element supports the ValuePattern and retrieve the value
+        valuePattern = focusedElement.GetCurrentPattern(UIA_ValuePatternId)
+        if valuePattern:
+            valuePattern = valuePattern.QueryInterface(IUIAutomationValuePattern)
+            value = valuePattern.CurrentValue
+            print(f"The full text inside the focused control is: {value}")
+        else:
+            print("Focused control does not support ValuePattern.")
+
         # Check if the focused element supports the TextPattern and retrieve it
         pattern = focusedElement.GetCurrentPattern(UIA_TextPatternId)
         if pattern:
@@ -48,15 +59,13 @@ def main():
 
             # Check if we got a range (the caret is within a text pattern)
             if range:
-                # Move the endpoint of the range backward by one character to get the character before the caret
-                range.MoveEndpointByUnit(TextPatternRangeEndpoint_Start, TextUnit_Character, -1)
-
-                # Now get the text from the start to the end of the range, which should be one character
-                char_before_caret = range.GetText(2)  # 2 is the maximum length of the string to return
-                print(f"The character before the caret position is: '{char_before_caret}'")
+                # Expand the range to get the full word at the caret
+                word_range = range.Clone()
+                word_range.ExpandToEnclosingUnit(TextUnit_Word)
+                word_at_caret = word_range.GetText(-1)
+                print(f"The word at the caret position is: '{word_at_caret}'")
             else:
                 print("Could not get text range from caret position.")
-
         else:
             print("Focused control does not support TextPattern.")
 
