@@ -586,13 +586,7 @@ class KeyListener:
         print(f"Key {key} pressed.")
        
 
-        ##    
-        window_title = pyautogui.getActiveWindowTitle()
-        print(window_title)
-        ##       
         
-        result = identifier.main()  # Here we use test.main to reference the main function from test.py
-        print("Result from test.py:", result)
 
 
         if key == "ctrl":
@@ -632,6 +626,16 @@ class KeyListener:
         key = event.name
         print(f"Key pressed: {key}")  # Debugging: Changed from Key released to Key pressed
 
+
+
+
+        
+
+
+
+
+
+
         # Initialize variables to None at the start of the function
         expansion = None
         format_value = None
@@ -662,8 +666,22 @@ class KeyListener:
 
             else:
                 char = key
-
+            ################################################################# HANDLE THE CHARS CARACTERS  #################################
             processed_char = self.handle_accents(char)  # Call handle_accents and save the returned character
+
+
+
+
+            ########################################################## IDENTIFY APP - FIELD - FULL TEXT - CARET POSITION ##################### 
+            ########################################################## IDENTIFY APP - FIELD - FULL TEXT - CARET POSITION ##################### 
+            ########################################################## IDENTIFY APP - FIELD - FULL TEXT - CARET POSITION ##################### 
+            window_title = pyautogui.getActiveWindowTitle()
+            print(window_title)
+            ##       
+            
+            result = identifier.main()  # Here we use test.main to reference the main function from test.py
+            print("Result from test.py:", result)
+            ##################################################################################################################################
 
             print(f"Self Typed Keys:__ {self.typed_keys}")
             print(f"Last Sequence:__1 {self.last_sequence}")
