@@ -13,6 +13,8 @@ from comtypes.gen.UIAutomationClient import (
     UIA_ValuePatternId,
     IUIAutomationTextPattern,
     UIA_TextPatternId,
+    IUIAutomationLegacyIAccessiblePattern,
+    UIA_LegacyIAccessiblePatternId,
     TextPatternRangeEndpoint_Start,
     TextPatternRangeEndpoint_End,
     TextUnit_Character,
@@ -41,29 +43,22 @@ def main():
         name = focusedElement.CurrentName
         print(f"The focused element is: {name}")
 
-        # Check if the focused element supports the ValuePattern and retrieve the value
-        valuePattern = focusedElement.GetCurrentPattern(UIA_ValuePatternId)
-        if valuePattern:
-            valuePattern = valuePattern.QueryInterface(IUIAutomationValuePattern)
-            value = valuePattern.CurrentValue
-            print(f"The full text inside the focused control is: {value}")
-        else:
-            print("Focused control does not support ValuePattern.")
-
         # Check if the focused element supports the TextPattern and retrieve it
-        pattern = focusedElement.GetCurrentPattern(UIA_TextPatternId)
-        if pattern:
-            textPattern = pattern.QueryInterface(IUIAutomationTextPattern)
+        textPattern = focusedElement.GetCurrentPattern(UIA_TextPatternId)
+        if textPattern:
+            textPattern = textPattern.QueryInterface(IUIAutomationTextPattern)
             # Get the degenerate range where the caret is
             range = textPattern.GetSelection().GetElement(0)
 
             # Check if we got a range (the caret is within a text pattern)
             if range:
-                # Expand the range to get the full word at the caret
-                word_range = range.Clone()
-                word_range.ExpandToEnclosingUnit(TextUnit_Word)
-                word_at_caret = word_range.GetText(-1)
-                print(f"The word at the caret position is: '{word_at_caret}'")
+                # Move the start of the range to the beginning of the word
+                range.MoveEndpointByUnit(TextPatternRangeEndpoint_Start, TextUnit_Word, -1)
+                # Move the end of the range to the end of the word
+                range.MoveEndpointByUnit(TextPatternRangeEndpoint_End, TextUnit_Word, 1)
+                # Get the text of the word at the caret
+                word_at_caret = range.GetText(-1)
+                print(f"The word at the caret position is: '{word_at_caret.strip()}'")
             else:
                 print("Could not get text range from caret position.")
         else:
