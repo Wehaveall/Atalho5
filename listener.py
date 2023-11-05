@@ -679,7 +679,7 @@ class KeyListener:
             print(window_title)
             ##       
             
-            result = identifier.main()  # Here we use test.main to reference the main function from test.py
+            result = identifier.get_focused_info()  # Here we use test.main to reference the main function from test.py
             print("Result from test.py:", result)
             ##################################################################################################################################
 
