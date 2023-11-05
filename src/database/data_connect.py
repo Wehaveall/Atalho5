@@ -135,12 +135,6 @@ import importlib
 
 
 def lookup_word_in_all_databases(word):
-    # Import Api class from the '__main__' module
-    Api = importlib.import_module("__main__").Api
-
-    # Load checkbox states using the Api class
-    checkBoxStates = Api().load_checkBox_states()
-
     # Define the base directory
     base_directory = os.path.abspath(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
@@ -148,45 +142,31 @@ def lookup_word_in_all_databases(word):
 
     # List to store database files
     db_files = []
-
-    # List to store all found expansions
-    all_expansions = []
+    all_expansions = []  # Define the list to store all expansions
 
     # Use os.walk to traverse all subdirectories of db_directory
-    for root, dirs, files in os.walk(base_directory):
+    for root, _, files in os.walk(base_directory):
         for file in files:
             if file.endswith(".db"):
                 db_files.append(os.path.join(root, file))
+                print(f"Database file found: {os.path.join(root, file)}")  # Print each database file found
 
     # Create a MetaData instance once
     metadata = MetaData()
 
     for db_file in db_files:
-        # Extract group and database name from the full path
-        relative_path = os.path.relpath(db_file, base_directory)
-        group_name, db_filename = os.path.split(relative_path)
-        db_name, _ = os.path.splitext(db_filename)
-
-        # Construct the key
-        key = f"{group_name}|{db_name}"
-
-        # Skip this database if its checkbox is not checked
-        if not checkBoxStates.get(key, False):
-            continue
-
-        engine = create_engine(f"sqlite:///{db_file}")  # Get the engine
-
-        # Use Inspector to get table names
+        # Create engine
+        engine = create_engine(f"sqlite:///{db_file}")
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
 
-        # Select the table that is not 'sqlite_sequence' and 'config'
-        target_table_name = next(
-            (name for name in table_names if name not in ["sqlite_sequence", "config"]),
-            None,
-        )
+        # Exclude 'sqlite_sequence', 'config', or any other known non-target tables
+        target_tables = [table_name for table_name in table_names if table_name not in ["sqlite_sequence", "config"]]
 
         # Fetch required_delimiters and delimiters from the config table
+        requires_delimiter = None
+        delimiters = None
+       
         if "config" in table_names:
             config_table = Table("config", metadata, autoload_with=engine)
             s_config = select(config_table)
@@ -196,24 +176,22 @@ def lookup_word_in_all_databases(word):
                     requires_delimiter = config_result.requires_delimiter
                     delimiters = config_result.delimiters
 
-        if target_table_name:
-            table = Table(target_table_name, metadata, autoload_with=engine)
+        for table_name in target_tables:
+            table = Table(table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)
-
             with Session(engine) as session:
-                results = session.execute(s).all()  # Get all results
-                for result in results:
+                result = session.execute(s).first()  # We expect only one expansion per shortcut
+                if result:
                     format_value = int(result.format)
                     expansion_data = {
-                        # Change is made here
                         "expansion": result.expansion.decode('utf-8') if isinstance(result.expansion, bytes) else result.expansion,
                         "format_value": format_value,
                         "requires_delimiter": requires_delimiter,
                         "delimiters": delimiters
                     }
                     all_expansions.append(expansion_data)
-                    
+                    print(f"Expansion found in {db_file}: {expansion_data['expansion']}")  # Print each expansion found
     
-     # Debug: print all expansions found
+    # Debug: print all expansions found
     print(f"Debug: All expansions found: {all_expansions}")
     return all_expansions

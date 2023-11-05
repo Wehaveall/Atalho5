@@ -21,10 +21,6 @@ import re
 import identifier
 
 
-
-
-
-
 # Third-Party Libraries
 import html_clipboard
 import keyboard  # Replacing pynput
@@ -73,7 +69,7 @@ class KeyListener:
         #variável suffix_patterns
         # def get_current_suffix_patterns():
         #   return load_suffix_data()
-
+        
         self.current_focused_element = None
         self.suffix_patterns = get_current_suffix_patterns()
        
@@ -143,7 +139,7 @@ class KeyListener:
     #TO DO - newline must be configurable in the GUI
     
 
-# Initialize an empty list to hold regex patterns
+    # Initialize an empty list to hold regex patterns
 
 
     
@@ -236,11 +232,11 @@ class KeyListener:
         return bigrams, bigram_scored
 
     # -------------------------------------------DOUBLE CAPS--------------------------
-    def fix_double_caps(self, last_word):
+    def fix_double_caps(self, word_at_caret):
         pattern = r"\b[A-Z]{2}[a-zA-Z]*\b"  # Removed \b
 
-        if re.match(pattern, last_word):
-            converted_word = last_word[0].upper() + last_word[1:].lower()
+        if re.match(pattern, word_at_caret):
+            converted_word = word_at_caret[0].upper() + word_at_caret[1:].lower()
             print(f"Converted word: {converted_word}")  # Debugging line
 
             keyboard.unhook_all()
@@ -269,14 +265,14 @@ class KeyListener:
             print(f"Before: {self.typed_keys}")
 
             # Update the last word and the typed keys
-            if self.typed_keys.endswith(last_word + " "):
+            if self.typed_keys.endswith(word_at_caret + " "):
                 self.typed_keys = (
-                    self.typed_keys[: -len(last_word) - 1] + converted_word + " "
+                    self.typed_keys[: -len(word_at_caret) - 1] + converted_word + " "
                 )
 
-            elif self.typed_keys.endswith(last_word):
+            elif self.typed_keys.endswith(word_at_caret):
                 self.typed_keys = (
-                    self.typed_keys[: -len(last_word)] + converted_word + " "
+                    self.typed_keys[: -len(word_at_caret)] + converted_word + " "
                 )
 
             # Debugging line to check the value of self.typed_keys after modification
@@ -292,11 +288,12 @@ class KeyListener:
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
+       
         print(f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}")
         
         self.programmatically_typing = True  # Set the flag
           # Debug: Print before changes
-        print(f"Before paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
+   
 
     # New code: Locate %cursor% in the expansion and record its position
         cursor_position = None
@@ -375,10 +372,7 @@ class KeyListener:
 
         self.programmatically_typing = False  # Reset the flag
 
-        print(f"After paste: Multi-line string: {self.multi_line_string}, Cursor col: {self.cursor_col}")
-
-
-
+        
 
     # ----------------------------------------------------------------Handle Accents
 
@@ -400,8 +394,8 @@ class KeyListener:
             self.accent = None
 
         else:
-            self.typed_keys += key_char
-            self.last_sequence += key_char  # Update last_sequence here
+            #self.typed_keys += key_char
+            #self.last_sequence += key_char  # Update last_sequence here
             return key_char  # Return the original character
 
     # -------------------------------------------------------------------------
@@ -444,7 +438,9 @@ class KeyListener:
     ############################################################################################################
 
     def create_popup(self):
+        
         print("Entered create_popup method")  # Debugging line
+        
         if self.tk_queue:
             self.tk_queue.put(("create_popup", self.expansions_list, self))
             print("Added to tk_queue")  # Debugging line
@@ -457,7 +453,7 @@ class KeyListener:
 
     def lookup_and_expand(self, sequence):
         
-        
+       
       # Suffix
         #Aqui o dicionário já está carregado quando inicia a classe
         for pattern, replacement in self.suffix_patterns.items():
@@ -467,23 +463,20 @@ class KeyListener:
                 expanded_sequence = re.sub(pattern, replacement, sequence)
                 self.paste_expansion(expanded_sequence, format_value=0)
                 self.typed_keys = ""
-                self.last_sequence = ""  # Clear last_sequence after successful expansion
+              
                 return  # Exit the function to prevent further processing
             
             else:
-                print("Nothing found")
+                pass
+                #print("Debug - Nothing found")
       
 
-        
-        
-        
-        
         try:
             expansions_list = lookup_word_in_all_databases(sequence)
-            print(f"Debug: Type of expansions_list: {type(expansions_list)}")  # Debug print
-            print(f"Debug: All expansions found: {expansions_list}")  # Debug print
+            #print(f"Debug: Type of expansions_list: {type(expansions_list)}")  # Debug print
+            #print(f"Debug: All expansions found: {expansions_list}")  # Debug print
         except ValueError:
-            print("Not enough values returned from lookup1")
+            #print("Not enough values returned from lookup1")
             return  # Exit the function if the lookup failed
 
         if len(expansions_list) > 1:
@@ -500,9 +493,7 @@ class KeyListener:
             self.requires_delimiter = expansion_data.get('requires_delimiter', None)
             self.delimiters = expansion_data.get('delimiters', None)
 
-
-
-            print(f"Debug: Expansion found for {sequence} is {expansion} with format_value {format_value}")  # Debug print
+            #print(f"Debug: Expansion found for {sequence} is {expansion} with format_value {format_value}")  # Debug print
 
        
 
@@ -510,10 +501,6 @@ class KeyListener:
         if expansion and '%DATE%' in expansion:
             current_date = datetime.now().strftime('%d/%m/%Y')
             expansion = expansion.replace('%DATE%', current_date)
-
-
-
-
 
 
         
@@ -530,22 +517,14 @@ class KeyListener:
                     # Potentially delete the shortcut text here before pasting the expansion
                     self.paste_expansion(expansion, format_value=format_value)
                     self.typed_keys = ""
-                    self.last_sequence = ""  # Clear last_sequence after successful expansion
+
+                  
+                   
             
         elif self.requires_delimiter == "no":
             if expansion is not None:
                 self.paste_expansion(expansion, format_value=format_value)
                 self.typed_keys = ""
-
-
-   
-      
-
-      
-
-
-
-
 
 
     
@@ -554,12 +533,10 @@ class KeyListener:
 
 
 
-
-
     def on_key_release(self, event):
       
         key = event.name  # Capture the released key's name
-        print(f"Key {key} released.")
+        #print(f"Key {key} released.")
 
         # Reset the state of the modifier keys if they are released
         if key == "ctrl":
@@ -573,22 +550,24 @@ class KeyListener:
 
 
 
-
-
-
-
     def on_key_press(self, event):
-      
-       
-    
-    # Before anything, update the state of the modifier keys
-        key = event.name  # Capture the key name first
-        print(f"Key {key} pressed.")
-       
-
         
+        # Initialize variables to None at the start of the function
+        word_at_caret = None
+        expansion = None
+        format_value = None
+        self.requires_delimiter = None
+        self.delimiters = None
+        processed_char = None
+        next_char = None  # Initialize next_char to None
+        char = None  # Highlighted Change
 
 
+
+        key = event.name  # Capture the key name first
+        #print(f"Key {key} pressed.")
+       
+        # Before anything, update the state of the modifier keys
         if key == "ctrl":
             self.ctrl_pressed = True
             
@@ -605,143 +584,91 @@ class KeyListener:
             self.winkey_pressed = True
             
 
-        # Now check if any of the modifier keys are pressed
-        if self.ctrl_pressed or self.shift_pressed or self.alt_pressed or self.winkey_pressed:
+        # Check if we should skip processing this key press
+        if (self.programmatically_typing or self.ctrl_pressed or 
+            self.alt_pressed or self.winkey_pressed):
             return
 
-        
-        processed_char = None
-        next_char = None  # Initialize next_char to None
-        char = None  # Highlighted Change
+        # Handle keypress for character keys
+        if key.isprintable() and not key.isspace():  # Check if key is a printable character and not a space
+            # Convert to upper case if Shift is pressed, otherwise use the character as is
+            char = key.upper() if self.shift_pressed else key
 
-       
-        
-        if (self.programmatically_typing):  # Skip if we are programmatically typing or popup is open
-            return
-
-        
-    
-        
-        print("on_key_press called" )  # Debugging: Changed from on_key_release to on_key_press
-        key = event.name
-        print(f"Key pressed: {key}")  # Debugging: Changed from Key released to Key pressed
-
-
-
-
-        
-
-
-
-
-
-
-        # Initialize variables to None at the start of the function
-        expansion = None
-        format_value = None
-        self.requires_delimiter = None
-        self.delimiters = None
+        # Reset the shift flag after use if it was pressed
+        if self.shift_pressed:
+            self.shift_pressed = False
 
         start_time = time.time()
 
-        # Initialize self.last_sequence if not already done
-        if not hasattr(self, "last_sequence"):
-            self.last_sequence = ""
-
-
-     
+       
+    
 
         # Ignore 'space' when self.typed_keys is empty
         if key == "space" and not self.typed_keys:
             return
 
         if key not in self.omitted_keys:
-            # key = event.name
-            # Update the multi-line string here
-            # self.multi_line_string += key
+            # Convert to upper case if Shift is pressed, otherwise use the key as it is
+            char = key.upper() if self.shift_pressed else key
+            self.shift_pressed = False  # Reset the shift flag after use
 
-            if self.shift_pressed:
-                char = key.upper()  # Convert to upper case if Shift is pressed
-                self.shift_pressed = False  # Reset the flag immediately after use
+            # Process the character for accents or other modifications
+            processed_char = self.handle_accents(char)
 
-            else:
-                char = key
-            ################################################################# HANDLE THE CHARS CARACTERS  #################################
-            processed_char = self.handle_accents(char)  # Call handle_accents and save the returned character
+            # Update the self.typed_keys with the processed character
+            self.typed_keys += processed_char
+            print(f"Self Typed= {self.typed_keys}")
 
 
-
-
-            ########################################################## IDENTIFY APP - FIELD - FULL TEXT - CARET POSITION ##################### 
-            ########################################################## IDENTIFY APP - FIELD - FULL TEXT - CARET POSITION ##################### 
             ########################################################## IDENTIFY APP - FIELD - FULL TEXT - CARET POSITION ##################### 
             window_title = pyautogui.getActiveWindowTitle()
             print(window_title)
             ##       
             
-            result = identifier.get_focused_info()  # Here we use test.main to reference the main function from test.py
-            print("Result from test.py:", result)
+            #result = identifier.get_focused_info()  # Here we use test.main to reference the main function from test.py
+            #print("Result from identifier.py:", result)
+
+            # Fetch the word at the caret from the identifier module
+            identifier_info = identifier.get_focused_info()
+            word_at_caret = identifier_info.get('word_at_caret', '')
+            print("Result from identifier.py:", identifier_info, word_at_caret)
+
             ##################################################################################################################################
 
-            print(f"Self Typed Keys:__ {self.typed_keys}")
-            print(f"Last Sequence:__1 {self.last_sequence}")
+            #print(f"Self Typed Keys:__ {self.typed_keys}")
+            #print(f"Last Sequence:__1 {self.last_sequence}")
 
         else:  # Key is in omitted_keys
             if key == "backspace":
                 self.typed_keys = self.typed_keys[:-1]
-                self.last_sequence = self.last_sequence[:-1]  # Update last_sequence
-
+            
+            
             elif key == "space":
-                self.typed_keys += " "
-                self.last_sequence = ""  # Clear last_sequence
-              
+                # Fetch the word at the caret from the identifier module
+                identifier_info = identifier.get_focused_info()
+                word_at_caret = identifier_info.get('word_at_caret', '')
+                print("Result from identifier.py:", identifier_info, word_at_caret)
+
+                # Here, we check if the word at the caret matches the pattern for double caps
+                self.fix_double_caps(word_at_caret)
                 
+                # Continue processing the space key as normal
+                self.typed_keys += " "
 
-            elif key == "enter":  # Handling the "Enter" key
-                # self.typed_keys += '\n' # Add newline to last_typed_keys
-                self.last_sequence = ""  # Clear last_sequence
+                
+           
+           
+            elif key == "enter":
+                self.typed_keys += '\n'
 
 
-            elif key == "left":
-                self.cursor_col = max(0, self.cursor_col - 1)
-                if self.last_sequence:  # Check if last_sequence is not empty
-                    self.last_sequence = self.last_sequence[:-1]  # Remove last character
-
-            elif key == "right":
-                next_char = (
-                    self.multi_line_string[self.cursor_col]
-                    if self.cursor_col < len(self.multi_line_string)
-                    else None
-                )
-                if next_char:
-                    self.cursor_col = min(
-                        len(self.multi_line_string), self.cursor_col + 1
-                    )
-                    self.last_sequence += next_char  # Append next character to last_sequence
-
-            elif key == "up":
-                # Removed cursor movement, only reset last_sequence
-                self.last_sequence = ""
-
-            elif key == "down":
-                # Removed cursor movement, only reset last_sequence
-                self.last_sequence = ""
-
+        
             # ---------------------------------------WORDS--------------------------------
             # Tokenize the sentence into words
             words_from_multi_line = word_tokenize(self.multi_line_string)
 
             # Get the last word only if the list is not empty
             self.last_word = words_from_multi_line[-1] if words_from_multi_line else None
-
-            if (
-                self.last_word
-            ):  # Highlighted Change: Only call fix_double_caps if last_word is not None
-                if (
-                    key != "backspace"
-                ):  # Highlighted Change: Add condition to skip "backspace"
-                    self.fix_double_caps(self.last_word)  # Call fix_double_caps here
-                    #self.lookup_and_expand(last_word)
 
             # --------------------------------------SENTENCES-----------------------------
             # Sentence Tokenization
@@ -751,9 +678,7 @@ class KeyListener:
 
             # ---------------------------------------ENTITIES--------------------------------
             # Tokenization
-            tokens = word_tokenize(
-                self.multi_line_string
-            )  # Make sure self.typed_keys is a string
+            tokens = word_tokenize(self.multi_line_string)  # Make sure self.typed_keys is a string
             tags = pos_tag(tokens)
             entities = ne_chunk(tags)
 
@@ -764,114 +689,17 @@ class KeyListener:
             # --------------------------------PRINTS--------------------------------
 
             print(f"Entities = {entities}")
-
-            print(f"Sentence List= {sentences}")
+            #print(f"Sentence List= {sentences}")
             print(f"Last Sentence = {last_sentence}")
-
-            print(f"Words List= {words_from_multi_line}")
-            print(f"Last Word= {self.last_word}")
-
-        if (processed_char is not None):  # Update multi_line_string using the returned character
-            lines = self.multi_line_string.split("\n")
-            current_line = lines[self.cursor_row]
-            lines[self.cursor_row] = (
-                current_line[: self.cursor_col]
-                + processed_char
-                + current_line[self.cursor_col :]
-            )
-            self.cursor_col += 1  # Move the cursor to the right by 1 position
-            self.multi_line_string = "\n".join(lines)
-            self.typed_keys = self.multi_line_string
-       
-
-
-
-
-        elif key == "backspace":
-            if (
-                self.cursor_row < len(self.multi_line_string.split("\n"))
-                and self.cursor_col > 0
-            ):  # Highlighted Change: Added checks
-                # Update the line at the cursor position within the specific line
-                lines = self.multi_line_string.split("\n")
-                current_line = lines[self.cursor_row]
-                lines[self.cursor_row] = (
-                    current_line[: max(0, self.cursor_col - 1)]
-                    + current_line[self.cursor_col :]
-                )
-                self.cursor_col = max(0, self.cursor_col - 1)  # Update cursor position
-                # Join the lines back into a single string
-                self.multi_line_string = "\n".join(lines)
-
-       
-        elif key == "delete":
-            if (
-                self.cursor_row < len(self.multi_line_string.split("\n"))
-                and self.cursor_col < len(self.multi_line_string.split("\n")[self.cursor_row])
-            ):  # Highlighted Change: Added checks for "delete"
-                # Update the line at the cursor position within the specific line
-                lines = self.multi_line_string.split("\n")
-                current_line = lines[self.cursor_row]
-                lines[self.cursor_row] = (
-                    current_line[: self.cursor_col]
-                    + current_line[self.cursor_col + 1 :]
-                )
-                # Cursor position remains the same for "delete"
-                # Join the lines back into a single string
-                self.multi_line_string = "\n".join(lines)
-
-        
-        elif key == "space":
-        
-            # Update the line at the cursor position within the specific line
-            lines = self.multi_line_string.split("\n")
-            current_line = lines[self.cursor_row]
-            lines[self.cursor_row] = (
-                current_line[: self.cursor_col] + " " + current_line[self.cursor_col :]
-            )
-            self.cursor_col += 1  # Move the cursor to the right by 1 position
-            # Join the lines back into a single string
-            self.multi_line_string = "\n".join(lines)
-          
-
+            #print(f"Words List= {words_from_multi_line}")
             
-           
-             
-
-        elif key == "enter":  # Highlighted Changes: Start
-            lines = self.multi_line_string.split("\n")
-
-            # Validate cursor_row before using it
-            if self.cursor_row >= len(lines):
-                self.cursor_row = len(lines) - 1
-
-            current_line = lines[self.cursor_row]
-
-            # Split the current line at the cursor and create a new line
-            lines.insert(self.cursor_row + 1, current_line[self.cursor_col:])
-            lines[self.cursor_row] = current_line[:self.cursor_col]
-            
-            self.cursor_row += 1  # Move the cursor down to the new line
-            self.cursor_col = 0  # Move the cursor to the beginning of the new line
-            self.multi_line_string = "\n".join(lines)
-            # Highlighted Changes: End
-
-
-    
-
-        print("Current multi-line string----->:")
-        print(self.multi_line_string)
-        print("Current SELF TYPED----->:")
-        print(self.typed_keys)
-
-        print(f"Last Sequence:__2 {self.last_sequence}")
-
+      
         try:
             self.last_key = key
 
             if key not in self.omitted_keys:
                 if (key != "backspace"):  # Add condition to skip "backspace" triggering shortcuts
-                    self.lookup_and_expand(self.last_sequence)
+                   self.lookup_and_expand(word_at_caret)  # Use word_at_caret instead of self.last_sequence
 
             else:
                
@@ -885,17 +713,19 @@ class KeyListener:
                         words = word_tokenize(self.multi_line_string)
                         # Get the last word only if words list is not empty
                         last_word = words[-1] if words else None
-                        if last_word:
-                            self.lookup_and_expand(last_word)
-                            self.last_sequence = ""  # Clear last_sequence after successful expansion
+                        if word_at_caret:
+
+                            self.lookup_and_expand(word_at_caret)
+                            word_at_caret = ""  # Clear word_at_caret after successful expansion
+                            
                         
 
                         
         except Exception as e:
-            logging.error(f"Error in on_key_release: {e}")
+            pass
+            #logging.error(f"Error in on_key_release: {e}")
 
 
-    
 
         end_time = time.time()
         elapsed_time = end_time - start_time
