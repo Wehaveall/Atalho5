@@ -18,7 +18,8 @@ from comtypes.gen.UIAutomationClient import (
     TextPatternRangeEndpoint_Start,
     TextPatternRangeEndpoint_End,
     TextUnit_Character,
-    TextUnit_Word
+    TextUnit_Word,
+    TextUnit_Document
 )
 
 def main():
@@ -43,19 +44,23 @@ def main():
         name = focusedElement.CurrentName
         print(f"The focused element is: {name}")
 
-        # Check if the focused element supports the ValuePattern and retrieve the value
+        # First, attempt to use ValuePattern to get the full text if it's a single-line edit control.
         valuePattern = focusedElement.GetCurrentPattern(UIA_ValuePatternId)
         if valuePattern:
             valuePattern = valuePattern.QueryInterface(IUIAutomationValuePattern)
             full_text = valuePattern.CurrentValue
             print(f"The full text inside the focused control is: '{full_text}'")
-
+        else:
+            # If ValuePattern is not supported, attempt to use TextPattern to get the full text.
             textPattern = focusedElement.GetCurrentPattern(UIA_TextPatternId)
             if textPattern:
                 textPattern = textPattern.QueryInterface(IUIAutomationTextPattern)
+                documentRange = textPattern.DocumentRange
+                full_text = documentRange.GetText(-1)
+                print(f"The full text inside the focused control is: '{full_text}'")
+
                 # Get the degenerate range where the caret is
                 range = textPattern.GetSelection().GetElement(0)
-
                 # Check if we got a range (the caret is within a text pattern)
                 if range:
                     # Move the start of the range to the beginning of the word
@@ -68,9 +73,7 @@ def main():
                 else:
                     print("Could not get text range from caret position.")
             else:
-                print("Focused control does not support TextPattern.")
-        else:
-            print("Focused control does not support ValuePattern.")
+                print("Focused control does not support ValuePattern or TextPattern.")
 
         # Assuming success if we get this far
         return True
