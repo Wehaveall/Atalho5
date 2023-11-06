@@ -143,7 +143,7 @@ def lookup_word_in_all_databases(word):
 
     # List to store database files
     db_files = []
-    all_expansions = []  # Define the list to store all expansions
+    all_expansions = []  # Updated to store all expansions for each shortcut
 
     # Use os.walk to traverse all subdirectories of db_directory
     for root, _, files in os.walk(base_directory):
@@ -177,13 +177,13 @@ def lookup_word_in_all_databases(word):
                     requires_delimiter = config_result.requires_delimiter
                     delimiters = config_result.delimiters
 
-       
         for table_name in target_tables:
             table = Table(table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)
             with Session(engine) as session:
-                result = session.execute(s).first()  # We expect only one expansion per shortcut
-                if result:
+                # Updated to fetch all rows that match the shortcut
+                results = session.execute(s).fetchall()  # Fetch all expansions for the shortcut
+                for result in results:  # Iterate through each expansion found
                     format_value = int(result.format)
                     expansion_data = {
                         "expansion": result.expansion.decode('utf-8') if isinstance(result.expansion, bytes) else result.expansion,
