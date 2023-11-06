@@ -127,8 +127,9 @@ def get_engine(db_path):
 
 
 import os
-from sqlalchemy import create_engine, MetaData, Table, select, inspect
+from sqlalchemy import create_engine, MetaData, Table, select, inspect, text
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 
 import importlib
@@ -166,7 +167,7 @@ def lookup_word_in_all_databases(word):
         # Fetch required_delimiters and delimiters from the config table
         requires_delimiter = None
         delimiters = None
-       
+        
         if "config" in table_names:
             config_table = Table("config", metadata, autoload_with=engine)
             s_config = select(config_table)
@@ -176,6 +177,7 @@ def lookup_word_in_all_databases(word):
                     requires_delimiter = config_result.requires_delimiter
                     delimiters = config_result.delimiters
 
+       
         for table_name in target_tables:
             table = Table(table_name, metadata, autoload_with=engine)
             s = select(table).where(table.c.shortcut == word)

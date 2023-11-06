@@ -39,10 +39,18 @@ def extract_fields_from_txt(text_file, prefix):
 
     for i in range(1, len(articles)):
         article = articles[i].strip()
-        shortcut_match = re.search(r"(\d+)(-\s*[a-zA-Z])?", article)
+
+        # This regex pattern captures numbers with or without a period
+        shortcut_match = re.search(r"(\d+)(\.\d+)?(-\s*[a-zA-Z])?", article)
+        
         if shortcut_match:
-            # Extract and clean up the shortcut, converting letter to lowercase
-            shortcut = shortcut_match.group().replace("-", "").replace(" ", "").lower()
+            # Extract the numeric part and the optional suffix with letter
+            number_part = shortcut_match.group(1)
+            decimal_part = shortcut_match.group(2) if shortcut_match.group(2) else ""
+            letter_suffix = shortcut_match.group(3).replace("-", "").replace(" ", "").lower() if shortcut_match.group(3) else ""
+
+            # Remove the periods and concatenate the parts to form the shortcut
+            shortcut = (number_part + decimal_part + letter_suffix).replace(".", "")
 
             # Replace the delimiters with newlines only for the full articles
             if article.startswith("*Art."):
