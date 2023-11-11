@@ -28,6 +28,7 @@ import pyautogui
 import pyperclip  # Added for clipboard manipulation
 
 # Project-Specific Libraries
+from src.classes.popup import *
 from src.database.data_connect import lookup_word_in_all_databases
 from src.utils import number_utils
 from suffix_accents_utils import *
@@ -70,6 +71,7 @@ class KeyListener:
         # def get_current_suffix_patterns():
         #   return load_suffix_data()
         
+        self.word_at_caret = ""
         self.current_focused_element = None
         self.suffix_patterns = get_current_suffix_patterns()
        
@@ -99,9 +101,8 @@ class KeyListener:
         self.last_key = None
         self.cursor_row = 0
         self.cursor_col = 0
-        self.multi_line_string = """"""
         self.typed_keys = """"""
-        self.lines = """"""
+     
 
         # Added this line to store the pynput listener
         # self.pynput_listener = keyboard.Listener(on_press=self.on_key_press, on_release=self.on_key_release)
@@ -413,24 +414,7 @@ class KeyListener:
 
         self.just_pasted_expansion = True
         # Split the multi_line_string into lines
-        lines = self.multi_line_string.split("\n")
-        # Get the current line
-        current_line = lines[self.cursor_row]
-        # Find the last occurrence of the typed shortcut in the current line------LAST SEQUENCEE _ NOT LAST WORD------------
-        last_occurrence = current_line.rfind(self.last_sequence)
-        # Remove the last typed shortcut from the current line
-        if last_occurrence != -1:
-            current_line = current_line[:last_occurrence] + current_line[last_occurrence + len(self.last_sequence):]
-        # Add the selected expansion to the current line
-        new_current_line = current_line + expansion_to_paste
-        lines[self.cursor_row] = new_current_line
-        # Update the multi_line_string
-        self.multi_line_string = "\n".join(lines)
-        # Update the cursor position to the end of the new line
-        self.cursor_col = len(new_current_line)
-        # Reset self.typed_keys and self.last_sequence to the selected expansion
-        self.typed_keys = expansion_to_paste
-        self.last_sequence = expansion_to_paste
+       
         self.start_listener()
         return
 
@@ -482,6 +466,10 @@ class KeyListener:
         if len(expansions_list) > 1:
             self.expansions_list = expansions_list
             self.create_popup()
+            
+            if not self.popup_selector.selection_made:  # <-- Check if a selection was made
+               self.word_at_caret=""
+               return  # Exit the function if no selection was made
         
         elif len(expansions_list) == 1:
             print("Debug: Single expansion detected.")  # Debug print
@@ -665,32 +653,32 @@ class KeyListener:
         
             # ---------------------------------------WORDS--------------------------------
             # Tokenize the sentence into words
-            words_from_multi_line = word_tokenize(self.multi_line_string)
+            #words_from_multi_line = word_tokenize(self.multi_line_string)
 
             # Get the last word only if the list is not empty
-            self.last_word = words_from_multi_line[-1] if words_from_multi_line else None
+            #self.last_word = words_from_multi_line[-1] if words_from_multi_line else None
 
             # --------------------------------------SENTENCES-----------------------------
             # Sentence Tokenization
-            sentences = sent_tokenize(self.multi_line_string)
-            last_sentence = sentences[-1] if sentences else ""
-            last_sentence = sentences[-1] if sentences else None  # Highlighted Change
+            #sentences = sent_tokenize(self.multi_line_string)
+            #last_sentence = sentences[-1] if sentences else ""
+            #last_sentence = sentences[-1] if sentences else None  # Highlighted Change
 
             # ---------------------------------------ENTITIES--------------------------------
             # Tokenization
-            tokens = word_tokenize(self.multi_line_string)  # Make sure self.typed_keys is a string
-            tags = pos_tag(tokens)
-            entities = ne_chunk(tags)
+            #tokens = word_tokenize(self.multi_line_string)  # Make sure self.typed_keys is a string
+            #tags = pos_tag(tokens)
+            #entities = ne_chunk(tags)
 
             # ---------------------------------------COLLECT DATA
             # Call the new method here
-            self.capture_ngrams_and_collocations()
+            #self.capture_ngrams_and_collocations()
 
             # --------------------------------PRINTS--------------------------------
 
-            print(f"Entities = {entities}")
+            #print(f"Entities = {entities}")
             #print(f"Sentence List= {sentences}")
-            print(f"Last Sentence = {last_sentence}")
+            #print(f"Last Sentence = {last_sentence}")
             #print(f"Words List= {words_from_multi_line}")
             
       

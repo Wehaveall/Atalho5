@@ -67,19 +67,30 @@ def get_focused_info():
             valuePattern = valuePattern.QueryInterface(IUIAutomationValuePattern)
             info['full_text'] = valuePattern.CurrentValue
 
-        # Check if the focused element supports the TextPattern and retrieve it for the word at the caret
         textPattern = focusedElement.GetCurrentPattern(UIA_TextPatternId)
         if textPattern:
             textPattern = textPattern.QueryInterface(IUIAutomationTextPattern)
+            
             # Get the degenerate range where the caret is
             range = textPattern.GetSelection().GetElement(0)
             if range:
-                # Move the start of the range to the beginning of the word
-                range.MoveEndpointByUnit(TextPatternRangeEndpoint_Start, TextUnit_Word, -1)
-                # Move the end of the range to the end of the word
-                range.MoveEndpointByUnit(TextPatternRangeEndpoint_End, TextUnit_Word, 1)
-                # Get the text of the word at the caret
-                info['word_at_caret'] = range.GetText(-1).strip()
+                # Clone the range for checking the character before the caret
+                charBeforeCaretRange = range.Clone()
+                # Move the start of the range to the previous character
+                charBeforeCaretRange.MoveEndpointByUnit(TextPatternRangeEndpoint_Start, TextUnit_Character, -1)
+                # Get the character before the caret
+                charBeforeCaret = charBeforeCaretRange.GetText(-1)
+
+                # Check if the character before the caret is a space or if there is no character (beginning of text)
+                if charBeforeCaret.isspace() or charBeforeCaret == '':
+                    info['word_at_caret'] = ''
+                else:
+                    # Move the start of the range to the beginning of the word
+                    range.MoveEndpointByUnit(TextPatternRangeEndpoint_Start, TextUnit_Word, -1)
+                    # Move the end of the range to the end of the word
+                    range.MoveEndpointByUnit(TextPatternRangeEndpoint_End, TextUnit_Word, 1)
+                    # Get the text of the word at the caret
+                    info['word_at_caret'] = range.GetText(-1).strip()
 
         # Return the gathered information
         return info
