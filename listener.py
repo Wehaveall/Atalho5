@@ -28,7 +28,6 @@ import pyautogui
 import pyperclip  # Added for clipboard manipulation
 
 # Project-Specific Libraries
-from src.classes.popup import *
 from src.database.data_connect import lookup_word_in_all_databases
 from src.utils import number_utils
 from suffix_accents_utils import *
@@ -46,15 +45,6 @@ from nltk.metrics import BigramAssocMeasures
 # Setup logging - DISABLE TO CHECK PEFORMANCE
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-
-
-
-
-global cursor_row  # Declare cursor_row as global to modify it
-global cursor_col  # Declare cursor_col as global to modify it
-
-cursor_row = 0
-cursor_col = 0
 
 
 
@@ -195,22 +185,28 @@ class KeyListener:
             self.on_key_release(event)
 
 
+
+
     def stop_listener(self):
-        print("Stopping Listener from Listerner.py")
+        print("Stopping Listener from Listener.py")
         try:
-            keyboard.unhook(self.press_hook)
-            keyboard.unhook(self.release_hook)
+            # Unhook the keyboard listener
+            keyboard.unhook(self.hook)
             print("Successfully unhooked the keyboard listeners.")
         except Exception as e:
             print(f"An error occurred while unhooking: {e}")
 
+
     def start_listener(self):
         print("Starting Listener from Listener.py")
         try:
+            # Hook the general_handler function to listen to keyboard events
             self.hook = keyboard.hook(self.general_handler)
             print("Successfully hooked the keyboard listeners.")
         except Exception as e:
             print(f"An error occurred while hooking: {e}")
+
+
 
 
     # ----------------------------------------GRAMMAR AND ORTOGRAPH ---------------
@@ -413,7 +409,7 @@ class KeyListener:
         self.paste_expansion(expansion_to_paste,format_value=selected_expansion_data["format_value"],)
 
         self.just_pasted_expansion = True
-        # Split the multi_line_string into lines
+        self.word_at_caret = ""
        
         self.start_listener()
         return
