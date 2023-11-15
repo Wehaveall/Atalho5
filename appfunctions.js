@@ -340,20 +340,21 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
 function initializeCollapsibleStates(savedStates) {
   for (const [collapsibleId, state] of Object.entries(savedStates)) {
     const collapsibleElement = document.getElementById(collapsibleId);
-    const content = collapsibleElement.nextElementSibling;
+    const content = collapsibleElement ? collapsibleElement.nextElementSibling : null;
 
-    if (state === 'block') {
-      collapsibleElement.classList.add('active');
-      content.style.maxHeight = content.scrollHeight + 'px';
-      collapsibleElement.innerHTML = `▼ ${collapsibleElement.id}`;
-    } else {
-      collapsibleElement.classList.remove('active');
-      content.style.maxHeight = null;
-      collapsibleElement.innerHTML = `▶ ${collapsibleElement.id}`;
+    if (collapsibleElement && content) {
+      if (state === 'block') {
+        collapsibleElement.classList.add('active');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        collapsibleElement.innerHTML = `▼ ${collapsibleElement.id}`;  // Consider using a different label here
+      } else {
+        collapsibleElement.classList.remove('active');
+        content.style.maxHeight = null;
+        collapsibleElement.innerHTML = `▶ ${collapsibleElement.id}`;  // Consider using a different label here
+      }
     }
   }
 }
-
 
 ///////////////////////////////////////////////////////////////////  TOGGLE COLLAPSIBLE    ////////////////////////////////////////////////////////
 // Function to toggle collapsible content

@@ -89,8 +89,6 @@ class KeyListener:
         self.delimiters = None
         self.accent = False
         self.last_key = None
-        self.cursor_row = 0
-        self.cursor_col = 0
         self.typed_keys = """"""
      
 
@@ -132,8 +130,6 @@ class KeyListener:
 
     # Initialize an empty list to hold regex patterns
 
-
-    
 
 
 
@@ -642,8 +638,7 @@ class KeyListener:
                 
            
            
-            elif key == "enter":
-                self.typed_keys += '\n'
+          
 
 
         
