@@ -219,23 +219,24 @@
 
 
 
-                    <div id="inputContainer">
-                      <div id="labelRight">
-                        <input id="label" type="text" placeholder="Descrição:" size="60">
+                  <div id="inputContainer" role="form">
+                    <div id="labelRight">
+                      <input id="label" type="text" placeholder="Descrição:" size="60" aria-label="Label Description" tabindex="1">
+                    </div>
+                    <div id="rightInputs">
+                      <div id="atalhoRight">
+                        <input id="shortcutInput" type="text" placeholder="Atalho:" size="30" aria-label="Shortcut Input" tabindex="2">
                       </div>
-                      <div id="rightInputs">
-                        <div id="atalhoRight">
-                          <input id="shortcutInput" type="text" placeholder="Atalho:" size="30" >
-                        </div>
-                        <div id="caseRight" class="case">
-                          <select data-custom id="caseChoice">
-                            <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
-                            <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
-                            <option id="adapt">Adaptar ao atalho</option>
-                          </select>
-                        </div>
+                      <div id="caseRight" class="case">
+                        <select data-custom id="caseChoice" aria-label="Case Choice">
+                          <option id="caseSensitive">Diferenciar Maiúsculas/Minúsculas</option>
+                          <option id="noCase">Ignorar Maiúsculas/Minúsculas</option>
+                          <option id="adapt">Adaptar ao atalho</option>
+                        </select>
                       </div>
                     </div>
+                  </div>
+
                   </div>
 
                 </div>
