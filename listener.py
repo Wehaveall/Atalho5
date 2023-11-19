@@ -17,7 +17,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import re
 
-#Windows libraries
+# Windows libraries
 
 import ctypes
 
@@ -142,9 +142,46 @@ class KeyListener:
 
         self.omitted_keys = set(
             [
-                "esc","shift","ctrl","alt","cmd","f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","page up","page down","home","end","delete",
-                "insert","up","down","left","right","backspace","print screen","scroll lock","pause","space","caps lock","tab","enter","num lock","right ctrl",
-                "left ctrl", "left shift", "right shift",
+                "esc",
+                "shift",
+                "ctrl",
+                "alt",
+                "cmd",
+                "f1",
+                "f2",
+                "f3",
+                "f4",
+                "f5",
+                "f6",
+                "f7",
+                "f8",
+                "f9",
+                "f10",
+                "f11",
+                "f12",
+                "page up",
+                "page down",
+                "home",
+                "end",
+                "delete",
+                "insert",
+                "up",
+                "down",
+                "left",
+                "right",
+                "backspace",
+                "print screen",
+                "scroll lock",
+                "pause",
+                "space",
+                "caps lock",
+                "tab",
+                "enter",
+                "num lock",
+                "right ctrl",
+                "left ctrl",
+                "left shift",
+                "right shift",
             ]
         )
 
@@ -165,8 +202,6 @@ class KeyListener:
 
     #!!!!!!!!! O Status do numlock influencia muito na ações da library Keyboard. Dependendo se on ou off, muitas teclas
     # não vao funcionar corretamente.
-
-   
 
     def update_suffix_patterns(self, new_patterns):
         self.suffix_patterns = new_patterns
@@ -313,12 +348,31 @@ class KeyListener:
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
-        
-        print(f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}")
+        print(
+            f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}"
+        )
 
         self.programmatically_typing = True  # Set the flag
         # Debug: Print before changes
 
+        # Check if numlock is on
+        def is_numlock_on():
+            # GetKeyState function retrieves the status of the specified key
+            # VK_NUMLOCK (0x90) is the virtual-key code for the NumLock key
+            return ctypes.windll.user32.GetKeyState(0x90) != 0
+
+        def toggle_numlock():
+            # Toggle NumLock state
+            keyboard.press_and_release("num lock")
+
+        # Example usage
+        if is_numlock_on():
+            print("NumLock is ON")
+            state = True
+            toggle_numlock()
+
+        else:
+            print("NumLock is OFF")
 
         # New code: Locate %cursor% in the expansion and record its position
         cursor_position = None
@@ -387,7 +441,8 @@ class KeyListener:
 
         # self.cursor_col += len(formatted_expansion)
         # print(f"Debug: Updated cursor_col: {self.cursor_col}")  # Debug print
-       
+        if state == True:
+            toggle_numlock()
 
         self.programmatically_typing = False  # Reset the flag
 
