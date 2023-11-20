@@ -303,11 +303,33 @@ class KeyListener:
             # Set flag to indicate programmatic typing
             self.programmatically_typing = True
 
+
+        # Check if numlock is on -----------------------------------------------------------
+        def is_numlock_on():
+            # GetKeyState function retrieves the status of the specified key
+            # VK_NUMLOCK (0x90) is the virtual-key code for the NumLock key
+            return ctypes.windll.user32.GetKeyState(0x90) != 0
+
+        def toggle_numlock():
+            # Toggle NumLock state
+            keyboard.press_and_release("num lock")
+
+        # Example usage
+        if is_numlock_on():
+            print("NumLock is ON")
+            state = True
+            toggle_numlock()
+
+        else:
+            print("NumLock is OFF")
+        #-------------------------------------------------------------------------------------
+           
+           
             # Clear previously typed keys
             keyboard.press("ctrl")
             keyboard.press("shift")
             time.sleep(0.05)
-            keyboard.press_and_release("right arrow")
+            keyboard.press_and_release("left arrow")
             keyboard.release("shift")
             keyboard.release("ctrl")
             keyboard.press_and_release("backspace")
@@ -338,6 +360,9 @@ class KeyListener:
             # Debugging line to check the value of self.typed_keys after modification
             print(f"After: {self.typed_keys}")
 
+            if state == True:
+              toggle_numlock()
+           
             # Reset the flag
             self.programmatically_typing = False
 
@@ -355,7 +380,7 @@ class KeyListener:
         self.programmatically_typing = True  # Set the flag
         # Debug: Print before changes
 
-        # Check if numlock is on
+        # Check if numlock is on----------------------------------------------------------
         def is_numlock_on():
             # GetKeyState function retrieves the status of the specified key
             # VK_NUMLOCK (0x90) is the virtual-key code for the NumLock key
@@ -374,6 +399,8 @@ class KeyListener:
         else:
             print("NumLock is OFF")
 
+        #--------------------------------------------------------------------------------
+       
         # New code: Locate %cursor% in the expansion and record its position
         cursor_position = None
         if expansion and "%CURSOR%" in expansion:
@@ -436,11 +463,7 @@ class KeyListener:
 
         # Update other variables
         self.typed_keys = ""
-        # self.last_word = formatted_expansion
-        # self.word_buffer.append(formatted_expansion)
 
-        # self.cursor_col += len(formatted_expansion)
-        # print(f"Debug: Updated cursor_col: {self.cursor_col}")  # Debug print
         if state == True:
             toggle_numlock()
 
