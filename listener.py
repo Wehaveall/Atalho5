@@ -325,50 +325,50 @@ class KeyListener:
         #-------------------------------------------------------------------------------------
            
            
-            # Clear previously typed keys
-            keyboard.press("ctrl")
-            keyboard.press("shift")
-            time.sleep(0.05)
-            keyboard.press_and_release("left arrow")
-            keyboard.release("shift")
-            keyboard.release("ctrl")
-            keyboard.press_and_release("backspace")
+        # Clear previously typed keys
+        keyboard.press("ctrl")
+        keyboard.press("shift")
+        time.sleep(0.05)
+        keyboard.press_and_release("left arrow")
+        keyboard.release("shift")
+        keyboard.release("ctrl")
+        keyboard.press_and_release("backspace")
 
-            pyperclip.copy(converted_word)
+        pyperclip.copy(converted_word)
 
-            time.sleep(0.05)
-            keyboard.press_and_release("ctrl+v")
-            time.sleep(0.05)
-            # Insert a space
-            keyboard.write(" ")
-            time.sleep(0.05)
+        time.sleep(0.05)
+        keyboard.press_and_release("ctrl+v")
+        time.sleep(0.05)
+        # Insert a space
+        keyboard.write(" ")
+        time.sleep(0.05)
 
-            # Debugging line to check the value of self.typed_keys before modification
-            print(f"Before: {self.typed_keys}")
+        # Debugging line to check the value of self.typed_keys before modification
+        print(f"Before: {self.typed_keys}")
 
-            # Update the last word and the typed keys
-            if self.typed_keys.endswith(word_at_caret + " "):
-                self.typed_keys = (
-                    self.typed_keys[: -len(word_at_caret) - 1] + converted_word + " "
-                )
+        # Update the last word and the typed keys
+        if self.typed_keys.endswith(word_at_caret + " "):
+            self.typed_keys = (
+                 self.typed_keys[: -len(word_at_caret) - 1] + converted_word + " "
+            )
 
-            elif self.typed_keys.endswith(word_at_caret):
-                self.typed_keys = (
-                    self.typed_keys[: -len(word_at_caret)] + converted_word + " "
-                )
+        elif self.typed_keys.endswith(word_at_caret):
+            self.typed_keys = (
+                self.typed_keys[: -len(word_at_caret)] + converted_word + " "
+            )
 
-            # Debugging line to check the value of self.typed_keys after modification
-            print(f"After: {self.typed_keys}")
+        # Debugging line to check the value of self.typed_keys after modification
+        print(f"After: {self.typed_keys}")
 
-            if state == True:
-              toggle_numlock()
+        if state == True:
+            toggle_numlock()
            
-            # Reset the flag
-            self.programmatically_typing = False
+        # Reset the flag
+        self.programmatically_typing = False
 
-            # Restarting hook
-            self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
-            return
+        # Restarting hook
+        self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+        return
 
     # ----------------------------------------------------------------
 
