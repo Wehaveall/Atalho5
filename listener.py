@@ -304,78 +304,76 @@ class KeyListener:
             self.programmatically_typing = True
 
 
-        # Check if numlock is on -----------------------------------------------------------
-        def is_numlock_on():
-            # GetKeyState function retrieves the status of the specified key
-            # VK_NUMLOCK (0x90) is the virtual-key code for the NumLock key
-            return ctypes.windll.user32.GetKeyState(0x90) != 0
+            # Check if numlock is on -----------------------------------------------------------
+            def is_numlock_on():
+                # GetKeyState function retrieves the status of the specified key
+                # VK_NUMLOCK (0x90) is the virtual-key code for the NumLock key
+                return ctypes.windll.user32.GetKeyState(0x90) != 0
 
-        def toggle_numlock():
-            # Toggle NumLock state
-            keyboard.press_and_release("num lock")
+            def toggle_numlock():
+                # Toggle NumLock state
+                keyboard.press_and_release("num lock")
 
-        # Example usage
-        if is_numlock_on():
-            print("NumLock is ON")
-            state = True
-            toggle_numlock()
+            # Example usage
+            if is_numlock_on():
+                print("NumLock is ON")
+                state = True
+                toggle_numlock()
 
-        else:
-            print("NumLock is OFF")
-        #-------------------------------------------------------------------------------------
-           
-           
-        # Clear previously typed keys
-        keyboard.press("ctrl")
-        keyboard.press("shift")
-        time.sleep(0.05)
-        keyboard.press_and_release("left arrow")
-        keyboard.release("shift")
-        keyboard.release("ctrl")
-        keyboard.press_and_release("backspace")
+            else:
+                print("NumLock is OFF")
+            #-------------------------------------------------------------------------------------
+            
+            
+            # Clear previously typed keys
+            keyboard.press("ctrl")
+            keyboard.press("shift")
+            time.sleep(0.05)
+            keyboard.press_and_release("left arrow")
+            keyboard.release("shift")
+            keyboard.release("ctrl")
+            keyboard.press_and_release("backspace")
 
-        pyperclip.copy(converted_word)
+            pyperclip.copy(converted_word)
 
-        time.sleep(0.05)
-        keyboard.press_and_release("ctrl+v")
-        time.sleep(0.05)
-        # Insert a space
-        keyboard.write(" ")
-        time.sleep(0.05)
+            time.sleep(0.05)
+            keyboard.press_and_release("ctrl+v")
+            time.sleep(0.05)
+            # Insert a space
+            keyboard.write(" ")
+            time.sleep(0.05)
 
-        # Debugging line to check the value of self.typed_keys before modification
-        print(f"Before: {self.typed_keys}")
+            # Debugging line to check the value of self.typed_keys before modification
+            print(f"Before: {self.typed_keys}")
 
-        # Update the last word and the typed keys
-        if self.typed_keys.endswith(word_at_caret + " "):
-            self.typed_keys = (
-                 self.typed_keys[: -len(word_at_caret) - 1] + converted_word + " "
-            )
+            # Update the last word and the typed keys
+            if self.typed_keys.endswith(word_at_caret + " "):
+                self.typed_keys = (
+                    self.typed_keys[: -len(word_at_caret) - 1] + converted_word + " "
+                )
 
-        elif self.typed_keys.endswith(word_at_caret):
-            self.typed_keys = (
-                self.typed_keys[: -len(word_at_caret)] + converted_word + " "
-            )
+            elif self.typed_keys.endswith(word_at_caret):
+                self.typed_keys = (
+                    self.typed_keys[: -len(word_at_caret)] + converted_word + " "
+                )
 
-        # Debugging line to check the value of self.typed_keys after modification
-        print(f"After: {self.typed_keys}")
+            # Debugging line to check the value of self.typed_keys after modification
+            print(f"After: {self.typed_keys}")
 
-        if state == True:
-            toggle_numlock()
-           
-        # Reset the flag
-        self.programmatically_typing = False
+            if state == True:
+                toggle_numlock()
+            
+            # Reset the flag
+            self.programmatically_typing = False
 
-        # Restarting hook
-        self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
-        return
+            # Restarting hook
+            self.press_hook = keyboard.on_press(lambda e: self.on_key_press(e))
+            return
 
     # ----------------------------------------------------------------
 
     def paste_expansion(self, expansion, format_value):
-        print(
-            f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}"
-        )
+        print(f"Debug: paste_expansion called with expansion: {expansion}, format_value: {format_value}")
 
         self.programmatically_typing = True  # Set the flag
         # Debug: Print before changes
@@ -397,6 +395,7 @@ class KeyListener:
             toggle_numlock()
 
         else:
+            state = False
             print("NumLock is OFF")
 
         #--------------------------------------------------------------------------------
@@ -468,13 +467,14 @@ class KeyListener:
             toggle_numlock()
 
         self.programmatically_typing = False  # Reset the flag
+      
 
     # ----------------------------------------------------------------Handle Accents
 
     def handle_accents(self, key_char):
         if key_char in self.accents:
             self.accent = key_char
-            return None  # No character to append to multi_line_string
+            return ""  # Return an empty string instead of None
 
         elif self.accent:
             combination = self.accent + key_char
@@ -482,16 +482,13 @@ class KeyListener:
 
             if accented_char:
                 self.typed_keys += accented_char
-                self.last_sequence += accented_char  # Update last_sequence here
                 self.accent = None
                 return accented_char  # Return the accented character
 
             self.accent = None
 
-        else:
-            # self.typed_keys += key_char
-            # self.last_sequence += key_char  # Update last_sequence here
-            return key_char  # Return the original character
+        return key_char  # Return the original character or an empty string if key_char is None
+
 
     # -------------------------------------------------------------------------
     # Is deleting multiline previous content after expansion
@@ -616,12 +613,8 @@ class KeyListener:
     def on_key_press(self, event):
         # Initialize variables to None at the start of the function
         word_at_caret = None
-        expansion = None
-        format_value = None
         self.requires_delimiter = None
         self.delimiters = None
-        processed_char = None
-        next_char = None  # Initialize next_char to None
         char = None  # Highlighted Change
 
         key = event.name  # Capture the key name first
@@ -746,12 +739,8 @@ class KeyListener:
             self.last_key = key
 
             if key not in self.omitted_keys:
-                if (
-                    key != "backspace"
-                ):  # Add condition to skip "backspace" triggering shortcuts
-                    self.lookup_and_expand(
-                        word_at_caret
-                    )  # Use word_at_caret instead of self.last_sequence
+                if (key != "backspace"):  # Add condition to skip "backspace" triggering shortcuts
+                    self.lookup_and_expand(word_at_caret)  # Use word_at_caret instead of self.last_sequence
 
             else:
                 # Initialize delimiter_list at the start of your function
@@ -762,18 +751,14 @@ class KeyListener:
                 )
 
                 if key in delimiter_list:
-                    if (
-                        key != "backspace"
-                    ):  # Add condition to skip "backspace" triggering shortcuts
+                    if (key != "backspace"):  # Add condition to skip "backspace" triggering shortcuts
                         # Tokenize the sentence into words
                         words = word_tokenize(self.typed_keys)
                         # Get the last word only if words list is not empty
                         last_word = words[-1] if words else None
                         if word_at_caret:
                             self.lookup_and_expand(word_at_caret)
-                            word_at_caret = (
-                                ""  # Clear word_at_caret after successful expansion
-                            )
+                            word_at_caret = ""  # Clear word_at_caret after successful expansion
 
         except Exception as e:
             pass
