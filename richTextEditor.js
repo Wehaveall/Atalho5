@@ -20,33 +20,43 @@ tinymce.init({
 });
 
 
-// Assuming the custom select is applied to the 'escolha' element
- const customSelectElement = document.querySelector('.custom-select-container');
+/// Event listener for custom select change - Format Value - ID: "escolha"
+    const customSelectElement = document.querySelector('.custom-select-container');
+    
 
-// Custom select change event
 customSelectElement.addEventListener('valueSelected', function (event) {
+ 
     const choice = event.detail.value;
 
     if (isEditorUpdate || !window.currentRow) {
         return;
     }
 
-    const formatValue = choice === "1";
-    const shortcut = window.currentRow.dataset.shortcut;
-    const indexValue = window.currentRow.dataset.indexValue;  // Added
+   
+    // Gathering data from the currentRow (unchanged from your original code)
     const groupName = window.currentRow.dataset.groupName;
     const databaseName = window.currentRow.dataset.databaseName;
-    const tableName = window.currentRow.dataset.tableName;  // Added
-    const label = window.currentRow.dataset.label;  // Added
-    const caseChoice = document.getElementById('caseChoice').value;  // Added
+    const tableName = window.currentRow.dataset.tableName;
+    const indexValue = window.currentRow.dataset.indexValue;
+    const shortcut = window.currentRow.dataset.shortcut;
+    // ver newcontent
+    // Convert the 'choice' directly to a boolean for formatValue
+    const formatValue = choice === "1";
+   
+
+    const label = window.currentRow.dataset.label;
+    const caseChoice = document.getElementById('caseChoice').value;
     const currentContent = tinyMCE.get('editor').getContent();
 
     isSaving = true;
 
-    // Updated the function call to match your Python function's updated signature
+   
+    
+    // Save changes via API call (unchanged from your original code)
     window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
         .then(response => {
-            window.currentRow.dataset.format = choice;
+            // Directly update the format in the dataset
+            window.currentRow.dataset.format = formatValue ? "1" : "0";
             isSaving = false;
         })
         .catch((error) => {

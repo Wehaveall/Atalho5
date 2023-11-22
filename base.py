@@ -227,21 +227,11 @@ class Api:
     # --------------------------------------------------------------------------------------------------------------------------------
     # Save changes to the database
     # Used in: main.py and invoked from JavaScript
-    def save_changes(
-        self,
-        groupName,
-        databaseName,
-        tableName,
-        indexValue,  # Added indexValue
-        shortcut,  # Re-added shortcut
-        newContent,
-        formatValue,
-        label,
-        caseChoice=None,  # New parameter
-        ):
-        # Convert formatValue to 0 or 1 for SQLite storage
-        format_value_for_db = 1 if formatValue else 0
-
+    def save_changes(self,groupName,databaseName,tableName,indexValue,shortcut, newContent,formatValue,label, caseChoice=None):
+        
+       # Explicit boolean check
+        format_value_for_db = 1 if formatValue is True else 0
+        
         # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)
         engine = get_engine(database_path)
@@ -289,7 +279,7 @@ class Api:
             .values(**update_values)
             );
 
-    # Debug: Print the statement and other variables
+            # Debug: Print the statement and other variables
             print(f"Executing statement: {stmt}")
             print(f"Update values: {update_values}")
             print(f"Index value: {indexValue}")
