@@ -20,58 +20,13 @@ tinymce.init({
 });
 
 
-/// Event listener for custom select change - Format Value - ID: "escolha"
-    const customSelectElement = document.querySelector('.custom-select-container');
-    
-
-customSelectElement.addEventListener('valueSelected', function (event) {
- 
-    const choice = event.detail.value;
-
-    if (isEditorUpdate || !window.currentRow) {
-        return;
-    }
-
-   
-    // Gathering data from the currentRow (unchanged from your original code)
-    const groupName = window.currentRow.dataset.groupName;
-    const databaseName = window.currentRow.dataset.databaseName;
-    const tableName = window.currentRow.dataset.tableName;
-    const indexValue = window.currentRow.dataset.indexValue;
-    const shortcut = window.currentRow.dataset.shortcut;
-    // ver newcontent
-    // Convert the 'choice' directly to a boolean for formatValue
-    const formatValue = choice === "1";
-   
-
-    const label = window.currentRow.dataset.label;
-    const caseChoice = document.getElementById('caseChoice').value;
-    const currentContent = tinyMCE.get('editor').getContent();
-
-    isSaving = true;
-
-   
-    
-    // Save changes via API call (unchanged from your original code)
-    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
-        .then(response => {
-            // Directly update the format in the dataset
-            window.currentRow.dataset.format = formatValue ? "1" : "0";
-            isSaving = false;
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            isSaving = false;
-        });
-
-    reinitializeEditor(choice);
-});
 
  
 function reinitializeEditor(choice) {
     const visibleEditor = (document.getElementById('editor').style.display === 'none') ? '#editor-buffer' : '#editor';
     const hiddenEditor = (visibleEditor === '#editor') ? '#editor-buffer' : '#editor';
     const currentContent = tinymce.get(visibleEditor.substring(1)).getContent();
+
     tinymce.get(hiddenEditor.substring(1)).remove();
 
     function onEditorInit() {
@@ -88,11 +43,9 @@ var rowSelected = false;  // Flag para determinar se uma linha foi selecionada
 
 var isSaving = false;  // Flag para verificar se uma operação de salvamento está em andamento
 
-function getTinyMCEConfig(selector, isAdvanced, onEditorInit) {
-    var basicConfig = {
-        //Altura 10%% para maximizar
-        height: '100%', // Defina a altura para 100%
-        //Altura 100%
+function getTinyMCEConfig(selector, isAdvanced) {
+    var config = {
+        height: '100%',
         icons: "thin",
         selector: selector,
         menubar: false,
@@ -101,66 +54,64 @@ function getTinyMCEConfig(selector, isAdvanced, onEditorInit) {
         toolbar: 'undo redo',
         paste_as_text: true,
 
-
-
-
         setup: function (editor) {
-            var saveTimeout;  // Para armazenar o temporizador
+            if (isAdvanced) {
+                editor.on('ExecCommand', function (e) {
+                    if (!isEditorUpdate && window.currentRow) {
+                        saveEditorContent(editor);
+                    }
+                });
+            }
 
             editor.on('keyup', function () {
-                if (saveTimeout) {
-                    clearTimeout(saveTimeout);  // Limpar o temporizador anterior
+                if (!isEditorUpdate && window.currentRow) {
+                    saveEditorContent(editor);
                 }
-
-                saveTimeout = setTimeout(function () {
-                    if (!isEditorUpdate && window.currentRow) {
-                        // Conteúdo mudou, salvar as alterações
-                        var shortcut = window.currentRow.dataset.shortcut;
-                        var indexValue = window.currentRow.dataset.indexValue;  // Added
-                        var groupName = window.currentRow.dataset.groupName;
-                        var databaseName = window.currentRow.dataset.databaseName;
-                        var tableName = window.currentRow.dataset.tableName;  // Added
-                        var label = window.currentRow.dataset.label;  // Added
-                        var formatValue = document.getElementById('escolha').value === "1";
-                        var caseChoice = document.getElementById('caseChoice').value;  // Added
-
-
-                        isSaving = true;  // Set the flag before saving
-                        // Updated the function call to match your Python function's updated signature
-                        window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, editor.getContent(), formatValue, label, caseChoice)
-                            .then(response => {
-                                // Atualizar o dataset e o conteúdo visual da currentRow
-                                var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
-                                if (expansionCell) {
-                                    expansionCell.dataset.expansion = editor.getContent();
-                                    expansionCell.textContent = decodeHtml(editor.getContent().replace(/<[^>]*>/g, ''));
-                                }
-                                isSaving = false;  // Reset the flag after saving is done
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                                isSaving = false;  // Reset the flag in case of error
-                            });
-                    }
-                }, 1000);  // Aguardar 1 segundo antes de salvar
             });
         }
     };
 
     if (isAdvanced) {
-        return Object.assign(basicConfig, {
-            height: '100%',
-            plugins:
-            "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
+        Object.assign(config, {
+            plugins: "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
             toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough',
             toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
             paste_as_text: false,
-            
         });
     }
 
-    return basicConfig;
+    return config;
 }
+
+
+//Save editor content into the database
+function saveEditorContent(editor) {
+    if (isSaving) {
+        return;
+    }
+
+    const currentContent = editor.getContent();
+    const groupName = window.currentRow.dataset.groupName;
+    const databaseName = window.currentRow.dataset.databaseName;
+    const tableName = window.currentRow.dataset.tableName;
+    const indexValue = window.currentRow.dataset.indexValue;
+    const shortcut = window.currentRow.dataset.shortcut;
+    const label = window.currentRow.dataset.label;
+    const formatValue = document.getElementById('escolha').value === "1";
+    const caseChoice = document.getElementById('caseChoice').value;
+
+    isSaving = true;
+
+    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
+        .then(response => {
+            isSaving = false;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            isSaving = false;
+        });
+}
+
 
 
 
