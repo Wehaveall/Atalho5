@@ -14,7 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   selectElements.forEach(selectElement => {
     const customSelect = new Select(selectElement);
     window.customSelects[selectElement.id] = customSelect;
-
+   
+    //listerner for the Format Value Change and Case Choice
     customSelect.customElement.addEventListener('valueSelected', function (event) {
       const selectedValue = event.detail.value;
 
@@ -29,18 +30,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const databaseName = window.currentRow.dataset.databaseName;
       const currentContent = tinyMCE.get('editor').getContent();
       const label = window.currentRow.dataset.label;
-      let formatValue;
-      let caseChoice;
+      let formatValue = window.currentRow.dataset.format === 'true'; // Get the existing format value
+      let caseChoice = window.currentRow.dataset.caseChoice; // Get the existing case choice value
 
       if (selectElement.id === "escolha") {
         formatValue = selectedValue === "1";
         caseChoice = window.currentRow.dataset.caseChoice; // Get the existing value
-        
         reinitializeEditor(selectedValue);
+
       } else if (selectElement.id === "caseChoice") {
         caseChoice = selectedValue;
         window.currentRow.dataset.caseChoice = caseChoice; // Store the new value
+        // Removed the line that incorrectly resets formatValue
+        // No need to change formatValue here
       }
+      
+
       alert("Format Value being sent: " + formatValue + ", Type: " + typeof formatValue);
 
       // Set the flag to true because this change was made by the user
