@@ -229,8 +229,8 @@ class Api:
     # Used in: main.py and invoked from JavaScript
     def save_changes(self,groupName,databaseName,tableName,indexValue,shortcut, newContent,formatValue,label, caseChoice=None):
         
-       # Explicit boolean check
-        format_value_for_db = 1 if formatValue is True else 0
+       # Save the format value as received
+        format_value_for_db = formatValue  # Directly use the boolean value
         
         # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)

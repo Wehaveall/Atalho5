@@ -104,11 +104,19 @@ function saveEditorContent(editor) {
 
     window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
         .then(response => {
-            isSaving = false;
+            //
+            // Atualizar o dataset e o conteúdo visual da currentRow
+            //
+            var expansionCell = window.currentRow.cells[0].querySelector('.truncate');
+            if (expansionCell) {
+                expansionCell.dataset.expansion = editor.getContent();
+                expansionCell.textContent = decodeHtml(editor.getContent().replace(/<[^>]*>/g, ''));
+            }
+            isSaving = false;  // Reset the flag after saving is done
         })
         .catch((error) => {
             console.error('Error:', error);
-            isSaving = false;
+            isSaving = false;  // Reset the flag in case of error
         });
 }
 
