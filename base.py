@@ -227,10 +227,10 @@ class Api:
     # --------------------------------------------------------------------------------------------------------------------------------
     # Save changes to the database
     # Used in: main.py and invoked from JavaScript
-    def save_changes(self,groupName,databaseName,tableName,indexValue,shortcut, newContent,formatValue,label, caseChoice=None):
+    def save_changes(self,groupName,databaseName,tableName,indexValue,shortcut,newContent,formatValue,label,caseChoice=None):
         
-       # Save the format value as received
-        format_value_for_db = formatValue  # Directly use the boolean value
+       # Explicit boolean check
+        format_value_for_db = 1 if formatValue is True else 0
         
         # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)
