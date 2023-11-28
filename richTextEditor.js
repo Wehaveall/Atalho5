@@ -117,6 +117,14 @@ function getTinyMCEConfig(selector, isAdvanced) {
         //-- On Change
         setup: function (editor) {
             editor.on('change', function () {
+
+                if (isEditorUpdate) {
+                    // Ignore programmatic changes
+                    return;
+                }
+
+
+
                 // Save when the editor content changes
                 if (!isEditorUpdate && window.currentRow) {
                     var shortcut = window.currentRow.dataset.shortcut;
@@ -149,6 +157,7 @@ function getTinyMCEConfig(selector, isAdvanced) {
 
                 saveTimeout = setTimeout(function () {
                     if (!isEditorUpdate && window.currentRow) {
+                        
                         // Conteúdo mudou, salvar as alterações
                         var shortcut = window.currentRow.dataset.shortcut;
                         var indexValue = window.currentRow.dataset.indexValue;  // Added
@@ -224,14 +233,7 @@ function initializeEditorBasedOnDropdown() {
     // Initialize the buffer editor
     initializeEditor('#editor-buffer', isFormatted);
 
-    // If the choice is for plain text, remove formatting
-    if (!isFormatted) {
-        var editor = tinyMCE.get('editor');
-        if (editor) {
-            var plainTextContent = editor.getContent({ format: 'text' });
-            editor.setContent(plainTextContent); // Set plain text content
-        }
-    }
+    
 }
 
 
@@ -247,4 +249,18 @@ function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
+}
+
+
+function throttle(func, limit) {
+    let inThrottle;
+    return function () {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
 }

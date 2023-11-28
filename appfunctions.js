@@ -558,11 +558,11 @@ async function copyHtmlToClipboard(html) {
 
 
 function handleRowClick() {
-  // Se uma operação de salvamento estiver em andamento, retorne imediatamente
+  // If a save operation is in progress, return immediately
   if (isSaving) return;
 
-// Show the #rightPanel without modifying the width of #middlePanel
-document.getElementById('rightPanel').style.display = 'flex';
+  // Show the #rightPanel without modifying the width of #middlePanel
+  document.getElementById('rightPanel').style.display = 'flex';
 
   // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
@@ -576,18 +576,15 @@ document.getElementById('rightPanel').style.display = 'flex';
   // Extract the relevant data from the clicked row
   const { groupName, databaseName, tableName, shortcut, label, format, caseChoice } = this.dataset;
 
+  const index = this.dataset.index;  // <-- Get the index
 
-  const index = this.dataset.index;  // <-- Add this line to get the index
-
-  
   // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
     .then(data => {
       const rowData = data[index];  // Use the index to get the specific row
-      
-      /////////////
-      isEditorUpdate = false;
 
+      // Set isEditorUpdate to true before programmatically updating the editor
+      isEditorUpdate = true;
 
       if (rowData) {
         const editor = tinyMCE.get('editor');
@@ -608,53 +605,44 @@ document.getElementById('rightPanel').style.display = 'flex';
           setTimeout(() => {
             editor.execCommand('SelectAll'); // Select all content
             editor.execCommand('RemoveFormat'); // Remove formatting
+            isEditorUpdate = false; // Set to false after update is complete
           }, 100); // Delay of 100 milliseconds
+        } else {
+          isEditorUpdate = false; // Set to false if no formatting removal needed
         }
 
-
-
-        // Set the "atalho" value inside the #shortcutName div
+        // Set the "shortcut" value inside the #shortcutName div
         const shortcutNameDiv = document.getElementById('shortcutName');
-        shortcutNameDiv.innerHTML = `Atalho: ${shortcut}`;
+        shortcutNameDiv.innerHTML = `Shortcut: ${shortcut}`;
 
-        const { label } = this.dataset;
         document.getElementById('label').value = label;
-
 
         // Update dropdown based on the format value
         const selectValue = rowData.format ? '1' : '0';
+        const customSelectEscolha = window.customSelects['escolha'];
+        if (customSelectEscolha) {
+          customSelectEscolha.selectValue(selectValue);
+        } else {
+          alert('Error: customSelect not found for ID escolha');
+        }
 
         // Update the custom select for caseChoice
-        const caseChoiceSelectId = 'caseChoice';
-        const customCaseChoiceSelect = window.customSelects[caseChoiceSelectId];
+        const customCaseChoiceSelect = window.customSelects['caseChoice'];
         if (customCaseChoiceSelect) {
           customCaseChoiceSelect.selectValue(caseChoice);
         } else {
-          alert('Error: customSelect is not found for ID ' + caseChoiceSelectId);
+          alert('Error: customSelect not found for ID caseChoice');
         }
-
-
-        // Assuming the select element has an ID, and customSelects is accessible here:
-        const selectId = 'escolha'; // Replace with the actual ID
-        const customSelect = window.customSelects[selectId];
-        if (customSelect) {
-          customSelect.selectValue(selectValue);
-        } else {
-          alert('Error: customSelect is not found for ID ' + selectId);
-        }
-        // Reinitialize the editor based on the dropdown value
-        reinitializeEditor(selectValue);
       } else {
         tinyMCE.get('editor').setContent('');
+        isEditorUpdate = false; // Set to false if no data
       }
-      isEditorUpdate = false;  // Reset after updating the editor
     })
     .catch(error => console.error("Error fetching recent data:", error));
 
-
-
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 }
+
 
 
 
