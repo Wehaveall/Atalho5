@@ -647,7 +647,7 @@ document.getElementById('rightPanel').style.display = 'flex';
       } else {
         tinyMCE.get('editor').setContent('');
       }
-      isEditorUpdate = true;  // Reset after updating the editor
+      isEditorUpdate = false;  // Reset after updating the editor
     })
     .catch(error => console.error("Error fetching recent data:", error));
 

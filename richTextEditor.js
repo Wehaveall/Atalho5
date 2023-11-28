@@ -21,6 +21,8 @@ window.addEventListener('load', function () {
 
 
 
+
+
 //Editor oculto para as formatações
 tinymce.init({
     selector: '#hiddenEditor',
@@ -226,14 +228,13 @@ function initializeEditorBasedOnDropdown() {
     if (!isFormatted) {
         var editor = tinyMCE.get('editor');
         if (editor) {
-            // Remove formatting and set plain text content
-            let tempDiv = document.createElement("div");
-            tempDiv.innerHTML = editor.getContent();
-            var plainTextContent = tempDiv.textContent || tempDiv.innerText || "";
-            editor.setContent(plainTextContent);
+            var plainTextContent = editor.getContent({ format: 'text' });
+            editor.setContent(plainTextContent); // Set plain text content
         }
     }
 }
+
+
 
 function swapEditors() {
     const editor1 = document.getElementById('editor');
