@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         caseChoice = selectedValue;
         window.currentRow.dataset.caseChoice = caseChoice; // Store the new value
       }
-      alert("Format Value being sent: " + formatValue + ", Type: " + typeof formatValue);
+      //alert("Format Value being sent: " + formatValue + ", Type: " + typeof formatValue);
 
       // Set the flag to true because this change was made by the user
       isManualChange = true;

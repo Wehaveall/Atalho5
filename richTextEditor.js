@@ -21,21 +21,6 @@ window.addEventListener('load', function () {
 
 
 
-function showDropdownOptionIfTableIsNot(tableName) {
-    // Check if the current table name is different from the specified table name
-    if (window.currentRow && window.currentRow.dataset.tableName !== tableName) {
-        var formatOption = document.getElementById('format');
-        if (formatOption) {
-            formatOption.style.display = 'block'; // Show the option
-        }
-    }
-}
-
-
-
-
-
-
 //Editor oculto para as formatações
 tinymce.init({
     selector: '#hiddenEditor',
@@ -229,10 +214,26 @@ function initializeEditor(selector, isAdvanced) {
 
 function initializeEditorBasedOnDropdown() {
     var choice = document.getElementById('escolha').value;
-    initializeEditor('#editor', choice === "1");
-    initializeEditor('#editor-buffer', choice === "1");
-}
+    var isFormatted = choice === "1";
 
+    // Initialize the main editor
+    initializeEditor('#editor', isFormatted);
+
+    // Initialize the buffer editor
+    initializeEditor('#editor-buffer', isFormatted);
+
+    // If the choice is for plain text, remove formatting
+    if (!isFormatted) {
+        var editor = tinyMCE.get('editor');
+        if (editor) {
+            // Remove formatting and set plain text content
+            let tempDiv = document.createElement("div");
+            tempDiv.innerHTML = editor.getContent();
+            var plainTextContent = tempDiv.textContent || tempDiv.innerText || "";
+            editor.setContent(plainTextContent);
+        }
+    }
+}
 
 function swapEditors() {
     const editor1 = document.getElementById('editor');

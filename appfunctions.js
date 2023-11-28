@@ -174,6 +174,8 @@ function formatArticle(article, tableName) {
 
     return article;
   }
+  
+  
   return article; // If tableName is not 'aTable', return the unchanged article
 }
 
@@ -582,15 +584,32 @@ document.getElementById('rightPanel').style.display = 'flex';
   window.pywebview.api.get_data(groupName, databaseName, tableName)
     .then(data => {
       const rowData = data[index];  // Use the index to get the specific row
+      
+      /////////////
+      isEditorUpdate = false;
 
-      isEditorUpdate = true;  // Set before updating the editor
+
       if (rowData) {
-        // Primeiro, decodificar as entidades HTML
-        let decodedExpansion = decodeHtml(rowData.expansion);
-        // Em seguida, formatar o artigo usando sua função
-        let formattedExpansion = formatArticle(decodedExpansion, tableName);
+        const editor = tinyMCE.get('editor');
+        const formatValue = rowData.format === '0';
 
-        tinyMCE.get('editor').setContent(formattedExpansion);
+        // Clear the editor before setting new content
+        editor.setContent('');
+
+        // Set new content
+        let content = decodeHtml(rowData.expansion);
+        if (tableName === 'aTable') {
+          content = formatArticle(content, tableName);
+        }
+        editor.setContent(content);
+
+        // If formatValue is '0', remove formatting after a slight delay
+        if (formatValue) {
+          setTimeout(() => {
+            editor.execCommand('SelectAll'); // Select all content
+            editor.execCommand('RemoveFormat'); // Remove formatting
+          }, 100); // Delay of 100 milliseconds
+        }
 
 
 
@@ -628,7 +647,7 @@ document.getElementById('rightPanel').style.display = 'flex';
       } else {
         tinyMCE.get('editor').setContent('');
       }
-      isEditorUpdate = false;  // Reset after updating the editor
+      isEditorUpdate = true;  // Reset after updating the editor
     })
     .catch(error => console.error("Error fetching recent data:", error));
 
