@@ -10,19 +10,6 @@ window.addEventListener('load', function () {
 });
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
 //Editor oculto para as formatações
 tinymce.init({
     selector: '#hiddenEditor',
@@ -35,53 +22,6 @@ tinymce.init({
     // suas outras configurações aqui, idênticas à instância visível
 });
 
-
-/// Event listener for custom select change - Format Value - ID: "escolha"
-    const customSelectElement = document.querySelector('.custom-select-container');
-    
-
-customSelectElement.addEventListener('valueSelected', function (event) {
- 
-    const choice = event.detail.value;
-
-    if (isEditorUpdate || !window.currentRow) {
-        return;
-    }
-
-   
-    // Gathering data from the currentRow (unchanged from your original code)
-    const groupName = window.currentRow.dataset.groupName;
-    const databaseName = window.currentRow.dataset.databaseName;
-    const tableName = window.currentRow.dataset.tableName;
-    const indexValue = window.currentRow.dataset.indexValue;
-    const shortcut = window.currentRow.dataset.shortcut;
-    // ver newcontent
-    // Convert the 'choice' directly to a boolean for formatValue
-    const formatValue = choice === "1";
-   
-
-    const label = window.currentRow.dataset.label;
-    const caseChoice = document.getElementById('caseChoice').value;
-    const currentContent = tinyMCE.get('editor').getContent();
-
-    isSaving = true;
-
-   
-    
-    // Save changes via API call (unchanged from your original code)
-    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
-        .then(response => {
-            // Directly update the format in the dataset
-            window.currentRow.dataset.format = formatValue ? "1" : "0";
-            isSaving = false;
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            isSaving = false;
-        });
-
-    reinitializeEditor(choice);
-});
 
  
 function reinitializeEditor(choice) {
@@ -114,39 +54,19 @@ function getTinyMCEConfig(selector, isAdvanced) {
         plugins: ['paste'],
         toolbar: 'undo redo',
         paste_as_text: true,
-        //-- On Change
+        
+        //-- On Init
         setup: function (editor) {
-            editor.on('change', function () {
-
-                if (isEditorUpdate) {
-                    // Ignore programmatic changes
-                    return;
-                }
-
-
-
-                // Save when the editor content changes
-                if (!isEditorUpdate && window.currentRow) {
-                    var shortcut = window.currentRow.dataset.shortcut;
-                    var indexValue = window.currentRow.dataset.indexValue;
-                    var groupName = window.currentRow.dataset.groupName;
-                    var databaseName = window.currentRow.dataset.databaseName;
-                    var tableName = window.currentRow.dataset.tableName;
-                    var label = window.currentRow.dataset.label;
-                    var formatValue = document.getElementById('escolha').value === "1";
-                    var caseChoice = document.getElementById('caseChoice').value;
-
-                    isSaving = true;
-                    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, editor.getContent(), formatValue, label, caseChoice)
-                        .then(response => {
-                            isSaving = false;
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                            isSaving = false;
-                        });
+            // Event listener for editor initialization
+            editor.on('init', function () {
+                // Check if a row is selected and if the format value is '0'
+                if (window.currentRow && window.currentRow.dataset.format === '0') {
+                    // Convert the HTML content to plain text
+                    let plainTextContent = editor.getContent({ format: 'text' });
+                    editor.setContent(plainTextContent);
                 }
             });
+
 
             var saveTimeout;
             //-- On Key Up
@@ -223,17 +143,14 @@ function initializeEditor(selector, isAdvanced) {
     tinymce.init(getTinyMCEConfig(selector, isAdvanced));
 }
 
+// Initialize the editor and attach the handleEditorChange event listener
 function initializeEditorBasedOnDropdown() {
     var choice = document.getElementById('escolha').value;
     var isFormatted = choice === "1";
-
     // Initialize the main editor
     initializeEditor('#editor', isFormatted);
-
     // Initialize the buffer editor
     initializeEditor('#editor-buffer', isFormatted);
-
-    
 }
 
 
@@ -249,18 +166,4 @@ function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
-}
-
-
-function throttle(func, limit) {
-    let inThrottle;
-    return function () {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    }
 }

@@ -556,94 +556,47 @@ async function copyHtmlToClipboard(html) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 function handleRowClick() {
-  // If a save operation is in progress, return immediately
   if (isSaving) return;
 
-  // Show the #rightPanel without modifying the width of #middlePanel
   document.getElementById('rightPanel').style.display = 'flex';
 
-  // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
-    window.currentRow.className = '';  // Deselect the previous row
+    window.currentRow.className = '';
   }
 
-  // Highlight the current row
   this.className = 'selected';
   window.currentRow = this;
 
-  // Extract the relevant data from the clicked row
   const { groupName, databaseName, tableName, shortcut, label, format, caseChoice } = this.dataset;
+  const index = this.dataset.index;
 
-  const index = this.dataset.index;  // <-- Get the index
-
-  // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
     .then(data => {
-      const rowData = data[index];  // Use the index to get the specific row
+      const rowData = data[index];
+      const editor = tinyMCE.get('editor');
+      let content = decodeHtml(rowData.expansion);
 
-      // Set isEditorUpdate to true before programmatically updating the editor
-      isEditorUpdate = true;
-
-      if (rowData) {
-        const editor = tinyMCE.get('editor');
-        const formatValue = rowData.format === '0';
-
-        // Clear the editor before setting new content
-        editor.setContent('');
-
-        // Set new content
-        let content = decodeHtml(rowData.expansion);
-        if (tableName === 'aTable') {
-          content = formatArticle(content, tableName);
-        }
-        editor.setContent(content);
-
-        // If formatValue is '0', remove formatting after a slight delay
-        if (formatValue) {
-          setTimeout(() => {
-            editor.execCommand('SelectAll'); // Select all content
-            editor.execCommand('RemoveFormat'); // Remove formatting
-            isEditorUpdate = false; // Set to false after update is complete
-          }, 100); // Delay of 100 milliseconds
-        } else {
-          isEditorUpdate = false; // Set to false if no formatting removal needed
-        }
-
-        // Set the "shortcut" value inside the #shortcutName div
-        const shortcutNameDiv = document.getElementById('shortcutName');
-        shortcutNameDiv.innerHTML = `Shortcut: ${shortcut}`;
-
-        document.getElementById('label').value = label;
-
-        // Update dropdown based on the format value
-        const selectValue = rowData.format ? '1' : '0';
-        const customSelectEscolha = window.customSelects['escolha'];
-        if (customSelectEscolha) {
-          customSelectEscolha.selectValue(selectValue);
-        } else {
-          alert('Error: customSelect not found for ID escolha');
-        }
-
-        // Update the custom select for caseChoice
-        const customCaseChoiceSelect = window.customSelects['caseChoice'];
-        if (customCaseChoiceSelect) {
-          customCaseChoiceSelect.selectValue(caseChoice);
-        } else {
-          alert('Error: customSelect not found for ID caseChoice');
-        }
-      } else {
-        tinyMCE.get('editor').setContent('');
-        isEditorUpdate = false; // Set to false if no data
+      // Set the content based on format value
+      if (rowData.format === '0') {
+        // Convert HTML to plain text and set it
+        content = convertHtmlToPlainText(content);
+      } else if (tableName === 'aTable') {
+        // Apply specific formatting for 'aTable'
+        content = formatArticle(content, tableName);
       }
+
+      // Set the content in the editor
+      editor.setContent(content);
+
+      document.getElementById('shortcutName').innerHTML = `Shortcut: ${shortcut}`;
+      document.getElementById('label').value = label;
+      // Update dropdowns and other UI components as needed
     })
     .catch(error => console.error("Error fetching recent data:", error));
 
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 }
-
-
 
 
 
