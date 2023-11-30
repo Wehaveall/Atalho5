@@ -556,54 +556,105 @@ async function copyHtmlToClipboard(html) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 function handleRowClick() {
+  // Se uma operação de salvamento estiver em andamento, retorne imediatamente
   if (isSaving) return;
 
-  document.getElementById('rightPanel').style.display = 'flex';
+// Show the #rightPanel without modifying the width of #middlePanel
+document.getElementById('rightPanel').style.display = 'flex';
 
+  // Deselect the previously selected row, if any
   if (window.currentRow && window.currentRow !== this) {
-    window.currentRow.className = '';
+    window.currentRow.className = '';  // Deselect the previous row
   }
 
+  // Highlight the current row
   this.className = 'selected';
   window.currentRow = this;
 
+  // Extract the relevant data from the clicked row
   const { groupName, databaseName, tableName, shortcut, label, format, caseChoice } = this.dataset;
-  const index = this.dataset.index;
 
+
+  const index = this.dataset.index;  // <-- Add this line to get the index
+
+  
+  // Fetch the most recent data from the cache or database
   window.pywebview.api.get_data(groupName, databaseName, tableName)
     .then(data => {
-      const rowData = data[index];
-      const editor = tinyMCE.get('editor');
-      let content = decodeHtml(rowData.expansion);
+      const rowData = data[index];  // Use the index to get the specific row
+      
+      /////////////
+      isEditorUpdate = true;
 
-      // Set the content based on format value
-      if (rowData.format === '0') {
-        // Convert HTML to plain text and set it
-        content = convertHtmlToPlainText(content);
-      } else if (tableName === 'aTable') {
-        // Apply specific formatting for 'aTable'
-        content = formatArticle(content, tableName);
+
+      if (rowData) {
+        const editor = tinyMCE.get('editor');
+        const formatValue = rowData.format === '0';
+
+        // Clear the editor before setting new content
+        editor.setContent('');
+
+        // Set new content
+        let content = decodeHtml(rowData.expansion);
+        if (tableName === 'aTable') {
+          content = formatArticle(content, tableName);
+        }
+        editor.setContent(content);
+
+        // If formatValue is '0', remove formatting after a slight delay
+        if (formatValue) {
+          setTimeout(() => {
+            editor.execCommand('SelectAll'); // Select all content
+            editor.execCommand('RemoveFormat'); // Remove formatting
+          }, 100); // Delay of 100 milliseconds
+        }
+
+
+
+        // Set the "atalho" value inside the #shortcutName div
+        const shortcutNameDiv = document.getElementById('shortcutName');
+        shortcutNameDiv.innerHTML = `Atalho: ${shortcut}`;
+
+        const { label } = this.dataset;
+        document.getElementById('label').value = label;
+
+
+        // Update dropdown based on the format value
+        const selectValue = rowData.format ? '1' : '0';
+
+        // Update the custom select for caseChoice
+        const caseChoiceSelectId = 'caseChoice';
+        const customCaseChoiceSelect = window.customSelects[caseChoiceSelectId];
+        if (customCaseChoiceSelect) {
+          customCaseChoiceSelect.selectValue(caseChoice);
+        } else {
+          alert('Error: customSelect is not found for ID ' + caseChoiceSelectId);
+        }
+
+
+        // Assuming the select element has an ID, and customSelects is accessible here:
+        const selectId = 'escolha'; // Replace with the actual ID
+        const customSelect = window.customSelects[selectId];
+        if (customSelect) {
+          customSelect.selectValue(selectValue);
+        } else {
+          alert('Error: customSelect is not found for ID ' + selectId);
+        }
+        // Reinitialize the editor based on the dropdown value
+        reinitializeEditor(selectValue);
+      } else {
+        tinyMCE.get('editor').setContent('');
       }
-
-      // Set the content in the editor
-      editor.setContent(content);
-
-      document.getElementById('shortcutName').innerHTML = `Shortcut: ${shortcut}`;
-      document.getElementById('label').value = label;
-      // Update dropdowns and other UI components as needed
+      isEditorUpdate = false;  // Reset after updating the editor
     })
     .catch(error => console.error("Error fetching recent data:", error));
 
+
+
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 }
-
-
-
-
-
-
-
 
 
 
