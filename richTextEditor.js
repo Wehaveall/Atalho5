@@ -40,49 +40,6 @@ tinymce.init({
     const customSelectElement = document.querySelector('.custom-select-container');
     
 
-customSelectElement.addEventListener('valueSelected', function (event) {
- 
-    const choice = event.detail.value;
-
-    if (isEditorUpdate || !window.currentRow) {
-        return;
-    }
-
-   
-    // Gathering data from the currentRow (unchanged from your original code)
-    const groupName = window.currentRow.dataset.groupName;
-    const databaseName = window.currentRow.dataset.databaseName;
-    const tableName = window.currentRow.dataset.tableName;
-    const indexValue = window.currentRow.dataset.indexValue;
-    const shortcut = window.currentRow.dataset.shortcut;
-    // ver newcontent
-    // Convert the 'choice' directly to a boolean for formatValue
-    const formatValue = choice === "1";
-   
-
-    const label = window.currentRow.dataset.label;
-    const caseChoice = document.getElementById('caseChoice').value;
-    const currentContent = tinyMCE.get('editor').getContent();
-
-    isSaving = true;
-
-   
-    
-    // Save changes via API call (unchanged from your original code)
-    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue, label, caseChoice)
-        .then(response => {
-            // Directly update the format in the dataset
-            window.currentRow.dataset.format = formatValue ? "1" : "0";
-            isSaving = false;
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            isSaving = false;
-        });
-
-    reinitializeEditor(choice);
-});
-
  
 function reinitializeEditor(choice) {
     const visibleEditor = (document.getElementById('editor').style.display === 'none') ? '#editor-buffer' : '#editor';
@@ -104,44 +61,52 @@ var rowSelected = false;  // Flag para determinar se uma linha foi selecionada
 
 var isSaving = false;  // Flag para verificar se uma operação de salvamento está em andamento
 
-function getTinyMCEConfig(selector, isAdvanced) {
+function getTinyMCEConfig(editor, isAdvanced) {
     var basicConfig = {
         height: '100%',
         icons: "thin",
-        selector: selector,
+        selector: editor,
         menubar: false,
         statusbar: false,
         plugins: ['paste'],
-        toolbar: 'undo redo',
+        toolbar: 'undo redo customSave', // Corrected here
         paste_as_text: true,
         //-- On Change
         setup: function (editor) {
-            editor.on('change', function () {
-                // Save when the editor content changes
-                if (!isEditorUpdate && window.currentRow) {
-                    var shortcut = window.currentRow.dataset.shortcut;
-                    var indexValue = window.currentRow.dataset.indexValue;
-                    var groupName = window.currentRow.dataset.groupName;
-                    var databaseName = window.currentRow.dataset.databaseName;
-                    var tableName = window.currentRow.dataset.tableName;
-                    var label = window.currentRow.dataset.label;
-                    var formatValue = document.getElementById('escolha').value === "1";
-                    var caseChoice = document.getElementById('caseChoice').value;
+        
+            
+            editor.ui.registry.addButton('customSave', {
+                text: 'Save',
+                onAction: function () {
+                    // Implement your save logic here
+                    if (!isEditorUpdate && window.currentRow) {
+                        // Conteúdo mudou, salvar as alterações
+                        var shortcut = window.currentRow.dataset.shortcut;
+                        var indexValue = window.currentRow.dataset.indexValue;  // Added
+                        var groupName = window.currentRow.dataset.groupName;
+                        var databaseName = window.currentRow.dataset.databaseName;
+                        var tableName = window.currentRow.dataset.tableName;  // Added
+                        var label = window.currentRow.dataset.label;  // Added
+                        var formatValue = document.getElementById('escolha').value === "1";
+                        var caseChoice = document.getElementById('caseChoice').value;  // Added
 
-                    isSaving = true;
-                    window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, editor.getContent(), formatValue, label, caseChoice)
-                        .then(response => {
-                            isSaving = false;
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                            isSaving = false;
-                        });
+
+                        isSaving = true;  // Set the flag before saving
+                        // Updated the function call to match your Python function's updated signature
+                        window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, editor.getContent(), formatValue, label, caseChoice)
+                            .then(response => {
+                                isSaving = false;  // Reset the flag after saving is done
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                                isSaving = false;  // Reset the flag in case of error
+                            });
+                    }
+                    
                 }
             });
-
-            var saveTimeout;
-            //-- On Key Up
+            
+            
             editor.on('keyup', function () {
                 if (saveTimeout) {
                     clearTimeout(saveTimeout);

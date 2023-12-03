@@ -60,15 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
       isManualChange = true;
 
       if (isManualChange) {
-        // When saving, fetch the original formatted content from the database
+        var currentContent = editor.getContent({ format: 'html' });
+
         window.pywebview.api.get_data(groupName, databaseName, tableName)
           .then(data => {
-            const originalFormattedContent = data.find(row => row.id.toString() === indexValue).expansion;
+            const latestDatabaseContent = data.find(row => row.id.toString() === indexValue).expansion;
 
-            if (editor.getContent({ format: 'html' }) !== originalFormattedContent) {
+            if (currentContent !== latestDatabaseContent) {
               isSaving = true;
-              // Save the original formatted content, not the current editor content
-              window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, originalFormattedContent, formatValue || null, label || null, caseChoice || null)
+              window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, currentContent, formatValue || null, label || null, caseChoice || null)
                 .then(response => {
                   window.currentRow.dataset.format = formatValue ? 'true' : 'false';
                   if (caseChoice !== undefined) {
@@ -89,9 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
       }
     });
-
-
-    
   });
 });
 

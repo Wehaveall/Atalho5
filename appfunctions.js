@@ -581,64 +581,44 @@ function handleRowClick() {
       isEditorUpdate = true;
 
       if (rowData) {
-        //alert('Data fetched. Format: ' + rowData.format);
-
         const editor = tinyMCE.get('editor');
         let content = rowData.expansion;
-
-        // Assign format value directly from rowData.format
         const formatValue = rowData.format;
-        //alert('Interpreted format value is: ' + formatValue);
-
         if (formatValue) {
-         // alert('Using formatted content.');
           content = decodeHtml(content);
         } else {
-         // alert('Converting to plain text: ' + content);
           content = convertHtmlToPlainText(content);
         }
 
         editor.setContent(content);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         const shortcutNameDiv = document.getElementById('shortcutName');
         shortcutNameDiv.innerHTML = `Atalho: ${shortcut}`;
 
         document.getElementById('label').value = label;
 
         const selectValue = rowData.format ? '1' : '0';
-        //alert('Select value (format) is: ' + selectValue);
-
-        // Custom select updates
         if (window.customSelects['caseChoice']) {
           window.customSelects['caseChoice'].selectValue(caseChoice);
-         // alert('Updated caseChoice select.');
-        } else {
-         // alert('Error: customSelect not found for ID caseChoice');
         }
 
         if (window.customSelects['escolha']) {
           window.customSelects['escolha'].selectValue(selectValue);
-         // alert('Updated escolha select.');
-        } else {
-        //  alert('Error: customSelect not found for ID escolha');
         }
 
         reinitializeEditor(selectValue);
-       // alert('Editor reinitialized based on select value.');
       } else {
-       // alert('No data found for the selected row.');
         tinyMCE.get('editor').setContent('');
       }
       isEditorUpdate = false;
     })
     .catch(error => {
       console.error("Error fetching recent data:", error);
-     // alert('Error fetching data: ' + error);
     });
 
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
 }
+
 
 function convertHtmlToPlainText(html) {
   const tempDiv = document.createElement("div");
