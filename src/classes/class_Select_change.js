@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         var editor = tinyMCE.get('editor');
         if (formatValue === false) {
-          // Display plain text, but keep formatted content in database
+          // Display as plain text for editing
           var plainTextContent = editor.getBody().textContent || editor.getBody().innerText;
           editor.setContent(plainTextContent, { format: 'text' });
         } else {
@@ -46,34 +46,52 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         reinitializeEditor(selectedValue);
-      } else if (selectElement.id === "caseChoice") {
+      }
+      
+    
+      
+     
+      
+      else if (selectElement.id === "caseChoice") {
         caseChoice = selectedValue;
         window.currentRow.dataset.caseChoice = caseChoice;
       }
 
       isManualChange = true;
 
-      if (isManualChange) { // Only save if changed manually
-        isSaving = true;
-        const contentToSave = formatValue ? editor.getContent() : window.currentRow.dataset.expansion;
+      if (isManualChange) {
+        // When saving, fetch the original formatted content from the database
+        window.pywebview.api.get_data(groupName, databaseName, tableName)
+          .then(data => {
+            const originalFormattedContent = data.find(row => row.id.toString() === indexValue).expansion;
 
-        window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, contentToSave, formatValue || null, label || null, caseChoice || null)
-          .then(response => {
-            window.currentRow.dataset.format = formatValue ? 'true' : 'false';
-            if (caseChoice !== undefined) {
-              window.currentRow.dataset.caseChoice = caseChoice;
+            if (editor.getContent({ format: 'html' }) !== originalFormattedContent) {
+              isSaving = true;
+              // Save the original formatted content, not the current editor content
+              window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, originalFormattedContent, formatValue || null, label || null, caseChoice || null)
+                .then(response => {
+                  window.currentRow.dataset.format = formatValue ? 'true' : 'false';
+                  if (caseChoice !== undefined) {
+                    window.currentRow.dataset.caseChoice = caseChoice;
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                })
+                .finally(() => {
+                  isSaving = false;
+                  isManualChange = false;
+                });
             }
           })
-          .catch((error) => {
-            console.error('Error:', error);
-          })
-          .finally(() => {
-            // Ensure isSaving is reset after the operation completes, regardless of success or failure
-            isSaving = false;
-            isManualChange = false;
+          .catch(error => {
+            console.error("Error fetching recent data:", error);
           });
       }
     });
+
+
+    
   });
 });
 
