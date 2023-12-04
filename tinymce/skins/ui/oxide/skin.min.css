@@ -2252,7 +2252,7 @@ body.tox-dialog__disable-scroll {
 }
 
 .tox .tox-toolbar-label {
-    padding: 0 8px
+    padding: 0 2px
 }
 
 .tox[dir=rtl] .tox-label {
@@ -4373,8 +4373,9 @@ body.tox-dialog__disable-scroll {
 }
 
 .tox .tox-tbtn {
-    transform: scale(0.9) !important;
+    transform: scale(1) !important;
     /* you can set the scale that you want */
+ 
     height: unset !important;
     width: unset !important;
 }

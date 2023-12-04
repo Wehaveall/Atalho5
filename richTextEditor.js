@@ -29,9 +29,9 @@ tinymce.init({
     height: '100%',
     plugins:
         "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
-    toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough',
-    toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     paste_as_text: false,
+    content_css: "src/styles/combined_styles.css"
     // suas outras configurações aqui, idênticas à instância visível
 });
 
@@ -71,6 +71,8 @@ function getTinyMCEConfig(editor, isAdvanced) {
         plugins: ['paste'],
         toolbar: 'undo redo customSave', // Corrected here
         paste_as_text: true,
+       
+        
         //-- On Change
         setup: function (editor) {
         
@@ -154,9 +156,10 @@ function getTinyMCEConfig(editor, isAdvanced) {
             height: '100%',
             plugins:
             "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
-            toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough',
-            toolbar2: 'link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            toolbar1: 'undo redo fontfamily fontsize bold italic underline strikethroughlink image media table mergetags code spellcheckdialog a11ycheck typography  align lineheight checklist numlist bullist indent outdent emoticons charmap removeformat customSave',
             paste_as_text: false,
+            
+           
             
         });
     }
