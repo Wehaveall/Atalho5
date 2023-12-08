@@ -281,13 +281,6 @@ function createCollapsible(directory, db_files) {
 }
 
 
-function forceRedrawWithClass(element, className) {
-  element.classList.remove(className);
-  void element.offsetWidth; // This forces a redraw
-  element.classList.add(className);
-}
-
-
 // This function will be used as the event listener for dbFileElem click events
 function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile, tableName) {
   return async function () {  // Make the function async
@@ -645,19 +638,20 @@ function convertHtmlToPlainText(html) {
 
 function saveLabelValue(newValue) {
   var shortcut = window.currentRow.dataset.shortcut;
+  var indexValue = window.currentRow.dataset.indexValue; // Added
   var groupName = window.currentRow.dataset.groupName;
-  var tableName = window.currentRow.dataset.tableName;
   var databaseName = window.currentRow.dataset.databaseName;
+  var tableName = window.currentRow.dataset.tableName; // Added
   var formatValue = document.getElementById('escolha').value === "1";
-  var caseChoice = document.getElementById('caseChoice').value;
+  var caseChoice = document.getElementById('caseChoice').value; // Added
 
-  window.pywebview.api.save_changes(groupName, databaseName, tableName, shortcut, null, formatValue, newValue, caseChoice)
+  window.pywebview.api.save_changes(groupName, databaseName, tableName, indexValue, shortcut, null, formatValue, newValue, caseChoice)
     .then(response => {
-      console.log('Label value saved:', response);
-      // Atualize o valor do data-label na linha selecionada
+  
+      // Update the value of data-label in the selected row
       window.currentRow.dataset.label = newValue;
 
-      // Invalidar a entrada de cache após salvar
+      // Invalidate cache entry after saving
       invalidateCacheEntry(groupName, databaseName, tableName);
     })
     .catch(error => {
@@ -690,8 +684,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-
-
 
 
 
