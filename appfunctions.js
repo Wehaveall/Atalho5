@@ -281,6 +281,12 @@ function createCollapsible(directory, db_files) {
 }
 
 
+function forceRedrawWithClass(element, className) {
+  element.classList.remove(className);
+  void element.offsetWidth; // This forces a redraw
+  element.classList.add(className);
+}
+
 
 // This function will be used as the event listener for dbFileElem click events
 function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile, tableName) {
@@ -289,7 +295,9 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
     hideDataSettingsPanel();
     document.getElementById('rightPanel').style.display = 'none';
     document.getElementById('middlePanel').style.display = 'flex';
- 
+    
+   
+   
 
     //Reset Progress Bar Value here
     // Reset the progress bar to 0 here TOOOOOOO
@@ -329,10 +337,14 @@ function handleDbFileElemClick(directory, filenameWithoutExtension, databaseFile
       const data = await fetchData(directory, filenameWithoutExtension, tableName);
       // Now, populate the table
       populateTable(data, directory, filenameWithoutExtension, tableName);
+       
+      
     } catch (error) {
       console.error('Error in get_tables:', error);
     }
+   
   }
+  
 }
 
 
@@ -678,9 +690,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-
-
-
 
 
 

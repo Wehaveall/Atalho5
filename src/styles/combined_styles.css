@@ -897,7 +897,7 @@ html {
 
 .tab button {
   color: var(--text-color);
-  padding: 6, 3;
+  padding: 6px, 3px;
   font-family: "Work Sans", sans-serif;
   background-color: inherit;
   display: inline-block;
@@ -1103,11 +1103,6 @@ html {
   background: linear-gradient(180deg, #777, #3a3a3a);
 }
 
-.darkmode-container label,
-.darkmode-container label:after {
-  transition: 0.3s;
-}
-
 .darkmode-container label:active:after {
   width: 26px;
 }
@@ -1126,7 +1121,6 @@ html {
   top: 1px;
   /* Move up */
   fill: #dda816;
-  transition: 0.3s;
 }
 
 .darkmode-container label svg.moon {
@@ -1135,7 +1129,6 @@ html {
   top: 0px;
   /* Move up */
   fill: #7e7e7e;
-  transition: 0.3s;
 }
 
 .darkmode-container input:checked + label svg.sun {

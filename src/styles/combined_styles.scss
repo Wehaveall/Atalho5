@@ -267,7 +267,7 @@ input[type=text] {
     vertical-align: middle; 
 }
 
-// Styles from middlePanel.css
+// ///////////////////////////////////////////////////////////////////Styles from middlePanel.css
 #middlePanel {
     background-color: var(--window-bgcolor);
     color: var(--text-color);
@@ -971,7 +971,7 @@ html {
 
 .tab button {
     color: var(--text-color);
-    padding: 6, 3;
+    padding: 6px, 3px;
     font-family: $font-family;
     background-color: inherit;
     display: inline-block;
@@ -1183,9 +1183,9 @@ margin-left: 15px;
 
 .darkmode-container label:after {
     top: 1px;
-        /* Adjusts the position to center it vertically */
-        left: 1px;
-        /* Adjusts the position to center it horizontally */
+    /* Adjusts the position to center it vertically */
+    left: 1px;
+    /* Adjusts the position to center it horizontally */
     content: "";
     width: 18px;
     height: 18px;
@@ -1214,10 +1214,10 @@ margin-left: 15px;
     background: linear-gradient(180deg, #777, #3a3a3a);
 }
 
-.darkmode-container label,
-.darkmode-container label:after {
-    transition: 0.3s
-}
+//.darkmode-container label,
+//.darkmode-container label:after {
+  // transition: 0.3s
+//}
 
 .darkmode-container label:active:after {
     width: 26px;
@@ -1237,7 +1237,7 @@ margin-left: 15px;
     top: 1px;
     /* Move up */
     fill: #dda816;
-    transition: 0.3s;
+   // transition: 0.3s;
 }
 
 .darkmode-container label svg.moon {
@@ -1246,7 +1246,7 @@ margin-left: 15px;
     top: 0px;
     /* Move up */
     fill: #7e7e7e;
-    transition: 0.3s;
+  //  transition: 0.3s;
 }
 
 .darkmode-container input:checked+label svg.sun {
