@@ -51,6 +51,12 @@ html {
     background-color: var(--window-bgcolor);
 }
 
+
+
+
+
+
+
 // Loading screen
 #loadingScreen {
     position: fixed;
@@ -222,7 +228,7 @@ input[type=text] {
 .left-panel-content {
     background-color:var(--window-bgcolor); 
     color: var(--text-color);
-    transition: max-height 0.3s ease-in-out;
+    transition: max-height 0.2s ease-in-out;
     max-height: 0;
     overflow: hidden;
 }
@@ -583,7 +589,7 @@ progress {
 #rightPanel {
     color: var(--text-color);
     display: none;
-    flex-grow: 1;
+   // flex-grow: 1;
     background-color: var(--window-bgcolor);
     flex-direction: column;
     align-items: stretch;
@@ -979,7 +985,7 @@ html {
     border: none;
     outline: none;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.2s;
     font-size: 12px;
 }
 
@@ -1151,16 +1157,6 @@ margin-left: 15px;
 
 
 
-
-
-
-
-
-
-
-
-
-
 /////////////////////////////       DARK MODE TOGGLE      //////////////////////////////////////
 
 
@@ -1211,7 +1207,7 @@ margin-left: 15px;
 
 .darkmode-container input:checked+label {
     background: #242424;
-    overflow: hidden;
+    
 }
 
 .darkmode-container input:checked+label:after {
@@ -1219,13 +1215,13 @@ margin-left: 15px;
     left: 39px;
     transform: translateX(-100%);
     background: linear-gradient(180deg, #777, #3a3a3a);
-    overflow: hidden;
+   
 }
 
 .darkmode-container label,
 .darkmode-container label:after {
    
- //transition: 0.3s;
+ transition: 0.3s;
 }
 
 .darkmode-container label:active:after {
@@ -1243,33 +1239,33 @@ margin-left: 15px;
 
 /* Changes here: Updated positioning for sun and moon SVGs */
 .darkmode-container label svg.sun {
-    
+    z-index: 2;
     left: -3px;
     /* Move to the left */
     top: 1px;
     /* Move up */
     fill: #dda816;
     //transition: 0.3s;
-    overflow: hidden;
+    
 }
 
 .darkmode-container label svg.moon {
-    
+    z-index: 2;
     right: -5px;
     /* Move to the right */
     top: 0px;
     /* Move up */
     fill: #7e7e7e;
    //transition: 0.3s;
-    overflow: hidden;
+   
 }
 
 .darkmode-container input:checked+label svg.sun {
     fill: #7e7e7e;
-    overflow: hidden;
+    
 }
 
 .darkmode-container input:checked+label svg.moon {
-    overflow: hidden;
+    
     fill: #fff;
 }
