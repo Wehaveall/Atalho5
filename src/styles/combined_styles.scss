@@ -1235,6 +1235,10 @@ margin-left: 15px;
     top: 0px;
     overflow: hidden;
     z-index: 1;
+                                                                       /*IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /* Using z-index : 1 here on the parent and z-index: 2 on the child 
+    /* to avoid the bug with the animation transition, where it will go
+    out of bounds or inverted */
 }
 
 /* Changes here: Updated positioning for sun and moon SVGs */
