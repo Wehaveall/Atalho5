@@ -237,8 +237,6 @@ input[type=text] {
 #middlePanel {
   background-color: var(--window-bgcolor);
   color: var(--text-color);
-  flex-basis: calc(100% - 500px); /* Adjust as needed */
-  flex-grow: 0;
   margin: 0;
   padding: 0;
   height: calc(100vh - 78px);
@@ -246,6 +244,11 @@ input[type=text] {
   flex-direction: column;
   min-width: 250px;
   max-height: calc(100% - 15px);
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+  overflow: auto;
+  box-sizing: border-box;
 }
 
 #groupManage {
@@ -518,18 +521,40 @@ progress {
   background-color: var(--window-bgcolor);
   display: flex;
   flex: 1;
+  align-self: flex-start;
+}
+
+.gutter {
+  background-color: #ccc;
+  /* Divider color */
+  width: 10px;
+  /* Divider width */
+  cursor: ew-resize;
+  /* Cursor indicates resizable */
+}
+
+/* You can also add a hover state if needed */
+.gutter:hover {
+  cursor: ew-resize;
 }
 
 #rightPanel {
   color: var(--text-color);
-  display: none;
+  visibility: hidden;
   background-color: var(--window-bgcolor);
   flex-direction: column;
+  align-items: stretch;
   padding: 10px;
   justify-content: space-between;
-  overflow: visible;
   position: relative;
   max-height: calc(100% - 33px);
+  align-self: flex-start;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+  overflow: auto;
+  box-sizing: border-box;
+  min-width: 300px;
 }
 
 #shortcutName {

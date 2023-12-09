@@ -569,6 +569,7 @@ function handleRowClick() {
   }
 
   document.getElementById('rightPanel').style.display = 'flex';
+  
 
   if (window.currentRow && window.currentRow !== this) {
     window.currentRow.className = '';
@@ -622,6 +623,7 @@ function handleRowClick() {
     });
 
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
+  showRightPanel()
 }
 
 
@@ -794,3 +796,28 @@ window.onbeforeunload = function () {
     window.pywebview.api.save_all_states(appState.buttonStates);
   }
 };
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  Split(['#middlePanel', '#rightPanel'], {
+    sizes: [25, 75],
+    minSize: [245, 500], // First value for #middlePanel, second for #rightPanel
+    gutterSize: 10,
+    cursor: 'ew-resize',
+    gutter: (index, direction) => {
+      const gutter = document.createElement('div');
+      gutter.className = 'gutter';
+      return gutter;
+    }
+  });
+});
+
+function showRightPanel() {
+  const rightPanel = document.getElementById('rightPanel');
+  rightPanel.style.visibility = 'visible'; // Make the right panel visible
+
+  // Update the Split.js sizes
+  splitInstance.setSizes([25, 75]); // Adjust as needed
+}
+
