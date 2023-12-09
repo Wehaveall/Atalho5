@@ -739,10 +739,18 @@ document.addEventListener('DOMContentLoaded', function () {
       var labelInput = document.getElementById('label');
 
       // Adicione um event listener para detectar mudanças no valor do input
+      let saveTimeout;
+
       labelInput.addEventListener('input', function () {
-        // Chame a função para salvar os dados
-        saveLabelValue(this.value);
+        // Clear any existing timeout to reset the timer
+        clearTimeout(saveTimeout);
+
+        // Set a new timeout to save the label value after 1 second (1000 milliseconds)
+        saveTimeout = setTimeout(() => {
+          saveLabelValue(this.value);
+        }, 1000);
       });
+
 
       //Populate suffix list
       populateSuffixList();
