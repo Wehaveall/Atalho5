@@ -722,86 +722,111 @@ function initializePyWebView() {
     })
     .catch(console.error);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////       DOMContentLoaded       ///////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
-  window.addEventListener('pywebviewready', function () {
-    if (window.pywebview && window.pywebview.api) {
-      console.log("pywebview API is ready");
-      initializePyWebView();
 
 
-      pywebview.api.get_initial_states().then(response => {
-        initializeCollapsibleStates(response);
+      initializeSplitJS();
+    
+    ///////////////////////////////////////////////////////////////// 
+      window.addEventListener('pywebviewready', function () {
+        if (window.pywebview && window.pywebview.api) {
+          console.log("pywebview API is ready");
+          initializePyWebView();
+
+
+          pywebview.api.get_initial_states().then(response => {
+            initializeCollapsibleStates(response);
+        });
+
+          // Adicione este código em um lugar onde o DOM esteja carregado
+
+          // Pegue o elemento input pelo nome
+          var labelInput = document.getElementById('label');
+
+          // Adicione um event listener para detectar mudanças no valor do input
+          let saveTimeout;
+
+          labelInput.addEventListener('input', function () {
+            // Clear any existing timeout to reset the timer
+            clearTimeout(saveTimeout);
+
+            // Set a new timeout to save the label value after 1 second (1000 milliseconds)
+            saveTimeout = setTimeout(() => {
+              saveLabelValue(this.value);
+            }, 1000);
+          });
+
+
+          //Populate suffix list
+          populateSuffixList();
+
+
+
+
+        } else {
+          console.error("Failed to load pywebview API");
+        }
+      });
+    //////////////////////////////////////////////////////////////////
+      
+      
+      
+      document.getElementById("content").addEventListener("click", function (event) {
+        event.stopPropagation();
+      }, false);
+
+      let collapsibles = document.getElementsByClassName("content");
+      for (let i = 0; i < collapsibles.length; i++) {
+        collapsibles[i].addEventListener("click", function (event) {
+          event.stopPropagation();
+        }, false);
+      }
+
+
+
+
+
+      
     });
 
-      // Adicione este código em um lugar onde o DOM esteja carregado
+    //////////////////////////////////////////////////////////////////////////
 
-      // Pegue o elemento input pelo nome
-      var labelInput = document.getElementById('label');
+    window.addEventListener("load", function () {
+      hideLoadingScreen();
 
-      // Adicione um event listener para detectar mudanças no valor do input
-      let saveTimeout;
-
-      labelInput.addEventListener('input', function () {
-        // Clear any existing timeout to reset the timer
-        clearTimeout(saveTimeout);
-
-        // Set a new timeout to save the label value after 1 second (1000 milliseconds)
-        saveTimeout = setTimeout(() => {
-          saveLabelValue(this.value);
-        }, 1000);
-      });
-
-
-      //Populate suffix list
-      populateSuffixList();
+    });
 
 
 
+    window.onbeforeunload = function () {
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.save_all_states(appState.buttonStates);
+      }
+    };
 
-    } else {
-      console.error("Failed to load pywebview API");
-    }
-  });
 
   
-  
-  
-  
-  
-  
-  document.getElementById("content").addEventListener("click", function (event) {
-    event.stopPropagation();
-  }, false);
-
-  let collapsibles = document.getElementsByClassName("content");
-  for (let i = 0; i < collapsibles.length; i++) {
-    collapsibles[i].addEventListener("click", function (event) {
-      event.stopPropagation();
-    }, false);
-  }
-});
-
-
-window.addEventListener("load", function () {
-  hideLoadingScreen();
-
-});
-
-
-
-window.onbeforeunload = function () {
-  if (window.pywebview && window.pywebview.api) {
-    window.pywebview.api.save_all_states(appState.buttonStates);
-  }
-};
-
-
-document.addEventListener('DOMContentLoaded', function () {
+  function initializeSplitJS() {
   Split(['#middlePanel', '#rightPanel'], {
     sizes: [25, 75],
     minSize: [220, 420], // Adjust minimum sizes as needed
-    gutterSize: 5,
+    gutterSize: 2,
     cursor: 'ew-resize'
   });
-});
+    
+    
+    
+}
+///////////////////////////////////////////////////////// END DOMCONTENT LOADED
+
+
+
 

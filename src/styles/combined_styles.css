@@ -521,9 +521,9 @@ progress {
 }
 
 .gutter {
-  background-color: #cf1515;
+  background-color: #ccc;
   /* Gutter color */
-  width: 5px;
+  width: 2px;
   /* Gutter width */
   cursor: ew-resize;
   height: 100%;
