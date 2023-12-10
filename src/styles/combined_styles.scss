@@ -277,8 +277,8 @@ input[type=text] {
 #middlePanel {
     background-color: var(--window-bgcolor);
     color: var(--text-color);
-    //flex-basis: calc(100% - 500px);  /* Adjust as needed */
-
+    //flex-basis: 25%;  /* Adjust as needed */
+    flex-grow: 0;
     margin: 0;
     padding: 0;
     height: calc(100vh - 78px);
@@ -287,13 +287,13 @@ input[type=text] {
     min-width: 250px;
     max-height: calc(100% - 15px);
    // align-self: flex-start;
-
-
-    flex-grow: 0;
-    flex-shrink: 0;
+   
     flex-basis: auto;
-    overflow: auto;
-    box-sizing: border-box;
+
+
+
+
+
 
 }
 
@@ -590,65 +590,39 @@ progress {
     background-color: var(--window-bgcolor);
     display: flex;
     flex: 1;
-    align-self: flex-start;
-   
-       
+  //  width: 100%;
+  //  align-self: flex-start;
 }
 
-
-
-
-
-
-//////////////////////////////////////////////////
 
 .gutter {
-    background-color: #efad48;
-    /* Divider color */
-    width: 10px;
-    /* Divider width */
+    background-color: #cf1515;
+    /* Gutter color */
+    width: 5px;
+    /* Gutter width */
     cursor: ew-resize;
-    /* Cursor indicates resizable */
+    height: 100%;
+    /* Cursor indicates the gutter is resizable */
 }
 
-/* You can also add a hover state if needed */
-.gutter:hover {
-    cursor: ew-resize;
-}
-
-.split {
-    display: flex;
-    flex-direction: row;
-}
 
 /////////////////////////////////////////////////////////////////////// RIGHT PANEL ///////////////////////////
 // Styles from rightPanel.css
 #rightPanel {
     color: var(--text-color);
-    visibility: hidden;
-   // flex-grow: 1;
+    display: none;
+    flex-grow: 1;
     background-color: var(--window-bgcolor);
     flex-direction: column;
-    align-items: stretch;
-   // padding: 10px;
+   // align-items: stretch;
+    padding: 10px;
     justify-content: space-between;
-    //overflow: visible;
+    overflow: visible ;
     position: relative;
     max-height: calc(100% - 33px);
-    align-self: flex-start;
-
-
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: auto;
-    overflow: hidden;
-    box-sizing: border-box;
-    min-width: 290px;
-
-    
-
-
-
+   // align-self: flex-start;
+   min-width: 420px;
+   
 }
 
 

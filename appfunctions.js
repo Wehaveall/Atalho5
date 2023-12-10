@@ -1,4 +1,3 @@
-
 let left_Panel_Collapsible_States = {};
 
 var appState = {buttonStates: {}};
@@ -10,8 +9,6 @@ var allDbFiles = {};
 
 var numberOfEnters = 2; // Você pode ajustar esse valor conforme necessário
 //preciso que seja global, para ajustar a quantidade de enters!!
-
-
 
 
 
@@ -572,7 +569,6 @@ function handleRowClick() {
   }
 
   document.getElementById('rightPanel').style.display = 'flex';
-  
 
   if (window.currentRow && window.currentRow !== this) {
     window.currentRow.className = '';
@@ -626,11 +622,6 @@ function handleRowClick() {
     });
 
   document.getElementById('shortcutInput').value = this.dataset.shortcut;
-  
-  
-  showRightPanel()
-
-
 }
 
 
@@ -805,31 +796,12 @@ window.onbeforeunload = function () {
 };
 
 
-
 document.addEventListener('DOMContentLoaded', function () {
   Split(['#middlePanel', '#rightPanel'], {
     sizes: [25, 75],
-    minSize: [255, 290], // First value for #middlePanel, second for #rightPanel
-    gutterSize: 10,
-    cursor: 'ew-resize',
-    gutter: (index, direction) => {
-      const gutter = document.createElement('div');
-      gutter.className = 'gutter';
-      return gutter;
-    }
+    minSize: [220, 420], // Adjust minimum sizes as needed
+    gutterSize: 5,
+    cursor: 'ew-resize'
   });
 });
 
-function showRightPanel() {
-  const rightPanel = document.getElementById('rightPanel');
-  rightPanel.style.visibility = 'visible'; // Show the right panel
-
-  // Get the gutter element created by Split.js and make it visible
-  const gutter = document.querySelector('.gutter');
-  if (gutter) {
-    gutter.style.display = 'block'; // Show the gutter
-  }
-
-  // Update the Split.js sizes
-  splitInstance.setSizes([25.5, 74.5]); // Adjust as needed
-}
