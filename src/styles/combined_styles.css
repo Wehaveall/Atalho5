@@ -517,7 +517,6 @@ progress {
   color: var(--text-color);
   background-color: var(--window-bgcolor);
   display: flex;
-  flex-direction: row;
   flex: 1;
 }
 

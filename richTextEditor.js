@@ -27,8 +27,8 @@ window.addEventListener('load', function () {
 tinymce.init({
     selector: '#hiddenEditor',
     height: '100%',
-    //plugins:
-    //    "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
+    plugins:
+        "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
     toolbar1: 'undo redo | fontfamily fontsize|bold italic underline strikethrough link image media table mergetags code | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     paste_as_text: false,
     content_css: "src/styles/combined_styles.css"
@@ -64,11 +64,11 @@ var isSaving = false;  // Flag para verificar se uma operação de salvamento es
 function getTinyMCEConfig(editor, isAdvanced) {
     var basicConfig = {
         height: '100%',
-        icons: 'default', // Use the default icon pack
+        icons: "thin",
         selector: editor,
         menubar: false,
         statusbar: false,
-        //plugins: ['paste'],
+        plugins: ['paste'],
         toolbar: 'undo redo customSave', // Corrected here
         paste_as_text: true,
        
@@ -154,8 +154,8 @@ function getTinyMCEConfig(editor, isAdvanced) {
     if (isAdvanced) {
         return Object.assign(basicConfig, {
             height: '100%',
-           // plugins:
-           // "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
+            plugins:
+            "a11ychecker advcode advlist advtable anchor autocorrect autosave editimage image link linkchecker lists media mediaembed pageembed powerpaste searchreplace table template tinymcespellchecker typography visualblocks wordcount",
             toolbar1: 'undo redo fontfamily fontsize bold italic underline strikethroughlink image media table mergetags code spellcheckdialog a11ycheck typography  align lineheight checklist numlist bullist indent outdent emoticons charmap removeformat customSave',
             paste_as_text: false,
             
