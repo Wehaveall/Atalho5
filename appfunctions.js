@@ -516,7 +516,8 @@ async function populateTable(data, groupName, databaseName, tableName) {
     var formattedExpansion = formatExpansion(plainExpansion, tableName);
 
     // Populate the cells with content
-    cell1.appendChild(createCellContent('truncate', expansion === "" ? label : formattedExpansion));
+    // Here sets the ration expansio/shortcut in the taable
+    cell1.appendChild(createCellContent('truncate', expansion === "" ? label : formattedExpansion, 'left', '120%'));
     cell2.appendChild(createCellContent('truncate', shortcut, 'right'));
 
     // Add the row click event
@@ -526,13 +527,17 @@ async function populateTable(data, groupName, databaseName, tableName) {
 }
 
 // Helper function to create cell content
-function createCellContent(className, textContent, textAlign = 'left') {
+function createCellContent(className, textContent, textAlign = 'left', width = null) {
   var div = document.createElement('div');
   div.className = className;
   div.textContent = textContent;
   div.style.textAlign = textAlign;
+  if (width) {
+    div.style.width = width; // Set the width if provided
+  }
   return div;
 }
+
 
 
 // Row click handler

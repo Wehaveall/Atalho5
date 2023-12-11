@@ -3841,7 +3841,7 @@ body.tox-dialog__disable-scroll {
 .tox .tox-toolbar__overflow,
 .tox .tox-toolbar__primary {
     background-attachment: local;
-    background-color: #fff;
+    background-color: #fffef9;
     background-image: repeating-linear-gradient(#e3e3e3 0 1px, transparent 1px 39px);
     background-position: center top 40px;
     background-repeat: no-repeat;

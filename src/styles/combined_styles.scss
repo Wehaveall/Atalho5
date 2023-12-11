@@ -289,10 +289,8 @@ input[type=text] {
    // align-self: flex-start;
    
     flex-basis: auto;
-
-
-
-
+    overflow: hidden;
+    
 
 
 }
@@ -416,7 +414,9 @@ div::-webkit-scrollbar-thumb {
 //////////////////////////////////////////////
 
 
-
+table {
+    transition: width 0.8s ease;
+}
 
 
 #myTable th,
@@ -450,6 +450,7 @@ div::-webkit-scrollbar-thumb {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    
 }
 /*-------------------------------------------------------------------      
 
