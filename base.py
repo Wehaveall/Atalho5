@@ -495,24 +495,15 @@ class Api:
     def load_checkBox_states(self):
         filePath = "checkBox_states.json"
         try:
-            if os.path.exists(filePath):
-
-
-
-               with open(filePath, "rb") as f:
-                    file_content = f.read()
-
-                    # Decode the bytes to string
-                    decoded_str = file_content.decode('utf-8')
-
-                    # Parse the string as JSON
-                    import json
-                    checkBoxStates = json.loads(decoded_str)
+           if os.path.exists(filePath):
+              with open(filePath, "r", encoding="utf-8") as f:
+               checkBoxStates = json.load(f)
+               print("File exist")
            
            
            
            
-            else:
+           else:
                 print(f"{filePath} not found. Initializing empty checkbox states.")
                 checkBoxStates = {}
         except json.JSONDecodeError as e:

@@ -7,7 +7,7 @@
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 80%;
+    line-height: 120%;
     -webkit-tap-highlight-color: #fbb347;
     text-decoration: none;
     text-shadow: none;
@@ -4376,8 +4376,8 @@ body.tox-dialog__disable-scroll {
     transform: scale(0.9) !important;
     /* you can set the scale that you want */
  
-    height: unset !important;
-    width: unset !important;
+    height: auto !important;
+    width: auto !important;
 }
 
 .tox .tox-tbtn--bespoke .tox-tbtn__select-label {

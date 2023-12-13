@@ -356,29 +356,42 @@ input[type=text] {
 
 #header {
     color: var(--text-color);;
-    flex: 0;
+    flex: 0;         //TO DO - see why this flex 0 removal mess up the table
     padding-top: 5px;
     padding-bottom: 5px;
     font-family: $font-family;
     font-size: small;
-    display: none;
+    display: table;
     background-color: var(--window-bgcolor);
     width: 100%;
     table-layout: fixed;
 }
 
-#header.showing {
-    display: table;
-}
 
 #header td:first-child {
     width: 70%;
+    text-align: center;
+    /* Align left */
+    background-color: $focused-bg-color;
+    border-radius: 15px;
 }
 
 #header td:last-child {
     width: 30%;
-    text-align: right;
+    text-align: center;
+    /* Align right */
+    background-color: $focused-bg-color;
+    border-radius: 15px;
 }
+
+
+
+
+#header.showing {
+    display: table;
+}
+
+
 
 /////////////////////////////////////////////////////////////////////   TABELA   //////////////////////////////////////////////
 #myTable {

@@ -254,10 +254,28 @@ function createCollapsible(directory, db_files) {
   db_files.forEach((databaseFile) => {
     const filenameWithoutExtension = databaseFile.replace('.db', '');
 
+    //////////////
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'db-file-checkbox';
+    // Combine directory and filename for a unique ID
+    checkbox.id = `${directory}|${filenameWithoutExtension}`;
 
+    // Set the initial state of the checkbox from checkBoxStates
+    if (checkBoxStates[checkbox.id] !== undefined) {
+      checkbox.checked = checkBoxStates[checkbox.id];
+    }
+
+    // Add event listener to the checkbox
+    checkbox.addEventListener('change', function () {
+      // Update checkBoxStates with the new state
+      checkBoxStates[this.id] = this.checked;
+
+      // Save the updated states
+      saveCheckBoxStates();
+    });
+    ///////////////////////////////////   
+    
     const dbFileElem = document.createElement('div');
     dbFileElem.className = 'child-elem';
     dbFileElem.textContent = filenameWithoutExtension;

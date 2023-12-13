@@ -308,23 +308,30 @@ input[type=text] {
   padding-bottom: 5px;
   font-family: "Work Sans", sans-serif;
   font-size: small;
-  display: none;
+  display: table;
   background-color: var(--window-bgcolor);
   width: 100%;
   table-layout: fixed;
 }
 
-#header.showing {
-  display: table;
-}
-
 #header td:first-child {
   width: 70%;
+  text-align: center;
+  /* Align left */
+  background-color: #f79d44;
+  border-radius: 15px;
 }
 
 #header td:last-child {
   width: 30%;
-  text-align: right;
+  text-align: center;
+  /* Align right */
+  background-color: #f79d44;
+  border-radius: 15px;
+}
+
+#header.showing {
+  display: table;
 }
 
 #myTable {
