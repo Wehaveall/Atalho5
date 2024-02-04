@@ -47,9 +47,6 @@ from suffix_accents_utils import *
 #################################################################################################################
 
 
-
-
-
 state_lock = Lock()
 
 logging.basicConfig(
@@ -160,7 +157,7 @@ class Api:
     # Initialize API class variables
     # Used in: main.py
     def __init__(self):
-      
+
         self.key_listener_instance = None
         self.is_maximized = False
         self.is_window_open = True
@@ -168,21 +165,18 @@ class Api:
         self.events = []
         self.last_event_time = None
 
-    
     def update_suffix_json_api(self, lang, pattern, is_enabled):
         update_suffix_json(lang, pattern, is_enabled)
-        
+
         # Refresh the in-memory suffix patterns (if needed)
         self.suffix_patterns = load_suffix_data()  
-        
+
         # Update suffix_patterns in KeyListener
         self.key_listener_instance.update_suffix_patterns(self.suffix_patterns)
- 
 
-    
     def get_initial_states(self):
-       return self.load_all_states()
-    
+        return self.load_all_states()
+
     # Triggered when the window is closed
     # Used in: main.py
     def on_closed(self):
@@ -228,10 +222,10 @@ class Api:
     # Save changes to the database
     # Used in: main.py and invoked from JavaScript
     def save_changes(self,groupName,databaseName,tableName,indexValue,shortcut,newContent,formatValue,label,caseChoice=None):
-        
-       # Explicit boolean check
+
+        # Explicit boolean check
         format_value_for_db = 1 if formatValue is True else 0
-        
+
         # Get the engine for the specified database path
         database_path = get_database_path(groupName, databaseName)
         engine = get_engine(database_path)
@@ -288,14 +282,12 @@ class Api:
             session.execute(stmt)
             session.commit()
 
-           
             # Notify JavaScript to invalidate the cache after updating the database
             self.window.evaluate_js(
                 'invalidateCacheEntry("{groupName}", "{databaseName}", "{tableName}")'.format(
                     groupName=groupName, databaseName=databaseName, tableName=tableName
                 )
             )
-
 
     ##################################################################
 
@@ -492,30 +484,36 @@ class Api:
 
     # Load checkbox states from the checkBox_states.json file
     # Used in: main.py
-    
-    
-    
-    def load_checkBox_states():
-        filePath = "checkBox_states.json"
+    def load_checkBox_states(self):
+        print("Loading Checkbox States")
+        filePath = os.path.join(os.path.dirname(__file__), "checkBox_states.json")
+        active_databases = {}
+
         try:
             if os.path.exists(filePath):
                 with open(filePath, "r", encoding="utf-8") as f:
                     checkBoxStates = json.load(f)
-                    print("File exists")
+                    base_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "src", "database", "groups"))
+
+                    for db_key, isChecked in checkBoxStates.items():
+                        if isChecked:
+                            # Splitting the db_key to get group and database name
+                            group, dbName = db_key.split('|', 1)
+                            # Construct the full path without trying to replace backslashes
+                            db_full_path = os.path.join(base_directory, group, f"{dbName}.db")
+
+                            if os.path.exists(db_full_path):
+                                active_databases[db_key] = db_full_path
+                            else:
+                                print(f"Database marked as active not found: {db_full_path}")
+
             else:
-                print(f"{filePath} not found. Initializing empty checkbox states.")
-                checkBoxStates = {}
+                print(f"{filePath} not found. Using empty checkbox states.")
         except json.JSONDecodeError as e:
-            logging.error(f"JSON decoding error in load_checkBox_states: {e}")
-            checkBoxStates = {}
-        return checkBoxStates
+            print(f"JSON decoding error in loading checkBox states: {e}")
 
-
-
-
-
-
-
+        print(f"{active_databases} ACTIVE")
+        return active_databases
 
     # -------------------------------------------------------------------------CREATE WINDOW
 
@@ -537,18 +535,11 @@ class Api:
 
         time.sleep(1)
         window = get_window()
-       
+
         if window:
             window.moveTo(pos_x, pos_y)
         threading.Thread(target=self.call_load_handler_after_delay).start()
         return self.window
-    
-
-
-
-
-
-
 
     # Call the load_handler after a short delay
     # Used in: This API class (self.create_and_position_window)
@@ -583,9 +574,8 @@ def keyboard_listener(key_listener_instance):
     print("Keyboard listener stopped")
 
 
-
 ###-------------------------------------------------------------START APP
-#stop_threads = threading.Event()
+# stop_threads = threading.Event()
 
 
 def start_app(tk_queue):
@@ -596,7 +586,7 @@ def start_app(tk_queue):
     key_listener_instance = KeyListener(api_instance, tk_queue)
     # Now, api_instance.key_listener_instance points to key_listener_instance
     # and key_listener_instance.api points to api_instance
-       
+    
 
     # -------------------------------------------------------------------------------------Start Pop-Up Thread
     # Initialize Popup Thread
@@ -663,6 +653,6 @@ if __name__ == "__main__":
     try:
         tk_queue = queue.Queue()
         start_app(tk_queue)
-
+    
     except Exception as e:
         print(f"An error occurred: {e}")
