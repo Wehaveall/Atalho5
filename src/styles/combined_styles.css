@@ -26,10 +26,10 @@
 body,
 html {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  display: flex;
   flex-direction: column;
   background-color: var(--window-bgcolor);
 }
@@ -77,8 +77,8 @@ html {
   flex-direction: column;
   height: calc(100vh - 50px);
   width: 100vw;
-  background-color: var(--window-bgcolor);
   align-self: flex-start;
+  /* Disable transition during resize */
 }
 
 .content {
@@ -90,6 +90,8 @@ html {
   font-family: "Work Sans", sans-serif;
   margin-right: 5px;
   align-self: flex-start;
+  transition: none;
+  /* Disable transition during resize */
 }
 
 #leftPanel {
@@ -247,6 +249,8 @@ input[type=text] {
   max-height: calc(100% - 15px);
   flex-basis: auto;
   overflow: hidden;
+  transition: none;
+  /* Disable transition during resize */
 }
 
 #groupManage {
@@ -345,6 +349,8 @@ input[type=text] {
   border-collapse: collapse;
   margin-bottom: 10px;
   table-layout: fixed;
+  transition: none;
+  /* Disable transition during resize */
 }
 
 div::-webkit-scrollbar {
@@ -530,6 +536,9 @@ progress {
   background-color: var(--window-bgcolor);
   display: flex;
   flex: 1;
+  transition: none;
+  /* Disable transition during resize */
+  width: 100%;
 }
 
 .gutter {
@@ -795,82 +804,6 @@ progress {
 
 .custom-select-option.selected {
   background-color: #959595;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body,
-html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background-color: green;
-}
-
-#loadingScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-#loadingScreen .loader {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #f79d44;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 2s linear infinite;
-}
-
-#loadingScreen #loadingText {
-  font-family: Arial, sans-serif;
-  font-size: 18px;
-  text-align: center;
-  margin-top: 10px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-.mainContainer {
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 50px);
-  width: 100vw;
-  background-color: deeppink;
-  align-self: flex-start;
-}
-
-.content {
-  color: var(--text-color);
-  overflow: visible;
-  background-color: var(--window-bgcolor);
-  display: flex;
-  height: 100%;
-  width: 100%;
-  font-family: "Work Sans", sans-serif;
-  margin-right: 5px;
-  align-self: flex-start;
 }
 
 #bottomPanel {

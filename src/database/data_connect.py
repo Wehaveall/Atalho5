@@ -1,3 +1,4 @@
+
 import sqlite3
 
 
@@ -71,24 +72,20 @@ def get_db_files_in_directory(directory):
 
 def load_db_into_memory(database_path):
     # Connect to the file-based database
+    print(f"Attempting to load database from path: {database_path}")
     src = sqlite3.connect(database_path)
-
     # Connect to a new in-memory database
     dest = sqlite3.connect(":memory:")
-
     # Copy data from src to dest
     src.backup(dest)
-
     return src, dest
 
 
 def save_db_from_memory(dest, database_path):
     # Connect to the file-based database
     src = sqlite3.connect(database_path)
-
     # Copy data from dest (in-memory database) to src (file-based database)
     dest.backup(src)
-
 
 # ----------------------------------------------------Olhar listeners nos bds
 
@@ -130,9 +127,11 @@ import os
 from sqlalchemy import create_engine, MetaData, Table, select, inspect, text
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
 
 
 import importlib
+
 
 
 def lookup_word_in_all_databases(word):
@@ -167,7 +166,7 @@ def lookup_word_in_all_databases(word):
         # Fetch required_delimiters and delimiters from the config table
         requires_delimiter = None
         delimiters = None
-        
+
         if "config" in table_names:
             config_table = Table("config", metadata, autoload_with=engine)
             s_config = select(config_table)
@@ -193,7 +192,7 @@ def lookup_word_in_all_databases(word):
                     }
                     all_expansions.append(expansion_data)
                     print(f"Expansion found in {db_file}: {expansion_data['expansion']}")  # Print each expansion found
-    
+
     # Debug: print all expansions found
     print(f"Debug: All expansions found: {all_expansions}")
     return all_expansions

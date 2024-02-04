@@ -28,6 +28,7 @@ import pyautogui
 import pyperclip  # Added for clipboard manipulation
 
 # Project-Specific Libraries
+
 from src.database.data_connect import lookup_word_in_all_databases
 from src.utils import number_utils
 from suffix_accents_utils import *
@@ -303,7 +304,6 @@ class KeyListener:
             # Set flag to indicate programmatic typing
             self.programmatically_typing = True
 
-
             # Check if numlock is on -----------------------------------------------------------
             def is_numlock_on():
                 # GetKeyState function retrieves the status of the specified key
@@ -322,9 +322,8 @@ class KeyListener:
 
             else:
                 print("NumLock is OFF")
-            #-------------------------------------------------------------------------------------
-            
-            
+            # -------------------------------------------------------------------------------------
+
             # Clear previously typed keys
             keyboard.press("ctrl")
             keyboard.press("shift")
@@ -362,7 +361,7 @@ class KeyListener:
 
             if state == True:
                 toggle_numlock()
-            
+
             # Reset the flag
             self.programmatically_typing = False
 
@@ -398,8 +397,8 @@ class KeyListener:
             state = False
             print("NumLock is OFF")
 
-        #--------------------------------------------------------------------------------
-       
+        # --------------------------------------------------------------------------------
+
         # New code: Locate %cursor% in the expansion and record its position
         cursor_position = None
         if expansion and "%CURSOR%" in expansion:
@@ -467,7 +466,6 @@ class KeyListener:
             toggle_numlock()
 
         self.programmatically_typing = False  # Reset the flag
-      
 
     # ----------------------------------------------------------------Handle Accents
 
@@ -488,7 +486,6 @@ class KeyListener:
             self.accent = None
 
         return key_char  # Return the original character or an empty string if key_char is None
-
 
     # -------------------------------------------------------------------------
     # Is deleting multiline previous content after expansion
@@ -525,8 +522,8 @@ class KeyListener:
     ##--------------------------------------------------------------------------------------------
 
     def lookup_and_expand(self, sequence):
+        
         # Suffix
-        # Aqui o dicionário já está carregado quando inicia a classe
         for pattern, replacement in self.suffix_patterns.items():
             match = re.search(pattern, sequence)
             if match:

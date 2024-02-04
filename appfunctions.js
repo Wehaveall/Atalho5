@@ -837,17 +837,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   
-  function initializeSplitJS() {
+
+
+function initializeSplitJS() {
   Split(['#middlePanel', '#rightPanel'], {
     sizes: [25, 75],
-    minSize: [220, 420], // Adjust minimum sizes as needed
+    minSize: [220, 420],
     gutterSize: 2,
-    cursor: 'ew-resize'
+    cursor: 'ew-resize',
   });
-    
-    
-    
 }
+
+
+
 ///////////////////////////////////////////////////////// END DOMCONTENT LOADED
 
 
