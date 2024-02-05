@@ -1,3 +1,5 @@
+from config_Manager import ConfigManager
+
 # Standard Library Imports
 from collections import deque
 from ctypes import windll, Structure, c_long, byref
@@ -475,46 +477,20 @@ class Api:
     # Save checkbox states to the checkBox_states.json file
     # Used in: main.py and invoked from JavaScript
 
+
+###############################################################################################################
     def save_checkBox_states(self, checkBoxStates):
-        try:
-            with open("checkBox_states.json", "w", encoding="utf-8") as f:
-                json.dump(checkBoxStates, f, ensure_ascii=False)
-        except TypeError as e:
-            logging.error(f"JSON serialization error in save_checkBox_states: {e}")
+        # Directly call the ConfigManager's class method
+        ConfigManager.save_checkBox_states(checkBoxStates)
 
     # Load checkbox states from the checkBox_states.json file
     # Used in: main.py
+
     def load_checkBox_states(self):
-        print("Loading Checkbox States")
-        filePath = os.path.join(os.path.dirname(__file__), "checkBox_states.json")
-        active_databases = {}
+        return ConfigManager.checkBoxStates
 
-        try:
-            if os.path.exists(filePath):
-                with open(filePath, "r", encoding="utf-8") as f:
-                    checkBoxStates = json.load(f)
-                    base_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "src", "database", "groups"))
-
-                    for db_key, isChecked in checkBoxStates.items():
-                        if isChecked:
-                            # Splitting the db_key to get group and database name
-                            group, dbName = db_key.split('|', 1)
-                            # Construct the full path without trying to replace backslashes
-                            db_full_path = os.path.join(base_directory, group, f"{dbName}.db")
-
-                            if os.path.exists(db_full_path):
-                                active_databases[db_key] = db_full_path
-                            else:
-                                print(f"Database marked as active not found: {db_full_path}")
-
-            else:
-                print(f"{filePath} not found. Using empty checkbox states.")
-        except json.JSONDecodeError as e:
-            print(f"JSON decoding error in loading checkBox states: {e}")
-
-        print(f"{active_databases} ACTIVE")
-        return active_databases
-
+#################################################################################################################
+    
     # -------------------------------------------------------------------------CREATE WINDOW
 
     def create_and_position_window(self):
@@ -579,14 +555,16 @@ def keyboard_listener(key_listener_instance):
 
 
 def start_app(tk_queue):
-    
+    # Explicitly load checkBox states from the JSON file
+    ConfigManager.load_checkBox_states()
+   
     # Create an instance of Api class
     api_instance = Api()
+   
     # Create an instance of KeyListener class and pass the Api instance to it
     key_listener_instance = KeyListener(api_instance, tk_queue)
     # Now, api_instance.key_listener_instance points to key_listener_instance
     # and key_listener_instance.api points to api_instance
-    
 
     # -------------------------------------------------------------------------------------Start Pop-Up Thread
     # Initialize Popup Thread
@@ -611,10 +589,8 @@ def start_app(tk_queue):
     print("Starting Listener from Main.py")  # Existing line
     main_window = api_instance.create_and_position_window()  # Existing line
     main_window.events.closed += api_instance.on_closed
-   
-   
-   
-    #--------------------------------------------START
+
+    # --------------------------------------------START
     webview.start(http_server=True)
 
     print("Cleanup function called.")
@@ -653,6 +629,6 @@ if __name__ == "__main__":
     try:
         tk_queue = queue.Queue()
         start_app(tk_queue)
-    
+
     except Exception as e:
         print(f"An error occurred: {e}")
